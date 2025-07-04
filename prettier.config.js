@@ -5,5 +5,6 @@ export default {
     'prettier-plugin-packagejson',
     'prettier-plugin-tailwindcss',
   ],
+  semi: false,
   singleQuote: true,
-};
+}

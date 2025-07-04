@@ -1,7 +1,7 @@
-import { APITester } from './APITester';
+import { APITester } from './APITester'
 
-import logo from '@/ui/assets/logo.svg';
-import reactLogo from '@/ui/assets/react.svg';
+import logo from '@/ui/assets/logo.svg'
+import reactLogo from '@/ui/assets/react.svg'
 
 export function App() {
   return (
@@ -29,7 +29,7 @@ export function App() {
       </p>
       <APITester />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
