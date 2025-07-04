@@ -10,21 +10,14 @@ import { App } from './App'
 import './App.css'
 
 import { StrictMode } from 'react'
-import { BrowserRouter } from 'react-router'
+import { BrowserRouter, Route, Routes } from 'react-router'
 
-function start() {
-  const root = createRoot(document.getElementById('root')!)
-  root.render(
-    <StrictMode>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </StrictMode>,
-  )
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', start)
-} else {
-  start()
-}
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <BrowserRouter>
+      <Routes>
+        <Route path={'/'} element={<App />} />
+      </Routes>
+    </BrowserRouter>
+  </StrictMode>,
+)
