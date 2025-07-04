@@ -1,0 +1,32 @@
+{
+  "name": "bun-react-template",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/server.tsx",
+  "module": "src/server.tsx",
+  "scripts": {
+    "dev": "bun --hot src/server.tsx",
+    "start": "NODE_ENV=production bun src/server.tsx",
+    "build": "bun run build.ts",
+    "format": "prettier --experimental-cli --write .",
+    "lint": "eslint --cache .",
+    "lint:format": "prettier --experimental-cli --cache --check ."
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.11",
+    "@tailwindcss/postcss": "^4.1.11",
+    "bun-plugin-tailwind": "^0.0.14",
+    "react": "^19",
+    "react-dom": "^19",
+    "tailwindcss": "^4.1.11"
+  },
+  "devDependencies": {
+    "@nkzw/eslint-config": "^3.0.1",
+    "@types/bun": "latest",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9.30.1",
+    "prettier": "^3.6.2"
+  }
+}
