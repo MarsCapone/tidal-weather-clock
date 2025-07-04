@@ -3,17 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "src/server.tsx",
-  "module": "src/server.tsx",
+  "main": "src/backend/server.tsx",
+  "module": "src/backend/server.tsx",
   "scripts": {
     "build": "bun run build.ts",
     "configure": "command -v git >/dev/null 2>&1 && git config core.hooksPath git-hooks || exit 0",
-    "dev": "bun --hot src/server.tsx",
+    "dev": "bun --hot src/backend/server.tsx",
     "format": "prettier --experimental-cli --write .",
     "lint": "eslint --cache .",
     "lint:format": "prettier --experimental-cli --cache --check .",
     "pre-commit": "prettier --experimental-cli --write --ignore-unknown",
-    "start": "NODE_ENV=production bun src/server.tsx"
+    "start": "NODE_ENV=production bun src/backend/server.tsx"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.11",
