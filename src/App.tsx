@@ -1,7 +1,7 @@
-import { APITester } from "./APITester";
+import { APITester } from './APITester';
 
-import logo from "./assets/logo.svg";
-import reactLogo from "./assets/react.svg";
+import logo from './assets/logo.svg';
+import reactLogo from './assets/react.svg';
 
 export function App() {
   return (
@@ -21,10 +21,10 @@ export function App() {
 
       <h1 className="text-5xl font-bold my-4 leading-tight">Bun + React</h1>
       <p>
-        Edit{" "}
+        Edit{' '}
         <code className="bg-[#1a1a1a] px-2 py-1 rounded font-mono">
           src/App.tsx
-        </code>{" "}
+        </code>{' '}
         and save to test HMR
       </p>
       <APITester />
