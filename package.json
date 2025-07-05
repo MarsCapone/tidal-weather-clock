@@ -16,6 +16,7 @@
     "start": "NODE_ENV=production bun src/backend/server.tsx"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@tailwindcss/cli": "^4.1.11",
     "@tailwindcss/postcss": "^4.1.11",
     "bun-plugin-tailwind": "^0.0.14",

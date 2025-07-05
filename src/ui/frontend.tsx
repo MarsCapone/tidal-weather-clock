@@ -11,12 +11,15 @@ import './App.css'
 
 import { StrictMode } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router'
+import Layout from '@/ui/components/Layout'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path={'/'} element={<App />} />
+        <Route element={<Layout />}>
+          <Route index element={<App />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   </StrictMode>,
