@@ -1,35 +1,65 @@
-import { APITester } from './APITester'
+import DateDisplay from '@/ui/components/DateDisplay'
+import TideTimesChart from '@/ui/components/TideTimesChart'
+import { DataContext, TideDataPoints } from '@/types/data'
 
-import logo from '@/ui/assets/logo.svg'
-import reactLogo from '@/ui/assets/react.svg'
+const demoData: DataContext = {
+  tideData: {
+    points: [
+      {
+        type: 'high',
+        timestamp: new Date(2025, 4, 2, 10, 30),
+      },
+      // {
+      //   type: 'high',
+      //   timestamp: new Date(2025, 4, 2, 22, 45),
+      // },
+      {
+        type: 'low',
+        timestamp: new Date(2025, 4, 2, 16, 10),
+      },
+    ],
+  },
+  sunData: {
+    points: [
+      {
+        type: 'rise',
+        timestamp: new Date(2025, 4, 2, 6, 10),
+      },
+      {
+        type: 'set',
+        timestamp: new Date(2025, 4, 2, 20, 45),
+      },
+    ],
+  },
+}
 
-export function App() {
+export default function App() {
   return (
     <div className="max-w-7xl mx-auto p-8 text-center relative z-10">
-      <div className="flex justify-center items-center gap-8 mb-8">
-        <img
-          alt="Bun Logo"
-          className="h-24 p-6 transition-all duration-300 hover:drop-shadow-[0_0_2em_#646cffaa] scale-120"
-          src={logo}
-        />
-        <img
-          alt="React Logo"
-          className="h-24 p-6 transition-all duration-300 hover:drop-shadow-[0_0_2em_#61dafbaa] animate-[spin_20s_linear_infinite]"
-          src={reactLogo}
-        />
+      <DateDisplay />
+      <div className="flex items-center justify-center gap-8">
+        <div className="w-2/3">
+          <TideTimesChart
+            tideData={demoData.tideData!}
+            sunData={demoData.sunData!}
+          />
+        </div>
+        <div className="w-1/3">
+          <p>
+            Wind: <span>12kts</span>
+          </p>
+          <p>
+            Time: <span>2m</span>
+          </p>
+          <p>
+            Weather: <span>sunny</span>
+          </p>
+          <p>
+            Sunrise / Sunset: <span>6am - 9pm</span>
+          </p>
+        </div>
       </div>
-
-      <h1 className="text-5xl font-bold my-4 leading-tight">Bun + React</h1>
-      <p>
-        Edit{' '}
-        <code className="dark:bg-[#1a1a1a] px-2 py-1 rounded font-mono">
-          src/App.tsx
-        </code>{' '}
-        and save to test HMR
-      </p>
-      <APITester />
+      <div></div>
     </div>
   )
 }
-
-export default App
