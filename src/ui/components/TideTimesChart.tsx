@@ -91,24 +91,24 @@ export default function TideTimesChart({
           )}
         </IgrRadialGauge>
       </div>
-      <div className="grid grid-cols-2 gap-2">
-        {highTides && (
-          <>
-            <div className={rowSpanClass[highTides.length as 1 | 2]}>HW</div>
-            {highTides.map((d, i) => (
-              <div key={`high-tide-${i}`}>{format(d, 'p')}</div>
-            ))}
-          </>
-        )}
-        {lowTides && (
-          <>
-            <div className={rowSpanClass[lowTides.length as 1 | 2]}>LW</div>
-            {lowTides.map((d, i) => (
-              <div key={`low-tide-${i}`}>{format(d, 'p')}</div>
-            ))}
-          </>
-        )}
-      </div>
+      {/*<div className="grid grid-cols-2 gap-2">*/}
+      {/*  {highTides && (*/}
+      {/*    <>*/}
+      {/*      <div className={rowSpanClass[highTides.length as 1 | 2]}>HW</div>*/}
+      {/*      {highTides.map((d, i) => (*/}
+      {/*        <div key={`high-tide-${i}`}>{format(d, 'p')}</div>*/}
+      {/*      ))}*/}
+      {/*    </>*/}
+      {/*  )}*/}
+      {/*  {lowTides && (*/}
+      {/*    <>*/}
+      {/*      <div className={rowSpanClass[lowTides.length as 1 | 2]}>LW</div>*/}
+      {/*      {lowTides.map((d, i) => (*/}
+      {/*        <div key={`low-tide-${i}`}>{format(d, 'p')}</div>*/}
+      {/*      ))}*/}
+      {/*    </>*/}
+      {/*  )}*/}
+      {/*</div>*/}
     </div>
   )
 }
