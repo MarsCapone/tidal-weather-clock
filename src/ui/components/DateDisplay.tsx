@@ -9,7 +9,7 @@ export default function DateDisplay() {
   }
 
   return (
-    <h2 className="font-mono text-4xl mb-8">
+    <h2 className="font-mono text-4xl">
       {tomorrow.toLocaleDateString('en-GB', options)}
     </h2>
   )

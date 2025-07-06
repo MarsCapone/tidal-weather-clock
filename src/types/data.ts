@@ -1,5 +1,13 @@
-type TideType = 'high' | 'low'
-type CardinalDirection = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW'
+export type TideType = 'high' | 'low'
+export type CardinalDirection =
+  | 'N'
+  | 'NE'
+  | 'E'
+  | 'SE'
+  | 'S'
+  | 'SW'
+  | 'W'
+  | 'NW'
 
 type Timestamp = {
   timestamp: Date
@@ -9,9 +17,10 @@ type TideInfo = {
   type: TideType
 } & Timestamp
 
-type SunInfo = {
-  type: 'rise' | 'set'
-} & Timestamp
+type SunData = {
+  sunRise: Date
+  sunSet: Date
+}
 
 type WeatherInfo = {
   summary: string
@@ -31,11 +40,10 @@ type TimeBasedDataPoints<T extends Timestamp> = {
 export type TideDataPoints = TimeBasedDataPoints<TideInfo>
 export type WeatherDataPoints = TimeBasedDataPoints<WeatherInfo>
 export type WindDataPoints = TimeBasedDataPoints<WindInfo>
-export type SunDataPoints = TimeBasedDataPoints<SunInfo>
 
 export type DataContext = {
   tideData?: TideDataPoints
   weatherData?: WeatherDataPoints
   windData?: WindDataPoints
-  sunData?: SunDataPoints
+  sunData?: SunData
 }
