@@ -5,7 +5,7 @@ import CONSTANTS from '@/ui/constants'
 
 export default function Layout() {
   return (
-    <div className="text-center mx-auto p-8 ">
+    <div className="text-center mx-auto p-8 bg-background text-content">
       <div className="flex justify-between">
         <h1 className="text-5xl font-bold">{CONSTANTS.title}</h1>
         <ColorschemeToggle />

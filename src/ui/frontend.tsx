@@ -11,7 +11,7 @@ import './App.css'
 
 import { StrictMode } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router'
-import Layout from '@/ui/components/Layout'
+import Layout from '@/ui/Layout'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

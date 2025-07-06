@@ -1,9 +1,7 @@
 import DateDisplay from '@/ui/components/DateDisplay'
 import TideTimesChart from '@/ui/components/TideTimesChart'
 import { DataContext, TideDataPoints } from '@/types/data'
-import { format } from 'date-fns'
 import SuggestedActivity from '@/ui/components/SuggestedActivity'
-import Header from '@/ui/components/Header'
 import DataTable from '@/ui/components/DataTable'
 
 const demoData: DataContext = {

@@ -47,6 +47,7 @@ export default function TideTimesChart({
         <IgrRadialGauge
           value={highTideTime}
           highlightValue={lowTideTime}
+          backingBrush={'#f8fafc'}
           backingShape="circular"
           backingOuterExtent={0.8}
           backingStrokeThickness={0.4}
@@ -68,7 +69,6 @@ export default function TideTimesChart({
           needleStartWidthRatio={0.05}
           needlePivotShape={'none'}
           fontBrush={isDark ? 'white' : 'black'}
-          backingBrush={'white'}
           font={'18px'}
           rangeBrushes={['red', 'green', 'white']}
           rangeOutlines={'#000'}
