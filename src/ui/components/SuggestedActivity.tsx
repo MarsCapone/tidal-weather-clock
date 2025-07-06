@@ -16,31 +16,29 @@ const exampleActivities: Activity[] = [
       {
         type: 'time',
         comp: 'gt',
-        hour: 8,
-        minute: 0,
+        value: new Date(0, 0, 0, 9),
         description: 'not too early',
       },
       {
         type: 'time',
         comp: 'lt',
-        hour: 19,
-        minute: 0,
+        value: new Date(0, 0, 0, 16),
         description: 'not too late',
       },
       daylightConstraint,
       {
         type: 'wind-speed',
         comp: 'lt',
-        knots: 15,
+        value: 15,
         description: 'not much wind',
       },
       {
-        type: 'tide-height',
+        type: 'hightide-height',
         comp: 'gt',
-        height: 1.8,
+        value: 1.8,
+        tideType: 'high',
         description: 'tide more than 1.8m',
       },
-      { type: 'duration', minutes: 90, description: "there's enough time" },
     ],
   },
   {
@@ -48,11 +46,6 @@ const exampleActivities: Activity[] = [
     label: 'bank-hole',
     constraints: [
       daylightConstraint,
-      {
-        type: 'duration',
-        minutes: 20,
-        description: "there's enough time for something quick",
-      },
       {
         type: 'tide-state',
         tideType: 'low',
@@ -65,10 +58,16 @@ const exampleActivities: Activity[] = [
 
 export default function SuggestedActivity({
   dataContext,
+  date,
 }: {
   dataContext: DataContext
+  date: Date
 }) {
-  const activitySelection = suggestActivity(dataContext, exampleActivities)
+  const activitySelection = suggestActivity(
+    date,
+    dataContext,
+    exampleActivities,
+  )
 
   return (
     <div>

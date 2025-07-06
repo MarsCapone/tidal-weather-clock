@@ -3,21 +3,26 @@ import TideTimesChart from '@/ui/components/TideTimesChart'
 import { DataContext, TideDataPoints } from '@/types/data'
 import SuggestedActivity from '@/ui/components/SuggestedActivity'
 import DataTable from '@/ui/components/DataTable'
+import { addDays, parseISO } from 'date-fns'
+import { useParams } from 'react-router'
 
 const demoData: DataContext = {
   tideData: {
     points: [
       {
         type: 'high',
-        timestamp: new Date(2025, 4, 2, 10, 30),
+        height: 1.8,
+        timestamp: new Date(2025, 4, 22, 10, 30),
       },
       {
         type: 'high',
-        timestamp: new Date(2025, 4, 2, 22, 45),
+        height: 2.0,
+        timestamp: new Date(2025, 4, 22, 22, 45),
       },
       {
         type: 'low',
-        timestamp: new Date(2025, 4, 2, 16, 10),
+        height: 0.7,
+        timestamp: new Date(2025, 4, 22, 16, 10),
       },
     ],
   },
@@ -28,12 +33,23 @@ const demoData: DataContext = {
 }
 
 export default function App() {
+  let { dateString } = useParams()
+
+  let date
+  if (!dateString) {
+    date = addDays(new Date(), 1)
+  } else {
+    date = parseISO(dateString)
+  }
+
+  const suggestedActivity = (
+    <SuggestedActivity dataContext={demoData} date={date} />
+  )
+
   return (
     <div className="flex flex-col mx-auto p-8 text-center relative z-10 min-w-full md:min-w-0 gap-10">
-      <DateDisplay />
-      <div className="md:hidden">
-        <SuggestedActivity dataContext={demoData} />
-      </div>
+      <DateDisplay date={date} />
+      <div className="md:hidden">{suggestedActivity}</div>
       <div className="flex-col md:flex-row flex items-center justify-center gap-6">
         <div className="w-full md:w-2/3">
           <TideTimesChart tideData={demoData.tideData!} />
@@ -43,7 +59,7 @@ export default function App() {
         </div>
       </div>
       <div className="hidden md:flex justify-center gap-8">
-        <SuggestedActivity dataContext={demoData} />
+        {suggestedActivity}
       </div>
     </div>
   )

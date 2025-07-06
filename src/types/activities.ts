@@ -1,52 +1,52 @@
 import { CardinalDirection, DataContext, TideType } from '@/types/data'
 
-type _Constraint<TypeName> = {
+type _Constraint<TypeName extends string> = {
   type: TypeName
   description: string
 }
 
-type _ComparisonConstraint<TypeName> = _Constraint<TypeName> & {
+export type ComparisonConstraint<TypeName, Value> = _Constraint<TypeName> & {
   comp: 'lt' | 'gt' | 'lte' | 'gte'
+  value: Value
 }
 
-type TimeConstraint = _ComparisonConstraint<'time'> & {
-  hour: number
-  minute?: number
-}
+export type TimeConstraint = ComparisonConstraint<'time', Date>
 
-type WindSpeedConstraint = _ComparisonConstraint<'wind-speed'> & {
-  knots: number
-}
+export type WindSpeedConstraint = ComparisonConstraint<'wind-speed', number>
 
-type WindDirectionConstraint = _Constraint<'wind-direction'> & {
+export type WindDirectionConstraint = _Constraint<'wind-direction'> & {
   direction: CardinalDirection
 }
 
-type TideHeightConstraint = _ComparisonConstraint<'tide-height'> & {
-  height: number
-}
+export type HighTideHeightConstraint = ComparisonConstraint<
+  'hightide-height',
+  number
+> & { tideType: TideType }
+export type LowTideHeightConstraint = ComparisonConstraint<
+  'lowtide-height',
+  number
+> & { tideType: TideType }
+export type TideHeightConstraint =
+  | HighTideHeightConstraint
+  | LowTideHeightConstraint
 
-type TideStateConstraint = _Constraint<'tide-state'> & {
+export type TideStateConstraint = _Constraint<'tide-state'> & {
   tideType: TideType
   deltaHours?: number
 }
 
-type SunConstraint = _Constraint<'sun'> & {
+export type SunConstraint = _Constraint<'sun'> & {
   isDaylight: boolean
 }
 
-type DurationConstraint = _Constraint<'duration'> & {
-  minutes: number
-}
-
-type Constraint =
+export type Constraint =
   | TimeConstraint
   | WindSpeedConstraint
   | WindDirectionConstraint
-  | TideHeightConstraint
+  | HighTideHeightConstraint
+  | LowTideHeightConstraint
   | TideStateConstraint
   | SunConstraint
-  | DurationConstraint
 
 export type Activity = {
   displayName: string
@@ -55,8 +55,8 @@ export type Activity = {
   constraints: Constraint[]
 }
 
-export type ActivitySelection = {
-  activity: Activity
-  matchingConstraints: Constraint[]
-  reasoning?: string[]
+export const NullActivity: Activity = {
+  displayName: 'Unknown',
+  label: 'unknown',
+  constraints: [],
 }

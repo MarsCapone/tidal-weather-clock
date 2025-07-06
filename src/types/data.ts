@@ -15,6 +15,7 @@ type Timestamp = {
 
 type TideInfo = {
   type: TideType
+  height: number
 } & Timestamp
 
 type SunData = {

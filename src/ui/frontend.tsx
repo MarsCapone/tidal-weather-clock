@@ -19,6 +19,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<App />} />
+          <Route path={'/:dateString'} element={<App />} />
         </Route>
       </Routes>
     </BrowserRouter>

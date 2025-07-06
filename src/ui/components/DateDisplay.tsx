@@ -1,6 +1,10 @@
-export default function DateDisplay() {
-  const tomorrow = new Date()
-  tomorrow.setDate(tomorrow.getDate() + 1)
+import { addDays } from 'date-fns'
+
+export default function DateDisplay({ date }: { date?: Date }) {
+  if (!date) {
+    date = addDays(new Date(), 1)
+  }
+
   const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
@@ -10,7 +14,7 @@ export default function DateDisplay() {
 
   return (
     <h2 className="font-mono text-4xl">
-      {tomorrow.toLocaleDateString('en-GB', options)}
+      {date.toLocaleDateString('en-GB', options)}
     </h2>
   )
 }
