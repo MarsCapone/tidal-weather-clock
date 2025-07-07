@@ -11,7 +11,7 @@ import {
   parseISO,
   startOfDay,
 } from 'date-fns'
-import { useNavigate, useParams } from 'react-router'
+import { useLoaderData, useNavigate, useParams } from 'react-router'
 
 const demoData: DataContext = {
   tideData: {
@@ -39,13 +39,7 @@ const demoData: DataContext = {
   },
 }
 
-function AppContent({
-  date,
-  showWarningBanner,
-}: {
-  date: Date
-  showWarningBanner: boolean
-}) {
+function AppContent({ date }: { date: Date }) {
   const suggestedActivity = (
     <SuggestedActivity dataContext={demoData} date={date} />
   )
@@ -70,29 +64,7 @@ function AppContent({
 }
 
 export default function App() {
-  let { dateString } = useParams()
-  let navigate = useNavigate()
+  const { date } = useLoaderData()
 
-  let date
-  if (!dateString) {
-    date = addDays(new Date(), 1)
-  } else {
-    date = parseISO(dateString)
-  }
-
-  // only accept things up to a week from now
-  const acceptedInterval = {
-    start: startOfDay(new Date()),
-    end: endOfDay(addWeeks(new Date(), 1)),
-  }
-
-  if (!isWithinInterval(date, acceptedInterval)) {
-  }
-
-  return (
-    <AppContent
-      date={date}
-      showWarningBanner={!isWithinInterval(date, acceptedInterval)}
-    />
-  )
+  return <AppContent date={date} />
 }
