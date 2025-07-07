@@ -175,7 +175,7 @@ type FunctionMap = {
   ) => boolean
 }
 
-const evaluationFunctions: FunctionMap = {
+const functionMap: FunctionMap = {
   'hightide-height': evaluateTideHeightConstraint,
   'lowtide-height': evaluateTideHeightConstraint,
   sun: evaluateSunConstraint,
@@ -202,12 +202,24 @@ function evaluateAllConstraints(
   const results: ConstraintResult[] = []
 
   timestamps.forEach((timestamp) => {
-    const allConstraintsMatch = constraints
-      .map((constraint) => {
-        const evalConstraint = evaluationFunctions[constraint.type]
-        return evalConstraint(constraint, timestamp, context)
-      })
-      .every(truthy)
+    const allConstraintsMatch = constraints.every((constraint) => {
+      switch (constraint.type) {
+        case 'hightide-height':
+          return functionMap['hightide-height'](constraint, timestamp, context)
+        case 'lowtide-height':
+          return functionMap['lowtide-height'](constraint, timestamp, context)
+        case 'tide-state':
+          return functionMap['tide-state'](constraint, timestamp, context)
+        case 'wind-direction':
+          return functionMap['wind-direction'](constraint, timestamp, context)
+        case 'wind-speed':
+          return functionMap['wind-speed'](constraint, timestamp, context)
+        case 'sun':
+          return functionMap['sun'](constraint, timestamp, context)
+        case 'time':
+          return functionMap['time'](constraint, timestamp, context)
+      }
+    })
 
     if (allConstraintsMatch) {
       results.push(
