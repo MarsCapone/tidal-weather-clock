@@ -53,9 +53,10 @@ function AppContent({
         </div>
         <div className="w-full md:w-1/3">
           <DataTable dataContext={data} />
+          <div className="hidden lg:flex mt-8">{suggestedActivity}</div>
         </div>
       </div>
-      <div className="hidden md:flex justify-center gap-8">
+      <div className="hidden md:flex lg:hidden justify-center gap-8">
         {suggestedActivity}
       </div>
     </div>
