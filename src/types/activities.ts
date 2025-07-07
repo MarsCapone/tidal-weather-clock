@@ -1,8 +1,8 @@
-import { CardinalDirection, DataContext, TideType } from '@/types/data'
+import { CardinalDirection, TideType } from '@/types/data'
 
 type _Constraint<TypeName extends string> = {
-  type: TypeName
   description: string
+  type: TypeName
 }
 
 export type ComparisonConstraint<
@@ -34,8 +34,8 @@ export type TideHeightConstraint =
   | LowTideHeightConstraint
 
 export type TideStateConstraint = _Constraint<'tide-state'> & {
-  tideType: TideType
   deltaHours?: number
+  tideType: TideType
 }
 
 export type SunConstraint = _Constraint<'sun'> & {
@@ -52,14 +52,14 @@ export type Constraint =
   | SunConstraint
 
 export type Activity = {
-  displayName: string
-  label: string
   // imageUrl?: string;
   constraints: Constraint[]
+  displayName: string
+  label: string
 }
 
 export const NullActivity: Activity = {
+  constraints: [],
   displayName: 'Unknown',
   label: 'unknown',
-  constraints: [],
 }

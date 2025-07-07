@@ -12,7 +12,6 @@ import {
   WindSpeedConstraint,
 } from '@/types/activities'
 import {
-  addDays,
   eachMinuteOfInterval,
   Interval,
   compareAsc,
@@ -35,7 +34,7 @@ type ComparisonFn<T> = (a: T, b: T) => -1 | 0 | 1
  * @param value The value to compare against.
  */
 function evaluateComparisonConstraint<T>(
-  constraint: ComparisonConstraint<any, T>,
+  constraint: ComparisonConstraint<string, T>,
   comparisonFn: ComparisonFn<T>,
   value: T,
 ): boolean {
@@ -62,11 +61,16 @@ function evaluateComparisonConstraint<T>(
 
 const numberComparison = (a: number, b: number): 0 | 1 | -1 => {
   const v = a - b
-  if (v < 0) return -1
-  if (v > 0) return 1
+  if (v < 0) {
+    return -1
+  }
+  if (v > 0) {
+    return 1
+  }
   return 0
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const truthy = (v: any): boolean => !!v
 
 function evaluateTimeConstraint(
@@ -86,7 +90,9 @@ function evaluateWindSpeedConstraint(
   timestamp: Date,
   context: DataContext,
 ): boolean {
-  if (!context.windData) return false
+  if (!context.windData) {
+    return false
+  }
   return false
 }
 
@@ -95,7 +101,9 @@ function evaluateWindDirectionConstraint(
   timestamp: Date,
   context: DataContext,
 ): boolean {
-  if (!context.windData) return false
+  if (!context.windData) {
+    return false
+  }
   return false
 }
 
@@ -104,7 +112,9 @@ function evaluateTideHeightConstraint(
   timestamp: Date,
   context: DataContext,
 ): boolean {
-  if (!context.tideData) return false
+  if (!context.tideData) {
+    return false
+  }
   // find tides of the correct type
   // apply the comparison on them
   // return if any of the comparisons succeeded
@@ -123,15 +133,17 @@ function evaluateTideStateConstraint(
 ): boolean {
   // find the timestamps of the constraint tideType
   // is the timestamp within the discovered time +/- the delta?
-  if (!context.tideData) return false
+  if (!context.tideData) {
+    return false
+  }
 
   const timestamps = context.tideData.points
     .filter((p) => p.type === constraint.tideType)
     .map((p) => p.timestamp)
   const deltaHours = constraint.deltaHours || 0
   const intervals = timestamps.map((timestamp) => ({
-    start: addHours(timestamp, -deltaHours),
     end: addHours(timestamp, deltaHours),
+    start: addHours(timestamp, -deltaHours),
   }))
 
   return intervals.some((interval) => isWithinInterval(timestamp, interval))
@@ -142,23 +154,26 @@ function evaluateSunConstraint(
   timestamp: Date,
   context: DataContext,
 ): boolean {
-  if (!context.sunData) return false
+  if (!context.sunData) {
+    return false
+  }
 
   // true if the timestamp is between sunrise and sunset
   return isWithinInterval(timestamp, {
-    start: context.sunData.sunRise,
     end: context.sunData.sunSet,
+    start: context.sunData.sunRise,
   })
 }
 
+// eslint-disable-next-line
 const evaluationFunctions: Record<Constraint['type'], Function> = {
-  time: evaluateTimeConstraint,
-  'wind-speed': evaluateWindSpeedConstraint,
-  'wind-direction': evaluateWindDirectionConstraint,
   'hightide-height': evaluateTideHeightConstraint,
   'lowtide-height': evaluateTideHeightConstraint,
-  'tide-state': evaluateTideStateConstraint,
   sun: evaluateSunConstraint,
+  'tide-state': evaluateTideStateConstraint,
+  time: evaluateTimeConstraint,
+  'wind-direction': evaluateWindDirectionConstraint,
+  'wind-speed': evaluateWindSpeedConstraint,
 }
 
 type ConstraintResults = {
@@ -186,8 +201,8 @@ function evaluateAllConstraints(
       )
       if (result) {
         results.push({
-          constraint: constraint,
-          timestamp: timestamp,
+          constraint,
+          timestamp,
         })
       }
     })
@@ -208,8 +223,8 @@ export function suggestActivity(
   activities: Activity[],
 ): ActivitySelection {
   const interval = {
-    start: startOfDay(date),
     end: endOfDay(date),
+    start: startOfDay(date),
   }
 
   const best: {

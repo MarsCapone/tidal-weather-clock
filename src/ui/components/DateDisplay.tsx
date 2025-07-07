@@ -6,10 +6,10 @@ export default function DateDisplay({ date }: { date?: Date }) {
   }
 
   const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'long',
     day: 'numeric',
+    month: 'long',
     weekday: 'long',
+    year: 'numeric',
   }
 
   return (

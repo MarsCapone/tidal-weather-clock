@@ -2,8 +2,8 @@ import { format } from 'date-fns'
 import { DataContext } from '@/types/data'
 
 export default function DataTable(props: {
-  dataContext: DataContext
   className?: string
+  dataContext: DataContext
 }) {
   const highTides = props.dataContext
     .tideData!.points.filter((t) => t.type === 'high')
@@ -33,23 +33,21 @@ export default function DataTable(props: {
     2: 'row-span-2',
   }
 
-  const tableElements = dataTable
-    .map((row, i) => {
-      return [
-        <div
-          key={`${row.label}-label-${i}`}
-          className={`text-end ${rowSpanByLength[row.values.length as 1 | 2]}`}
-        >
-          {row.label}
-        </div>,
-        ...row.values.map((value, v) => (
-          <div key={`${row.label}-value-${i}-${v}`} className="text-start">
-            {value}
-          </div>
-        )),
-      ]
-    })
-    .flat()
+  const tableElements = dataTable.flatMap((row, i) => {
+    return [
+      <div
+        className={`text-end ${rowSpanByLength[row.values.length as 1 | 2]}`}
+        key={`${row.label}-label-${i}`}
+      >
+        {row.label}
+      </div>,
+      ...row.values.map((value, v) => (
+        <div className="text-start" key={`${row.label}-value-${i}-${v}`}>
+          {value}
+        </div>
+      )),
+    ]
+  })
 
   return (
     <div

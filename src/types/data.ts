@@ -14,8 +14,8 @@ type Timestamp = {
 }
 
 type TideInfo = {
-  type: TideType
   height: number
+  type: TideType
 } & Timestamp
 
 type SunData = {
@@ -24,14 +24,14 @@ type SunData = {
 }
 
 type WeatherInfo = {
+  cloudCoverage?: number
   summary: string
   temperature: number
-  cloudCoverage?: number
 } & Timestamp
 
 type WindInfo = {
-  speed: number
   direction: CardinalDirection
+  speed: number
 } & Timestamp
 
 type TimeBasedDataPoints<T extends Timestamp> = {
@@ -43,8 +43,8 @@ export type WeatherDataPoints = TimeBasedDataPoints<WeatherInfo>
 export type WindDataPoints = TimeBasedDataPoints<WindInfo>
 
 export type DataContext = {
+  sunData?: SunData
   tideData?: TideDataPoints
   weatherData?: WeatherDataPoints
   windData?: WindDataPoints
-  sunData?: SunData
 }

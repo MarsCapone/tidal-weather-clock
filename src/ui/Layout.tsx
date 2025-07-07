@@ -1,6 +1,5 @@
 import { Outlet } from 'react-router'
 import ColorschemeToggle from '@/ui/components/Colorscheme'
-import * as React from 'react'
 import CONSTANTS from '@/ui/constants'
 
 export default function Layout() {

@@ -1,5 +1,5 @@
 import { MoonIcon, SunIcon } from '@heroicons/react/24/solid'
-import * as React from 'react'
+import React from 'react'
 
 export default function ColorschemeToggle() {
   const [isDark, setIsDark] = React.useState(false)

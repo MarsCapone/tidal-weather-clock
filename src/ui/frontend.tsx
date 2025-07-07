@@ -10,38 +10,25 @@ import App from './App'
 import './App.css'
 
 import { StrictMode } from 'react'
-import {
-  BrowserRouter,
-  createBrowserRouter,
-  LoaderFunctionArgs,
-  redirect,
-  Route,
-  RouterProvider,
-  Routes,
-  useNavigate,
-} from 'react-router'
+import { createBrowserRouter, redirect, RouterProvider } from 'react-router'
 import Layout from '@/ui/Layout'
 import {
   addDays,
   isWithinInterval,
   parseISO,
-  startOfDay,
   startOfToday,
   startOfTomorrow,
-  tomo,
 } from 'date-fns'
 
 const PERMITTED_INTERVAL = {
-  start: startOfToday(),
   end: addDays(startOfToday(), 7),
+  start: startOfToday(),
 }
 
 const router = createBrowserRouter([
   {
-    Component: Layout,
     children: [
       {
-        path: ':dateString?',
         Component: App,
         loader: async ({ params }) => {
           const date = params.dateString
@@ -52,19 +39,21 @@ const router = createBrowserRouter([
           }
           return { date }
         },
+        path: ':dateString?',
       },
       {
-        path: 'plus/:days',
         Component: App,
         loader: async ({ params }) => {
-          const days = parseInt(params.days!)
+          const days = Number.parseInt(params.days!)
           if (days < 0 || days > 7) {
             return redirect('/')
           }
           return { date: addDays(startOfToday(), days) }
         },
+        path: 'plus/:days',
       },
     ],
+    Component: Layout,
   },
 ])
 

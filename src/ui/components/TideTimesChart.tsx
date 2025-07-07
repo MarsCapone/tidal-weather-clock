@@ -4,25 +4,26 @@ import {
   IgrRadialGaugeRange,
 } from 'igniteui-react-gauges'
 import { TideDataPoints } from '@/types/data'
-import { format } from 'date-fns'
 
 IgrRadialGaugeModule.register()
 
 function getFractionalHours(d: Date | null): number | undefined {
-  if (!d) return undefined
+  if (!d) {
+    return undefined
+  }
   const hours = d.getHours()
   const fractionalMinutes = d.getMinutes() / 60
   return hours + fractionalMinutes
 }
 
 export default function TideTimesChart({
-  tideData,
   highTideBounds = 2,
   lowTideBounds = 1,
+  tideData,
 }: {
-  tideData: TideDataPoints
   highTideBounds?: number
   lowTideBounds?: number
+  tideData: TideDataPoints
 }) {
   const isDark = document.documentElement.classList.contains('dark')
 
@@ -45,48 +46,48 @@ export default function TideTimesChart({
     <div>
       <div className="aspect-square">
         <IgrRadialGauge
-          value={highTideTime}
-          highlightValue={lowTideTime}
           backingBrush={'#f8fafc'}
-          backingShape="circular"
           backingOuterExtent={0.8}
+          backingShape="circular"
           backingStrokeThickness={0.4}
-          width="100%"
-          height="100%"
-          scaleStartAngle={-60}
-          scaleEndAngle={270}
-          scaleOversweep={30}
-          scaleStartExtent={0.3}
-          scaleEndExtent={0.5}
-          interval={1}
-          minimumValue={1}
-          maximumValue={12}
-          minorTickCount={0}
-          tickStrokeThickness={1.5}
-          labelExtent={0.65}
-          isNeedleDraggingEnabled={false}
-          highlightValueOpacity={1}
-          needleStartWidthRatio={0.05}
-          needlePivotShape={'none'}
-          fontBrush={isDark ? 'white' : 'black'}
           font={'18px'}
+          fontBrush={isDark ? 'white' : 'black'}
+          height="100%"
+          highlightValue={lowTideTime}
+          highlightValueOpacity={1}
+          interval={1}
+          isNeedleDraggingEnabled={false}
+          labelExtent={0.65}
+          maximumValue={12}
+          minimumValue={1}
+          minorTickCount={0}
+          needlePivotShape={'none'}
+          needleStartWidthRatio={0.05}
           rangeBrushes={['red', 'green', 'white']}
           rangeOutlines={'#000'}
+          scaleEndAngle={270}
+          scaleEndExtent={0.5}
+          scaleOversweep={30}
+          scaleStartAngle={-60}
+          scaleStartExtent={0.3}
+          tickStrokeThickness={1.5}
+          value={highTideTime}
+          width="100%"
         >
           {highTideTime !== undefined && (
             <IgrRadialGaugeRange
+              brush="green"
+              endValue={highTideTime + highTideBounds}
               key={'high-tide'}
               startValue={highTideTime - highTideBounds}
-              endValue={highTideTime + highTideBounds}
-              brush="green"
             />
           )}
           {lowTideTime !== undefined && (
             <IgrRadialGaugeRange
+              brush="red"
+              endValue={lowTideTime + lowTideBounds}
               key={'low-tide'}
               startValue={lowTideTime - lowTideBounds}
-              endValue={lowTideTime + lowTideBounds}
-              brush="red"
             />
           )}
         </IgrRadialGauge>

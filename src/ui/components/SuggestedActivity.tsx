@@ -3,56 +3,56 @@ import { Activity } from '@/types/activities'
 import { suggestActivity } from '@/utils/activities'
 
 const daylightConstraint = {
-  type: 'sun',
-  isDaylight: true,
   description: "it's daylight hours",
+  isDaylight: true,
+  type: 'sun',
 } as const
 
 const exampleActivities: Activity[] = [
   {
+    constraints: [
+      {
+        comp: 'gt',
+        description: 'not too early',
+        type: 'time',
+        value: new Date(0, 0, 0, 9),
+      },
+      {
+        comp: 'lt',
+        description: 'not too late',
+        type: 'time',
+        value: new Date(0, 0, 0, 16),
+      },
+      daylightConstraint,
+      {
+        comp: 'lt',
+        description: 'not much wind',
+        type: 'wind-speed',
+        value: 15,
+      },
+      {
+        comp: 'gt',
+        description: 'tide more than 1.8m',
+        tideType: 'high',
+        type: 'hightide-height',
+        value: 1.8,
+      },
+    ],
     displayName: 'Paddle boarding',
     label: 'paddle-board',
-    constraints: [
-      {
-        type: 'time',
-        comp: 'gt',
-        value: new Date(0, 0, 0, 9),
-        description: 'not too early',
-      },
-      {
-        type: 'time',
-        comp: 'lt',
-        value: new Date(0, 0, 0, 16),
-        description: 'not too late',
-      },
-      daylightConstraint,
-      {
-        type: 'wind-speed',
-        comp: 'lt',
-        value: 15,
-        description: 'not much wind',
-      },
-      {
-        type: 'hightide-height',
-        comp: 'gt',
-        value: 1.8,
-        tideType: 'high',
-        description: 'tide more than 1.8m',
-      },
-    ],
   },
   {
-    displayName: 'Swim in Bank Hole',
-    label: 'bank-hole',
     constraints: [
       daylightConstraint,
       {
-        type: 'tide-state',
-        tideType: 'low',
         deltaHours: 1,
         description: 'the tide is low',
+        tideType: 'low',
+        type: 'tide-state',
       },
     ],
+    displayName: 'Swim in Bank Hole',
+    label: 'bank-hole',
   },
 ]
 
