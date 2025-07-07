@@ -167,8 +167,15 @@ function evaluateSunConstraint(
   })
 }
 
-// eslint-disable-next-line
-const evaluationFunctions: Record<Constraint['type'], Function> = {
+type FunctionMap = {
+  [K in Constraint['type']]: (
+    constraint: Extract<Constraint, { type: K }>,
+    date: Date,
+    context: DataContext,
+  ) => boolean
+}
+
+const evaluationFunctions: FunctionMap = {
   'hightide-height': evaluateTideHeightConstraint,
   'lowtide-height': evaluateTideHeightConstraint,
   sun: evaluateSunConstraint,
@@ -197,11 +204,8 @@ function evaluateAllConstraints(
   timestamps.forEach((timestamp) => {
     const allConstraintsMatch = constraints
       .map((constraint) => {
-        return evaluationFunctions[constraint.type](
-          constraint,
-          timestamp,
-          context,
-        )
+        const evalConstraint = evaluationFunctions[constraint.type]
+        return evalConstraint(constraint, timestamp, context)
       })
       .every(truthy)
 

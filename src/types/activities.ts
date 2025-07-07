@@ -57,9 +57,3 @@ export type Activity = {
   displayName: string
   label: string
 }
-
-export const NullActivity: Activity = {
-  constraints: [],
-  displayName: 'Unknown',
-  label: 'unknown',
-}
