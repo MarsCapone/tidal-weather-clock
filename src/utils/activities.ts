@@ -72,9 +72,6 @@ const timeStringComparison = (a: string, b: string) => {
   return numberComparison(aHour + aMinute / 60, bHour + bMinute / 60)
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const truthy = (v: any): boolean => !!v
-
 function evaluateTimeConstraint(
   constraint: TimeConstraint,
   timestamp: Date,
@@ -122,10 +119,9 @@ function evaluateTideHeightConstraint(
   // return if any of the comparisons succeeded
   return context.tideData
     .filter((t) => t.type === constraint.tideType)
-    .map((point) =>
+    .some((point) =>
       evaluateComparisonConstraint(constraint, numberComparison, point.height),
     )
-    .some(truthy)
 }
 
 function evaluateTideStateConstraint(
