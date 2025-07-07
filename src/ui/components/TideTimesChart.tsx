@@ -15,10 +15,7 @@ export default function TideTimesChart({
   highTideBounds?: number
   lowTideBounds?: number
   tideData: TideInfo[]
-  referenceDate: Date
 }) {
-  const isDark = document.documentElement.classList.contains('dark')
-
   const highTides = tideData.filter((t) => t.type === 'high')
   const lowTides = tideData.filter((t) => t.type === 'low')
 
@@ -34,7 +31,7 @@ export default function TideTimesChart({
           backingShape="circular"
           backingStrokeThickness={0.4}
           font={'18px'}
-          fontBrush={isDark ? 'white' : 'black'}
+          fontBrush={'black'}
           height="100%"
           highlightValue={lowTideTime}
           highlightValueOpacity={1}

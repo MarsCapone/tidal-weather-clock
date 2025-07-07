@@ -14,6 +14,7 @@ import { createBrowserRouter, redirect, RouterProvider } from 'react-router'
 import Layout from '@/ui/Layout'
 import {
   addDays,
+  formatISO,
   isWithinInterval,
   parseISO,
   startOfToday,
@@ -33,11 +34,24 @@ const router = createBrowserRouter([
         loader: async ({ params }) => {
           const date = params.dateString
             ? parseISO(params.dateString)
-            : startOfTomorrow()
-          if (!isWithinInterval(date, PERMITTED_INTERVAL)) {
-            return redirect('/')
+            : startOfToday()
+
+          // if the date is specified directly, we don't redirect
+          if (params.dateString) {
+            // we're specifying iso dates, so keep doing that
+            return {
+              date,
+              nextPath: `/${formatISO(addDays(date, 1), { representation: 'date' })}`,
+              prevPath: `/${formatISO(addDays(date, -1), { representation: 'date' })}`,
+            }
           }
-          return { date }
+
+          // we didn't specify anything, so use relative dates
+          return {
+            date,
+            nextPath: '/plus/1',
+            prevPath: null,
+          }
         },
         path: ':dateString?',
       },
@@ -48,7 +62,11 @@ const router = createBrowserRouter([
           if (days < 0 || days > 7) {
             return redirect('/')
           }
-          return { date: addDays(startOfToday(), days) }
+          return {
+            date: addDays(startOfToday(), days),
+            nextPath: days + 1 <= 7 ? `/plus/${days + 1}` : null,
+            prevPath: days - 1 >= 0 ? `/plus/${days - 1}` : null,
+          }
         },
         path: 'plus/:days',
       },
