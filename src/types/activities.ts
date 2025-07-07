@@ -5,7 +5,10 @@ type _Constraint<TypeName extends string> = {
   description: string
 }
 
-export type ComparisonConstraint<TypeName, Value> = _Constraint<TypeName> & {
+export type ComparisonConstraint<
+  TypeName extends string,
+  Value,
+> = _Constraint<TypeName> & {
   comp: 'lt' | 'gt' | 'lte' | 'gte'
   value: Value
 }

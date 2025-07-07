@@ -3,8 +3,15 @@ import TideTimesChart from '@/ui/components/TideTimesChart'
 import { DataContext, TideDataPoints } from '@/types/data'
 import SuggestedActivity from '@/ui/components/SuggestedActivity'
 import DataTable from '@/ui/components/DataTable'
-import { addDays, parseISO } from 'date-fns'
-import { useParams } from 'react-router'
+import {
+  addDays,
+  addWeeks,
+  endOfDay,
+  isWithinInterval,
+  parseISO,
+  startOfDay,
+} from 'date-fns'
+import { useNavigate, useParams } from 'react-router'
 
 const demoData: DataContext = {
   tideData: {
@@ -32,16 +39,13 @@ const demoData: DataContext = {
   },
 }
 
-export default function App() {
-  let { dateString } = useParams()
-
-  let date
-  if (!dateString) {
-    date = addDays(new Date(), 1)
-  } else {
-    date = parseISO(dateString)
-  }
-
+function AppContent({
+  date,
+  showWarningBanner,
+}: {
+  date: Date
+  showWarningBanner: boolean
+}) {
   const suggestedActivity = (
     <SuggestedActivity dataContext={demoData} date={date} />
   )
@@ -62,5 +66,33 @@ export default function App() {
         {suggestedActivity}
       </div>
     </div>
+  )
+}
+
+export default function App() {
+  let { dateString } = useParams()
+  let navigate = useNavigate()
+
+  let date
+  if (!dateString) {
+    date = addDays(new Date(), 1)
+  } else {
+    date = parseISO(dateString)
+  }
+
+  // only accept things up to a week from now
+  const acceptedInterval = {
+    start: startOfDay(new Date()),
+    end: endOfDay(addWeeks(new Date(), 1)),
+  }
+
+  if (!isWithinInterval(date, acceptedInterval)) {
+  }
+
+  return (
+    <AppContent
+      date={date}
+      showWarningBanner={!isWithinInterval(date, acceptedInterval)}
+    />
   )
 }
