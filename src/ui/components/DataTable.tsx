@@ -1,4 +1,3 @@
-import { addHours, format } from 'date-fns'
 import { DataContext } from '@/types/data'
 import { formatTime, withFractionalTime } from '@/utils/dates'
 import { calcMean } from '@/utils/utils'
@@ -34,7 +33,10 @@ export default function DataTable({
       label: 'Sunset',
       values: [formatTime(dataContext.sunData.sunSet)],
     },
-    { label: 'Tide Height', values: [...tides.map((t) => t.height)] },
+    {
+      label: 'Tide Height',
+      values: [...tides.map((t) => `${t.height.toFixed(1)}m`)],
+    },
     { label: 'HW', values: highTides.map((t) => t.display) },
     { label: 'LW', values: lowTides.map((t) => t.display) },
   ]
@@ -42,6 +44,8 @@ export default function DataTable({
   const rowSpanByLength = {
     1: 'row-span-1',
     2: 'row-span-2',
+    3: 'row-span-3',
+    4: 'row-span-4',
   }
 
   const tableElements = dataTable.flatMap((row, i) => {

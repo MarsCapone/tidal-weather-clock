@@ -8,6 +8,7 @@ import { Link, useLoaderData, useNavigate } from 'react-router'
 import React, { useEffect, useState } from 'react'
 import { StormglassDataFetcher, DataContextFetcher } from '@/utils/fetchData'
 import { DataContext } from '@/types/data'
+import CONSTANTS from './constants'
 
 function AppContent({
   date,
@@ -23,9 +24,8 @@ function AppContent({
     dataFetcher.getDataContext(date).then((data) => {
       setData(data)
       setLoading(false)
-      console.log(data)
     })
-  }, [])
+  }, [date])
 
   if (isLoading) {
     return (
@@ -49,10 +49,10 @@ function AppContent({
       <div className="md:hidden">{suggestedActivity}</div>
       <div className="flex-col md:flex-row flex items-center justify-center gap-6">
         <div className="w-full md:w-2/3">
-          <TideTimesChart tideData={data.tideData} />
+          <TideTimesChart key={date.toDateString()} tideData={data.tideData} />
         </div>
         <div className="w-full md:w-1/3">
-          <DataTable dataContext={data} />
+          <DataTable key={date.toDateString()} dataContext={data} />
           <div className="hidden lg:flex mt-8">{suggestedActivity}</div>
         </div>
       </div>
@@ -87,7 +87,9 @@ function NextPageButton({
 export default function App() {
   const { date, nextPath, prevPath } = useLoaderData()
 
-  const stormglass = new StormglassDataFetcher()
+  const stormglass = new StormglassDataFetcher(
+    CONSTANTS.BURNHAM_OVERY_STAITHE_COORDS,
+  )
 
   return (
     <div className="flex flex-col mx-auto p-8 text-center min-w-full md:min-w-0 gap-10">

@@ -1,5 +1,5 @@
 import { DataContext } from '@/types/data'
-import stormglassWeatherExample from './stormGlassExample.json'
+import stormglassWeatherExample from './stormGlassWeatherExample.json'
 import stormglassTideExample from './stormGlassTideExample.json'
 import stormglassSunExample from './stormGlassAstronomyExample.json'
 import CONSTANTS from '@/ui/constants'
@@ -18,9 +18,12 @@ import {
   getCachedResponse,
 } from '@/utils/cache'
 import {
+  StormglassSunResponse,
+  StormglassTideResponse,
   stormglassWeatherParams,
   StormglassWeatherResponse,
 } from '@/types/stormglass'
+import { getFractionalTime } from '@/utils/dates'
 
 export interface DataContextFetcher {
   getDataContext(date: Date): Promise<DataContext>
@@ -43,6 +46,19 @@ function getMeanValueFromSource(
     (value) => typeof value === 'number',
   )
   return values.reduce((a, b) => a + b) / values.length
+}
+
+function filterToDate<T extends { time: string }>(
+  date: Date,
+  hasTime: T[],
+): T[] {
+  const interval = {
+    start: startOfDay(date),
+    end: endOfDay(date),
+  }
+  return hasTime.filter(({ time }) =>
+    isWithinInterval(parseISO(time), interval),
+  )
 }
 
 export class StormglassDataFetcher implements DataContextFetcher {
@@ -95,46 +111,46 @@ export class StormglassDataFetcher implements DataContextFetcher {
     return stormglassWeatherExample
   }
 
-  async fetchTideResponse(): Promise<any | null> {
-    const response = await this.callStormglassApi('tide', cacheOptions)
+  async fetchTideResponse(): Promise<StormglassTideResponse> {
+    const response = await this.callStormglassApi<StormglassTideResponse>(
+      'tide',
+      {
+        expiryHours: 24 * 7,
+      },
+    )
     if (response) return response
 
-    return stormglassTideExample
+    return stormglassTideExample as StormglassTideResponse
   }
 
-  async fetchSunResponse(): Promise<any | null> {
-    const response = await this.callStormglassApi('sun', cacheOptions)
+  async fetchSunResponse(): Promise<StormglassSunResponse> {
+    const response = await this.callStormglassApi<StormglassSunResponse>(
+      'sun',
+      {
+        expiryHours: 24 * 7,
+      },
+    )
     if (response) return response
 
-    return stormglassSunExample
+    return stormglassSunExample as StormglassSunResponse
   }
 
   async getDataContext(date: Date): Promise<DataContext> {
-    const weatherResponse = await this.fetchWeatherResponse()
-    const tideResponse = await this.fetchTideResponse()
-    const sunResponse = await this.fetchSunResponse()
-
-    const interval = {
-      start: startOfDay(date),
-      end: endOfDay(date),
-    }
-
-    const relevantHours = weatherResponse.hours
-      .filter(({ time }) => isWithinInterval(parseISO(time), interval))
-      .map((str) => ({
-        airTemperature: getMeanValueFromSource(str.airTemperature),
-        cloudCover: getMeanValueFromSource(str.cloudCover),
-        gust: getMeanValueFromSource(str.gust),
-        windDirection: getMeanValueFromSource(str.windDirection),
-        windSpeed: getMeanValueFromSource(str.windSpeed),
-        timestamp: parseISO(str.time),
-      }))
+    const weatherResponse = filterToDate(
+      date,
+      (await this.fetchWeatherResponse()).hours,
+    )
+    const tideResponse = filterToDate(
+      date,
+      (await this.fetchTideResponse()).data,
+    )
+    const sunResponse = filterToDate(date, (await this.fetchSunResponse()).data)
 
     const result: DataContext = {
       referenceDate: date,
       sunData: {
-        sunSet: date,
-        sunRise: date,
+        sunSet: parseISO(sunResponse[0].sunset),
+        sunRise: parseISO(sunResponse[0].sunrise),
       },
       tideData: [],
       windData: {
@@ -145,17 +161,34 @@ export class StormglassDataFetcher implements DataContextFetcher {
       },
     }
 
-    relevantHours.forEach((hour) => {
-      result.windData.points.push({
-        timestamp: hour.timestamp,
-        direction: hour.windDirection,
-        speed: hour.windSpeed,
-        gustSpeed: hour.gust,
+    weatherResponse
+      .map((r) => ({
+        airTemperature: getMeanValueFromSource(r.airTemperature),
+        cloudCover: getMeanValueFromSource(r.cloudCover),
+        gust: getMeanValueFromSource(r.gust),
+        windDirection: getMeanValueFromSource(r.windDirection),
+        windSpeed: getMeanValueFromSource(r.windSpeed),
+        timestamp: parseISO(r.time),
+      }))
+      .forEach((hour) => {
+        result.windData.points.push({
+          timestamp: hour.timestamp,
+          direction: hour.windDirection,
+          speed: hour.windSpeed,
+          gustSpeed: hour.gust,
+        })
+        result.weatherData.points.push({
+          timestamp: hour.timestamp,
+          cloudCover: hour.cloudCover,
+          temperature: hour.airTemperature,
+        })
       })
-      result.weatherData.points.push({
-        timestamp: hour.timestamp,
-        cloudCover: hour.cloudCover,
-        temperature: hour.airTemperature,
+
+    tideResponse.forEach((r) => {
+      result.tideData.push({
+        time: getFractionalTime(parseISO(r.time)),
+        type: r.type,
+        height: r.height,
       })
     })
 
