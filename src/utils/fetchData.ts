@@ -1,5 +1,7 @@
 import { DataContext } from '@/types/data'
-import stormGlassWeatherResponseExample from './stormGlassExample.json'
+import stormglassWeatherExample from './stormGlassExample.json'
+import stormglassTideExample from './stormGlassTideExample.json'
+import stormglassSunExample from './stormGlassAstronomyExample.json'
 import CONSTANTS from '@/ui/constants'
 import {
   differenceInDays,
@@ -10,7 +12,15 @@ import {
   parseISO,
   startOfDay,
 } from 'date-fns'
-import { cacheResponse, getCachedResponse } from '@/utils/cache'
+import {
+  cacheResponse,
+  CacheResponseOptions,
+  getCachedResponse,
+} from '@/utils/cache'
+import {
+  stormglassWeatherParams,
+  StormglassWeatherResponse,
+} from '@/types/stormglass'
 
 export interface DataContextFetcher {
   getDataContext(date: Date): Promise<DataContext>
@@ -21,92 +31,89 @@ curl -H "Authorization: ${API_KEY}" \
   "https://api.stormglass.io/v2/weather/point?lat=52.9636&lng=0.7442&params=cloudCover,gust,windDirection,windSpeed,airTemperature"
 */
 
-const stormGlassWeatherParams = [
-  'cloudCover',
-  'gust',
-  'windDirection',
-  'windSpeed',
-  'airTemperature',
-]
+const stormglassBaseUrl = 'https://api.stormglass.io'
+const cacheOptions = { expiryHours: 36 }
 
-type StormglassSourceData = {
-  [source: string]: number | undefined
-}
-type StormglassTimestampResponse = {
-  time: string
-  cloudCover: StormglassSourceData
-  gust: StormglassSourceData
-  windDirection: StormglassSourceData
-  windSpeed: StormglassSourceData
-  airTemperature: StormglassSourceData
-}
-type StormglassMeta = {
-  cost: number
-  requestCount: number
-  dailyQuota: number
-  lat: number
-  lng: number
-  start: string
-  end: string
-  params: (typeof stormGlassWeatherParams)[number][]
-}
-type StormglassWeatherResponse = {
-  hours: StormglassTimestampResponse[]
-  meta: StormglassMeta
+function getMeanValueFromSource(
+  sourceData: Record<never, number | undefined>,
+): number {
+  if (!sourceData) return 0
+
+  const values = Object.values(sourceData).filter(
+    (value) => typeof value === 'number',
+  )
+  return values.reduce((a, b) => a + b) / values.length
 }
 
 export class StormglassDataFetcher implements DataContextFetcher {
   private readonly apiKey?: string
+  private readonly coords: [number, number]
 
   // https://docs.stormglass.io/#/weather
 
-  constructor(apiKey?: string) {
+  constructor(coords: [number, number], apiKey?: string) {
+    this.coords = coords
     this.apiKey = apiKey
   }
 
-  async fetchWeatherResponse(): Promise<StormglassWeatherResponse> {
-    const [lat, lng] = CONSTANTS.BURNHAM_OVERY_STAITHE_COORDS
+  async callStormglassApi<T>(
+    type: 'weather' | 'tide' | 'sun',
+    cacheOptions: CacheResponseOptions = {},
+  ): Promise<T | null> {
+    const cacheKey = `stormglass-response-${type}`
+    const cachedResponse = getCachedResponse<T>(cacheKey, cacheOptions)
+    if (cachedResponse) return cachedResponse
 
-    const cachedResponse = getCachedResponse<StormglassWeatherResponse>(
-      'stormglass-weather',
-      {
-        expiryHours: 36,
-      },
-    )
-    if (cachedResponse) {
-      return cachedResponse
+    const [lat, lng] = this.coords
+    const urls = {
+      weather: `${stormglassBaseUrl}/v2/weather/point?lat=${lat}&lng=${lng}&params=${stormglassWeatherParams.join(',')}`,
+      tide: `${stormglassBaseUrl}/v2/tide/extremes/point?lat=${lat}&lng=${lng}`,
+      sun: `${stormglassBaseUrl}/v2/astronomy/point?lat=${lat}&lng=${lng}`,
     }
 
     if (this.apiKey) {
-      console.log('fetching weather response from api')
-      const response = await fetch(
-        `https://api.stormglass.io/v2/weather/point?lat=${lat}&lng=${lng}&params=${stormGlassWeatherParams.join(',')}`,
-        {
-          headers: {
-            Authorization: this.apiKey,
-          },
-        },
-      )
-      const json = await response.json()
-      cacheResponse('stormglass-weather', json)
-      return json
+      console.log(`fetching ${type} data from stormglass api`)
+      const response = await fetch(urls[type], {
+        headers: { Authorization: this.apiKey },
+      })
+      if (response.ok) {
+        const json = await response.json()
+        cacheResponse(cacheKey, json)
+        return json
+      }
     }
+    return null
+  }
+  async fetchWeatherResponse(): Promise<StormglassWeatherResponse> {
+    const response = await this.callStormglassApi<StormglassWeatherResponse>(
+      'weather',
+      cacheOptions,
+    )
+    if (response) return response
 
     console.log('fetching weather response from static data')
-    return stormGlassWeatherResponseExample
+    return stormglassWeatherExample
   }
 
-  getMeanValueFromSource(sourceData: StormglassSourceData): number {
-    if (!sourceData) return 0
+  async fetchTideResponse(): Promise<any | null> {
+    const response = await this.callStormglassApi('tide', cacheOptions)
+    if (response) return response
 
-    const values = Object.values(sourceData).filter(
-      (value) => typeof value === 'number',
-    )
-    return values.reduce((a, b) => a + b) / values.length
+    return stormglassTideExample
+  }
+
+  async fetchSunResponse(): Promise<any | null> {
+    const response = await this.callStormglassApi('sun', cacheOptions)
+    if (response) return response
+
+    return stormglassSunExample
   }
 
   async getDataContext(date: Date): Promise<DataContext> {
     const weatherResponse = await this.fetchWeatherResponse()
+    const tideResponse = await this.fetchTideResponse()
+    const sunResponse = await this.fetchSunResponse()
+
     const interval = {
       start: startOfDay(date),
       end: endOfDay(date),
@@ -115,11 +122,11 @@ export class StormglassDataFetcher implements DataContextFetcher {
     const relevantHours = weatherResponse.hours
       .filter(({ time }) => isWithinInterval(parseISO(time), interval))
       .map((str) => ({
-        airTemperature: this.getMeanValueFromSource(str.airTemperature),
-        cloudCover: this.getMeanValueFromSource(str.cloudCover),
-        gust: this.getMeanValueFromSource(str.gust),
-        windDirection: this.getMeanValueFromSource(str.windDirection),
-        windSpeed: this.getMeanValueFromSource(str.windSpeed),
+        airTemperature: getMeanValueFromSource(str.airTemperature),
+        cloudCover: getMeanValueFromSource(str.cloudCover),
+        gust: getMeanValueFromSource(str.gust),
+        windDirection: getMeanValueFromSource(str.windDirection),
+        windSpeed: getMeanValueFromSource(str.windSpeed),
         timestamp: parseISO(str.time),
       }))
 
