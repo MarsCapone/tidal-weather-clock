@@ -27,6 +27,7 @@
     "react": "^19",
     "react-dom": "^19",
     "react-router": "^7.6.3",
+    "react-swipeable": "^7.0.2",
     "tailwindcss": "^4.1.11"
   },
   "devDependencies": {

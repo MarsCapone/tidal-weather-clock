@@ -4,11 +4,12 @@ import SuggestedActivity from '@/ui/components/SuggestedActivity'
 import DataTable from '@/ui/components/DataTable'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
 
-import { Link, useLoaderData, useNavigate } from 'react-router'
+import { Link, redirect, useLoaderData, useNavigate } from 'react-router'
 import React, { useEffect, useState } from 'react'
 import { StormglassDataFetcher, DataContextFetcher } from '@/utils/fetchData'
 import { DataContext } from '@/types/data'
 import CONSTANTS from './constants'
+import { useSwipeable } from 'react-swipeable'
 
 function AppContent({
   date,
@@ -71,29 +72,43 @@ function NextPageButton({
   Icon: React.ComponentType<{ className?: string }>
 }) {
   return (
-    <Link to={path}>
-      <button
-        disabled={path === null}
-        className={`rounded-md bg-background aspect-square p-2 ${path === null ? 'cursor-default' : 'hover:bg-muted hover:shadow-md'}`}
-      >
-        <Icon
-          className={`size-full sm:size-24 md:size-10 ${path === null ? 'text-background' : ''}`}
-        />
-      </button>
-    </Link>
+    <div className="hidden sm:block">
+      <Link to={path}>
+        <button
+          disabled={path === null}
+          className={`rounded-md bg-background aspect-square p-2 ${path === null ? 'cursor-default' : 'hover:bg-muted hover:shadow-md'}`}
+        >
+          <Icon
+            className={`size-full sm:size-24 md:size-10 ${path === null ? 'text-background' : ''}`}
+          />
+        </button>
+      </Link>
+    </div>
   )
 }
 
 export default function App() {
   const { date, nextPath, prevPath } = useLoaderData()
+  const navigate = useNavigate()
+  const handlers = useSwipeable({
+    onSwiped: ({ dir }) => {
+      console.log(`Swiped ${dir}`)
+      // swipe left means you want to see what's on the right, i.e. next
+      if (nextPath && dir === 'Left') navigate(nextPath)
+      if (prevPath && dir === 'Right') navigate(prevPath)
+    },
+  })
 
   const stormglass = new StormglassDataFetcher(
     CONSTANTS.BURNHAM_OVERY_STAITHE_COORDS,
   )
 
   return (
-    <div className="flex flex-col mx-auto p-8 text-center min-w-full md:min-w-0 gap-10">
-      <div className="flex justify-between px-20 gap-x-2">
+    <div
+      {...handlers}
+      className="flex flex-col mx-auto p-8 text-center min-w-full md:min-w-0 gap-10"
+    >
+      <div className="flex justify-center px-20 gap-x-2">
         <NextPageButton path={prevPath} Icon={ChevronLeftIcon} />
         <div className="py-2">
           <DateDisplay date={date} />

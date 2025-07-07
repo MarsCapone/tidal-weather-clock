@@ -13,7 +13,7 @@ export default function DateDisplay({ date }: { date?: Date }) {
   }
 
   return (
-    <h2 className="font-mono text-4xl">
+    <h2 className="font-mono text-4xl sm:text-5xl">
       {date.toLocaleDateString('en-GB', options)}
     </h2>
   )
