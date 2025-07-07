@@ -8,7 +8,7 @@ import { Link, redirect, useLoaderData, useNavigate } from 'react-router'
 import React, { useEffect, useState } from 'react'
 import { StormglassDataFetcher, DataContextFetcher } from '@/utils/fetchData'
 import { DataContext } from '@/types/data'
-import CONSTANTS from './constants'
+import CONSTANTS, { Activities } from './constants'
 import { useSwipeable } from 'react-swipeable'
 
 function AppContent({
@@ -43,7 +43,9 @@ function AppContent({
     )
   }
 
-  const suggestedActivity = <SuggestedActivity dataContext={data} date={date} />
+  const suggestedActivity = (
+    <SuggestedActivity dataContext={data} date={date} activities={Activities} />
+  )
 
   return (
     <div>
