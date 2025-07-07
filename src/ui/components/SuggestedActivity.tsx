@@ -1,6 +1,7 @@
 import { DataContext } from '@/types/data'
 import { Activity } from '@/types/activities'
 import { suggestActivity } from '@/utils/activities'
+import { format } from 'date-fns'
 
 const daylightConstraint = {
   description: "it's daylight hours",
@@ -15,13 +16,13 @@ const exampleActivities: Activity[] = [
         comp: 'gt',
         description: 'not too early',
         type: 'time',
-        value: new Date(0, 0, 0, 9),
+        value: '09:00',
       },
       {
         comp: 'lt',
         description: 'not too late',
         type: 'time',
-        value: new Date(0, 0, 0, 16),
+        value: '16:45',
       },
       daylightConstraint,
       {
@@ -74,7 +75,9 @@ export default function SuggestedActivity({
       <h4 className="text-xl">Suggested Activity:</h4>
       <h2 className="text-3xl">{activitySelection.activity.displayName}</h2>
       {activitySelection.matchingConstraints.map((c, i) => (
-        <p key={`${c.type}-reason-${i}`}>{c.description}</p>
+        <p key={`${c.constraint.type}-reason-${i}`}>
+          {format(c.timestamp, 'p')} {c.constraint.description}
+        </p>
       ))}
     </div>
   )

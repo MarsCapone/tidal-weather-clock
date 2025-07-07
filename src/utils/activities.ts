@@ -19,6 +19,7 @@ import {
   isWithinInterval,
   startOfDay,
   endOfDay,
+  format,
 } from 'date-fns'
 
 const _PERIOD_GRANULARITY_MINUTES = 10
@@ -61,13 +62,15 @@ function evaluateComparisonConstraint<T>(
 
 const numberComparison = (a: number, b: number): 0 | 1 | -1 => {
   const v = a - b
-  if (v < 0) {
-    return -1
-  }
-  if (v > 0) {
-    return 1
-  }
+  if (v < 0) return -1
+  if (v > 0) return 1
   return 0
+}
+
+const timeStringComparison = (a: string, b: string) => {
+  const [aHour, aMinute] = a.split(':').map((value) => parseInt(value))
+  const [bHour, bMinute] = b.split(':').map((value) => parseInt(value))
+  return numberComparison(aHour + aMinute / 60, bHour + bMinute / 60)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,10 +81,10 @@ function evaluateTimeConstraint(
   timestamp: Date,
   context: DataContext,
 ): boolean {
-  return evaluateComparisonConstraint<Date>(
+  return evaluateComparisonConstraint<string>(
     constraint,
-    compareAsc as (a: Date, b: Date) => 0 | 1 | -1,
-    timestamp,
+    timeStringComparison,
+    format(timestamp, 'HH:mm'),
   )
 }
 

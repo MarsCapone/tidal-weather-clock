@@ -13,7 +13,7 @@ export type ComparisonConstraint<
   value: Value
 }
 
-export type TimeConstraint = ComparisonConstraint<'time', Date>
+export type TimeConstraint = ComparisonConstraint<'time', string>
 
 export type WindSpeedConstraint = ComparisonConstraint<'wind-speed', number>
 
