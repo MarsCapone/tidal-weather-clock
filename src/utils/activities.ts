@@ -3,7 +3,6 @@ import {
   Activity,
   ComparisonConstraint,
   Constraint,
-  NullActivity,
   SunConstraint,
   TideHeightConstraint,
   TideStateConstraint,
@@ -12,15 +11,15 @@ import {
   WindSpeedConstraint,
 } from '@/types/activities'
 import {
-  eachMinuteOfInterval,
-  Interval,
-  compareAsc,
   addHours,
-  isWithinInterval,
-  startOfDay,
+  eachMinuteOfInterval,
   endOfDay,
   format,
+  Interval,
+  isWithinInterval,
+  startOfDay,
 } from 'date-fns'
+import arrayEqual from 'array-equal'
 
 const _PERIOD_GRANULARITY_MINUTES = 10
 
@@ -216,43 +215,103 @@ function evaluateAllConstraints(
 
 type ActivitySelection = {
   activity: Activity
-  matchingConstraints: ConstraintResults
-  reasoning?: string[]
+  timestamp: Date
+  reasons: string[]
+}
+
+export function suggestActivities(
+  date: Date,
+  context: DataContext,
+  activities: Activity[],
+): ActivitySelection[] {
+  const interval = {
+    end: endOfDay(date),
+    start: startOfDay(date),
+  }
+
+  return (
+    activities
+      .map((activity) => {
+        // for each activity, evaluate all the constraints against the input context, for every N minute period
+        // group by the time period, so at each time period there is an array of matching constraints
+        // filter out the ones that don't have any matches against constraints
+        const constraintsByTime = Map.groupBy(
+          //        ^?
+          evaluateAllConstraints(activity.constraints, interval, context),
+          (result) => format(result.timestamp, 'HH:mm'),
+        )
+          .entries()
+          .filter(([_, crs]) => crs.length > 0)
+
+        // convert each entry to an object with the activity, the timestamp, and an array of reasons extracted from the
+        // constraint descriptions
+        return constraintsByTime
+          .map(([timeString, crs]) => ({
+            activity,
+            timestamp: crs[0].timestamp,
+            reasons: crs.map(({ constraint }) => constraint.description),
+          }))
+          .toArray()
+      })
+      .flat() // flatten everything so all objects are at the same level
+      // then sort by which activity and timestamp has the most reasons
+      .toSorted((a, b) => b.reasons.length - a.reasons.length)
+  )
+}
+
+function formatActivitySelection(selection: ActivitySelection): string {
+  return `${format(selection.timestamp, 'HH:mm')} ${selection.activity.label} [${selection.reasons.join(', ')}]`
+}
+
+export type IntervalActivitySelection = ActivitySelection & {
+  interval: {
+    start: Date
+    end: Date
+  }
 }
 
 export function suggestActivity(
   date: Date,
   context: DataContext,
   activities: Activity[],
-): ActivitySelection {
-  const interval = {
-    end: endOfDay(date),
-    start: startOfDay(date),
-  }
+): IntervalActivitySelection {
+  const suggestions = suggestActivities(date, context, activities)
 
-  const best: {
-    activity: Activity
-    matchingConstraints: ConstraintResults
-  } = {
-    activity: NullActivity,
-    matchingConstraints: [],
-  }
+  const goodSuggestions = suggestions.filter(
+    (s) => s.reasons.length === suggestions[0].reasons.length,
+  )
+  // console.log(goodSuggestions.map(formatActivitySelection))
 
-  activities.forEach((activity) => {
-    const matchingConstraints = evaluateAllConstraints(
-      activity.constraints,
-      interval,
-      context,
-    )
-    if (matchingConstraints.length > best.matchingConstraints.length) {
-      best.activity = activity
-      best.matchingConstraints = matchingConstraints
+  // loop through all the suggestions to create a list of {interval, activity, reasons}
+  const activityIntervals = []
+  let current = goodSuggestions[0]
+  let interval = { start: current.timestamp, end: current.timestamp }
+  for (const suggestion of goodSuggestions) {
+    if (
+      suggestion.activity.label === current.activity.label &&
+      arrayEqual(suggestion.reasons, current.reasons)
+    ) {
+      interval.end = suggestion.timestamp
+    } else {
+      // we're at the end of the interval, so we need to push that and reset
+      activityIntervals.push({
+        interval,
+        activity: current.activity,
+        reasons: current.reasons,
+      })
+      current = suggestion
+      interval = { start: suggestion.timestamp, end: suggestion.timestamp }
     }
+  }
+  // finally push the last interval
+  activityIntervals.push({
+    interval,
+    activity: current.activity,
+    reasons: current.reasons,
   })
 
   return {
-    activity: best.activity,
-    matchingConstraints: best.matchingConstraints,
-    reasoning: best.matchingConstraints.map((c) => c.constraint.description),
+    ...activityIntervals[0],
+    timestamp: activityIntervals[0].interval.start,
   }
 }

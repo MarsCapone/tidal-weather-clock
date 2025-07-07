@@ -1,7 +1,8 @@
 import { DataContext } from '@/types/data'
 import { Activity } from '@/types/activities'
-import { suggestActivity } from '@/utils/activities'
+import { IntervalActivitySelection, suggestActivity } from '@/utils/activities'
 import { format } from 'date-fns'
+import { formatTime } from '@/utils/dates'
 
 const daylightConstraint = {
   description: "it's daylight hours",
@@ -57,6 +58,27 @@ const exampleActivities: Activity[] = [
   },
 ]
 
+function IntervalActivity({
+  selection,
+}: {
+  selection: IntervalActivitySelection
+}) {
+  return (
+    <div>
+      <h2 className="text-3xl font-bold">{selection.activity.displayName}</h2>
+      <h3 className="text-xl">
+        {formatTime(selection.interval.start)} -{' '}
+        {formatTime(selection.interval.end)}
+      </h3>
+      <ul>
+        {selection.reasons.map((reason, i) => (
+          <li key={`reason-${i}`}>{reason}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 export default function SuggestedActivity({
   dataContext,
   date,
@@ -73,12 +95,7 @@ export default function SuggestedActivity({
   return (
     <div>
       <h4 className="text-xl">Suggested Activity:</h4>
-      <h2 className="text-3xl">{activitySelection.activity.displayName}</h2>
-      {activitySelection.matchingConstraints.map((c, i) => (
-        <p key={`${c.constraint.type}-reason-${i}`}>
-          {format(c.timestamp, 'p')} {c.constraint.description}
-        </p>
-      ))}
+      <IntervalActivity selection={activitySelection} />
     </div>
   )
 }
