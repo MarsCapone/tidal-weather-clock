@@ -120,8 +120,8 @@ function evaluateTideHeightConstraint(
   // find tides of the correct type
   // apply the comparison on them
   // return if any of the comparisons succeeded
-  return context.tideData.points
-    .filter((p) => p.type === constraint.tideType)
+  return context.tideData
+    .filter((t) => t.type === constraint.tideType)
     .map((point) =>
       evaluateComparisonConstraint(constraint, numberComparison, point.height),
     )
@@ -139,13 +139,13 @@ function evaluateTideStateConstraint(
     return false
   }
 
-  const timestamps = context.tideData.points
-    .filter((p) => p.type === constraint.tideType)
-    .map((p) => p.timestamp)
+  const tides = context.tideData.filter((t) => t.type === constraint.tideType)
+
   const deltaHours = constraint.deltaHours || 0
-  const intervals = timestamps.map((timestamp) => ({
-    end: addHours(timestamp, deltaHours),
-    start: addHours(timestamp, -deltaHours),
+
+  const intervals = tides.map((tide) => ({
+    end: addHours(context.referenceDate, deltaHours + tide.time),
+    start: addHours(timestamp, -deltaHours + tide.time),
   }))
 
   return intervals.some((interval) => isWithinInterval(timestamp, interval))
@@ -178,36 +178,41 @@ const evaluationFunctions: Record<Constraint['type'], Function> = {
   'wind-speed': evaluateWindSpeedConstraint,
 }
 
-type ConstraintResults = {
+type ConstraintResult = {
   constraint: Constraint
   timestamp: Date
-}[]
+}
 
 function evaluateAllConstraints(
   constraints: Constraint[],
   interval: Interval,
   context: DataContext,
-): ConstraintResults {
+): ConstraintResult[] {
   const timestamps = eachMinuteOfInterval(interval, {
     step: _PERIOD_GRANULARITY_MINUTES,
   })
 
-  const results: ConstraintResults = []
+  const results: ConstraintResult[] = []
 
   timestamps.forEach((timestamp) => {
-    constraints.forEach((constraint) => {
-      const result = evaluationFunctions[constraint.type](
-        constraint,
-        timestamp,
-        context,
-      )
-      if (result) {
-        results.push({
+    const allConstraintsMatch = constraints
+      .map((constraint) => {
+        return evaluationFunctions[constraint.type](
           constraint,
           timestamp,
-        })
-      }
-    })
+          context,
+        )
+      })
+      .every(truthy)
+
+    if (allConstraintsMatch) {
+      results.push(
+        ...constraints.map((constraint) => ({
+          constraint: constraint,
+          timestamp: timestamp,
+        })),
+      )
+    }
   })
 
   return results
@@ -236,7 +241,6 @@ export function suggestActivities(
         // group by the time period, so at each time period there is an array of matching constraints
         // filter out the ones that don't have any matches against constraints
         const constraintsByTime = Map.groupBy(
-          //        ^?
           evaluateAllConstraints(activity.constraints, interval, context),
           (result) => format(result.timestamp, 'HH:mm'),
         )
@@ -274,13 +278,16 @@ export function suggestActivity(
   date: Date,
   context: DataContext,
   activities: Activity[],
-): IntervalActivitySelection {
+): IntervalActivitySelection | null {
   const suggestions = suggestActivities(date, context, activities)
 
   const goodSuggestions = suggestions.filter(
     (s) => s.reasons.length === suggestions[0].reasons.length,
   )
-  // console.log(goodSuggestions.map(formatActivitySelection))
+
+  if (!goodSuggestions.length) {
+    return null
+  }
 
   // loop through all the suggestions to create a list of {interval, activity, reasons}
   const activityIntervals = []

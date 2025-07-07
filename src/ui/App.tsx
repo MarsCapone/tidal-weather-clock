@@ -5,34 +5,36 @@ import SuggestedActivity from '@/ui/components/SuggestedActivity'
 import DataTable from '@/ui/components/DataTable'
 
 import { useLoaderData } from 'react-router'
+import { startOfDay } from 'date-fns'
 
-const demoData: DataContext = {
-  sunData: {
-    sunRise: new Date(2025, 4, 22, 6, 10),
-    sunSet: new Date(2025, 4, 22, 20, 43),
-  },
-  tideData: {
-    points: [
+function AppContent({ date }: { date: Date }) {
+  const demoData: DataContext = {
+    referenceDate: startOfDay(date),
+    sunData: {
+      sunRise: new Date(2025, 4, 22, 6, 10),
+      sunSet: new Date(2025, 4, 22, 20, 43),
+    },
+    tideData: [
       {
         height: 1.8,
-        timestamp: new Date(2025, 4, 22, 10, 30),
+        time: 10.5,
         type: 'high',
       },
       {
         height: 2.0,
-        timestamp: new Date(2025, 4, 22, 22, 45),
+        time: 22.75,
         type: 'high',
       },
       {
         height: 0.7,
-        timestamp: new Date(2025, 4, 22, 16, 10),
+        time: 16 + 10 / 60,
         type: 'low',
       },
     ],
-  },
-}
+    weatherData: { points: [] },
+    windData: { points: [] },
+  }
 
-function AppContent({ date }: { date: Date }) {
   const suggestedActivity = (
     <SuggestedActivity dataContext={demoData} date={date} />
   )

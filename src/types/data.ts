@@ -13,10 +13,11 @@ type Timestamp = {
   timestamp: Date
 }
 
-type TideInfo = {
+export type TideInfo = {
   height: number
   type: TideType
-} & Timestamp
+  time: number
+}
 
 type SunData = {
   sunRise: Date
@@ -38,13 +39,13 @@ type TimeBasedDataPoints<T extends Timestamp> = {
   points: T[]
 }
 
-export type TideDataPoints = TimeBasedDataPoints<TideInfo>
 export type WeatherDataPoints = TimeBasedDataPoints<WeatherInfo>
 export type WindDataPoints = TimeBasedDataPoints<WindInfo>
 
 export type DataContext = {
-  sunData?: SunData
-  tideData?: TideDataPoints
-  weatherData?: WeatherDataPoints
-  windData?: WindDataPoints
+  referenceDate: Date
+  sunData: SunData
+  tideData: TideInfo[]
+  weatherData: WeatherDataPoints
+  windData: WindDataPoints
 }

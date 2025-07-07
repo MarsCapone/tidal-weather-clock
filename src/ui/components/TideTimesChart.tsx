@@ -3,18 +3,9 @@ import {
   IgrRadialGaugeModule,
   IgrRadialGaugeRange,
 } from 'igniteui-react-gauges'
-import { TideDataPoints } from '@/types/data'
+import { TideInfo } from '@/types/data'
 
 IgrRadialGaugeModule.register()
-
-function getFractionalHours(d: Date | null): number | undefined {
-  if (!d) {
-    return undefined
-  }
-  const hours = d.getHours()
-  const fractionalMinutes = d.getMinutes() / 60
-  return hours + fractionalMinutes
-}
 
 export default function TideTimesChart({
   highTideBounds = 2,
@@ -23,24 +14,16 @@ export default function TideTimesChart({
 }: {
   highTideBounds?: number
   lowTideBounds?: number
-  tideData: TideDataPoints
+  tideData: TideInfo[]
+  referenceDate: Date
 }) {
   const isDark = document.documentElement.classList.contains('dark')
 
-  const highTides = tideData.points
-    .filter((t) => t.type === 'high')
-    .map((t) => t.timestamp)
-  const lowTides = tideData.points
-    .filter((t) => t.type === 'low')
-    .map((t) => t.timestamp)
+  const highTides = tideData.filter((t) => t.type === 'high')
+  const lowTides = tideData.filter((t) => t.type === 'low')
 
-  const highTideTime = highTides ? getFractionalHours(highTides[0]) : undefined
-  const lowTideTime = lowTides ? getFractionalHours(lowTides[0]) : undefined
-
-  const rowSpanClass = {
-    1: 'row-span-1',
-    2: 'row-span-2',
-  }
+  const highTideTime = highTides ? highTides[0].time : undefined
+  const lowTideTime = lowTides ? lowTides[0].time : undefined
 
   return (
     <div>
@@ -92,24 +75,6 @@ export default function TideTimesChart({
           )}
         </IgrRadialGauge>
       </div>
-      {/*<div className="grid grid-cols-2 gap-2">*/}
-      {/*  {highTides && (*/}
-      {/*    <>*/}
-      {/*      <div className={rowSpanClass[highTides.length as 1 | 2]}>HW</div>*/}
-      {/*      {highTides.map((d, i) => (*/}
-      {/*        <div key={`high-tide-${i}`}>{format(d, 'p')}</div>*/}
-      {/*      ))}*/}
-      {/*    </>*/}
-      {/*  )}*/}
-      {/*  {lowTides && (*/}
-      {/*    <>*/}
-      {/*      <div className={rowSpanClass[lowTides.length as 1 | 2]}>LW</div>*/}
-      {/*      {lowTides.map((d, i) => (*/}
-      {/*        <div key={`low-tide-${i}`}>{format(d, 'p')}</div>*/}
-      {/*      ))}*/}
-      {/*    </>*/}
-      {/*  )}*/}
-      {/*</div>*/}
     </div>
   )
 }

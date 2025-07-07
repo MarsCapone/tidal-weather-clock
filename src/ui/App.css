@@ -14,6 +14,7 @@
   --color-secondary: #dcfce7; /* Very light green for highlights */
   --color-content: #0f172a; /* Almost black, but softer */
   --color-background: #f8fafc; /* Off-white background, Notion-like */
+  --color-error: #f44336;
 }
 
 .dark {
@@ -25,6 +26,7 @@
   --color-secondary: #064e3b; /* Dark teal-green */
   --color-content: #f1f5f9; /* Off-white text */
   --color-background: #0f172a; /* Very dark blue-gray background */
+  --color-error: #f44336;
 }
 
 /*@layer theme {*/

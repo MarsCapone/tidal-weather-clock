@@ -1,7 +1,6 @@
 import { DataContext } from '@/types/data'
 import { Activity } from '@/types/activities'
 import { IntervalActivitySelection, suggestActivity } from '@/utils/activities'
-import { format } from 'date-fns'
 import { formatTime } from '@/utils/dates'
 
 const daylightConstraint = {
@@ -26,18 +25,24 @@ const exampleActivities: Activity[] = [
         value: '16:45',
       },
       daylightConstraint,
-      {
-        comp: 'lt',
-        description: 'not much wind',
-        type: 'wind-speed',
-        value: 15,
-      },
+      // {
+      //   comp: 'lt',
+      //   description: 'not much wind',
+      //   type: 'wind-speed',
+      //   value: 15,
+      // },
       {
         comp: 'gt',
         description: 'tide more than 1.8m',
         tideType: 'high',
         type: 'hightide-height',
         value: 1.8,
+      },
+      {
+        type: 'tide-state',
+        deltaHours: 2,
+        tideType: 'high',
+        description: 'within 2 hours of high tide',
       },
     ],
     displayName: 'Paddle boarding',
@@ -61,8 +66,15 @@ const exampleActivities: Activity[] = [
 function IntervalActivity({
   selection,
 }: {
-  selection: IntervalActivitySelection
+  selection: IntervalActivitySelection | null
 }) {
+  if (!selection) {
+    return (
+      <div>
+        <h2 className="text-3xl font-bold text-error">No activity found</h2>
+      </div>
+    )
+  }
   return (
     <div>
       <h2 className="text-3xl font-bold">{selection.activity.displayName}</h2>

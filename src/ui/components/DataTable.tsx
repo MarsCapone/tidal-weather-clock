@@ -1,16 +1,19 @@
-import { format } from 'date-fns'
+import { addHours, format } from 'date-fns'
 import { DataContext } from '@/types/data'
 
-export default function DataTable(props: {
+export default function DataTable({
+  className,
+  dataContext,
+}: {
   className?: string
   dataContext: DataContext
 }) {
-  const highTides = props.dataContext
-    .tideData!.points.filter((t) => t.type === 'high')
-    .map((t) => format(t.timestamp, 'p'))
-  const lowTides = props.dataContext
-    .tideData!.points.filter((t) => t.type === 'low')
-    .map((t) => format(t.timestamp, 'p'))
+  const highTides = dataContext.tideData
+    .filter((t) => t.type === 'high')
+    .map((t) => format(addHours(dataContext.referenceDate, t.time), 'p'))
+  const lowTides = dataContext.tideData
+    .filter((t) => t.type === 'low')
+    .map((t) => format(addHours(dataContext.referenceDate, t.time), 'p'))
 
   const dataTable = [
     { label: 'Wind', values: ['12 kts'] },
@@ -18,11 +21,11 @@ export default function DataTable(props: {
     { label: 'Weather', values: ['sunny'] },
     {
       label: 'Sunrise',
-      values: [format(props.dataContext.sunData!.sunRise, 'p')],
+      values: [format(dataContext.sunData.sunRise, 'p')],
     },
     {
       label: 'Sunset',
-      values: [format(props.dataContext.sunData!.sunSet, 'p')],
+      values: [format(dataContext.sunData.sunSet, 'p')],
     },
     { label: 'HW', values: highTides },
     { label: 'LW', values: lowTides },
@@ -51,7 +54,7 @@ export default function DataTable(props: {
 
   return (
     <div
-      className={`grid grid-cols-2 gap-x-16 gap-y-2 md:gap-x-6 ${props.className || ''}`}
+      className={`grid grid-cols-2 gap-x-16 gap-y-2 md:gap-x-6 ${className || ''}`}
     >
       {...tableElements}
     </div>
