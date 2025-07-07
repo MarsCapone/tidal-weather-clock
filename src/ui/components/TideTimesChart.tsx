@@ -19,8 +19,8 @@ export default function TideTimesChart({
   const highTides = tideData.filter((t) => t.type === 'high')
   const lowTides = tideData.filter((t) => t.type === 'low')
 
-  const highTideTime = highTides ? highTides[0].time : undefined
-  const lowTideTime = lowTides ? lowTides[0].time : undefined
+  const highTideTime = highTides.length > 0 ? highTides[0].time : 12
+  const lowTideTime = lowTides.length > 0 ? lowTides[0].time : 12
 
   return (
     <div>

@@ -1,5 +1,7 @@
 import { addHours, format } from 'date-fns'
 import { DataContext } from '@/types/data'
+import { formatTime, withFractionalTime } from '@/utils/dates'
+import { calcMean } from '@/utils/utils'
 
 export default function DataTable({
   className,
@@ -8,27 +10,33 @@ export default function DataTable({
   className?: string
   dataContext: DataContext
 }) {
-  const highTides = dataContext.tideData
-    .filter((t) => t.type === 'high')
-    .map((t) => format(addHours(dataContext.referenceDate, t.time), 'p'))
-  const lowTides = dataContext.tideData
-    .filter((t) => t.type === 'low')
-    .map((t) => format(addHours(dataContext.referenceDate, t.time), 'p'))
+  const tides = dataContext.tideData.map((t) => ({
+    ...t,
+    display: formatTime(withFractionalTime(dataContext.referenceDate, t.time)),
+  }))
+
+  const highTides = tides.filter((t) => t.type === 'high')
+  const lowTides = tides.filter((t) => t.type === 'low')
+
+  const windSpeeds = dataContext.windData.points.map((p) => p.speed)
+  const cloudiness = dataContext.weatherData.points.map((p) => p.cloudCover)
+  const temperature = dataContext.weatherData.points.map((p) => p.temperature)
 
   const dataTable = [
-    { label: 'Wind', values: ['12 kts'] },
-    { label: 'Tide Height', values: ['2.10 m'] },
-    { label: 'Weather', values: ['sunny'] },
+    { label: 'Wind', values: [`${calcMean(windSpeeds).toFixed(2)} kts`] },
+    { label: 'Temperature', values: [`${calcMean(temperature).toFixed(2)}°C`] },
+    { label: 'Cloudiness', values: [`${calcMean(cloudiness).toFixed(2)}%`] },
     {
       label: 'Sunrise',
-      values: [format(dataContext.sunData.sunRise, 'p')],
+      values: [formatTime(dataContext.sunData.sunRise)],
     },
     {
       label: 'Sunset',
-      values: [format(dataContext.sunData.sunSet, 'p')],
+      values: [formatTime(dataContext.sunData.sunSet)],
     },
-    { label: 'HW', values: highTides },
-    { label: 'LW', values: lowTides },
+    { label: 'Tide Height', values: [...tides.map((t) => t.height)] },
+    { label: 'HW', values: highTides.map((t) => t.display) },
+    { label: 'LW', values: lowTides.map((t) => t.display) },
   ]
 
   const rowSpanByLength = {
@@ -37,6 +45,18 @@ export default function DataTable({
   }
 
   const tableElements = dataTable.flatMap((row, i) => {
+    if (row.values.length === 0) {
+      return [
+        <div
+          className={`text-end ${rowSpanByLength[row.values.length as 1 | 2]}`}
+          key={`${row.label}-label-${i}`}
+        >
+          {row.label}
+        </div>,
+        <div key={`${row.label}-value-${i}`}></div>,
+      ]
+    }
+
     return [
       <div
         className={`text-end ${rowSpanByLength[row.values.length as 1 | 2]}`}

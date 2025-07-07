@@ -25,14 +25,15 @@ type SunData = {
 }
 
 type WeatherInfo = {
-  cloudCoverage?: number
-  summary: string
+  cloudCover: number
+  summary?: string
   temperature: number
 } & Timestamp
 
 type WindInfo = {
-  direction: CardinalDirection
+  direction: number
   speed: number
+  gustSpeed: number
 } & Timestamp
 
 type TimeBasedDataPoints<T extends Timestamp> = {

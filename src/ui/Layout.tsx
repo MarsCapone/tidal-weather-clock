@@ -7,7 +7,7 @@ export default function Layout() {
   return (
     <div className="text-center mx-auto p-8 bg-background text-content">
       <div className="flex justify-between">
-        <h1 className="text-5xl font-bold">{CONSTANTS.title}</h1>
+        <h1 className="text-5xl font-bold">{CONSTANTS.TITLE}</h1>
         <div className="flex gap-2">
           <Link to={'/'}>
             <HomeIcon className="h-6 w-6 m-3" />

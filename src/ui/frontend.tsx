@@ -17,6 +17,7 @@ import {
   formatISO,
   isWithinInterval,
   parseISO,
+  startOfDay,
   startOfToday,
   startOfTomorrow,
 } from 'date-fns'
@@ -33,7 +34,7 @@ const router = createBrowserRouter([
         Component: App,
         loader: async ({ params }) => {
           const date = params.dateString
-            ? parseISO(params.dateString)
+            ? startOfDay(parseISO(params.dateString))
             : startOfToday()
 
           // if the date is specified directly, we don't redirect
