@@ -10,6 +10,7 @@ import { StormglassDataFetcher, DataContextFetcher } from '@/utils/fetchData'
 import { DataContext } from '@/types/data'
 import CONSTANTS, { Activities } from './constants'
 import { useSwipeable } from 'react-swipeable'
+import { useFeatureFlags } from '@/utils/hooks'
 
 function AppContent({
   date,
@@ -20,6 +21,7 @@ function AppContent({
 }) {
   const [data, setData] = useState<DataContext | null>(null)
   const [isLoading, setLoading] = useState<boolean>(true)
+  const featureFlags = useFeatureFlags()
 
   useEffect(() => {
     dataFetcher.getDataContext(date).then((data) => {
@@ -43,9 +45,9 @@ function AppContent({
     )
   }
 
-  const suggestedActivity = (
+  const suggestedActivity = featureFlags.showSuggestedActivity ? (
     <SuggestedActivity dataContext={data} date={date} activities={Activities} />
-  )
+  ) : null
 
   return (
     <div>
