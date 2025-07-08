@@ -1,14 +1,15 @@
 import { differenceInHours, formatISO, parseISO } from 'date-fns'
+import CONSTANTS from '@/ui/constants'
 
 export type CacheResponseOptions = {
   expiryHours?: number
 }
 
 export function cacheResponse<T>(key: string, response: T): void {
-  const content = JSON.stringify({
+  const content = {
     timestamp: formatISO(new Date()),
     response,
-  })
+  }
   localStorage.setItem(key, JSON.stringify(content))
 }
 
@@ -22,7 +23,8 @@ export function getCachedResponse<T>(
   }
   const cachedContent = JSON.parse(content)
 
-  const expiryHours = options.expiryHours || 24
+  const expiryHours =
+    options.expiryHours || CONSTANTS.DEFAULT_CACHE_EXPIRY_HOURS
   if (
     differenceInHours(parseISO(cachedContent.timestamp), new Date()) >
     expiryHours

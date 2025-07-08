@@ -11,6 +11,7 @@ import { DataContext } from '@/types/data'
 import CONSTANTS, { Activities } from './constants'
 import { useSwipeable } from 'react-swipeable'
 import { useFeatureFlags } from '@/utils/hooks'
+import * as process from 'node:process'
 
 function AppContent({
   date,
@@ -103,7 +104,12 @@ export default function App() {
     },
   })
 
-  const stormglass = new StormglassDataFetcher(CONSTANTS.LOCATION_COORDS)
+  const API_KEY = undefined
+
+  const stormglass = new StormglassDataFetcher(
+    CONSTANTS.LOCATION_COORDS,
+    API_KEY,
+  )
 
   return (
     <div
