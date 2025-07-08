@@ -2,21 +2,14 @@ import { DataContext } from '@/types/data'
 import stormglassWeatherExample from './stormGlassWeatherExample.json'
 import stormglassTideExample from './stormGlassTideExample.json'
 import stormglassSunExample from './stormGlassAstronomyExample.json'
-import CONSTANTS from '@/ui/constants'
 import {
-  differenceInDays,
-  differenceInHours,
   endOfDay,
   formatISO,
   isWithinInterval,
   parseISO,
   startOfDay,
 } from 'date-fns'
-import {
-  cacheResponse,
-  CacheResponseOptions,
-  getCachedResponse,
-} from '@/utils/cache'
+import { cacheResponse, getCachedResponse } from '@/utils/cache'
 import {
   StormglassSunResponse,
   StormglassTideResponse,
@@ -24,6 +17,7 @@ import {
   StormglassWeatherResponse,
 } from '@/types/stormglass'
 import { getFractionalTime } from '@/utils/dates'
+import CONSTANTS from '@/ui/constants'
 
 export interface DataContextFetcher {
   getDataContext(date: Date): Promise<DataContext>
@@ -74,12 +68,8 @@ export class StormglassDataFetcher implements DataContextFetcher {
 
   async callStormglassApi<T>(
     type: 'weather' | 'tide' | 'sun',
-    cacheOptions: CacheResponseOptions = {},
   ): Promise<T | null> {
     const [lat, lng] = this.coords
-    const cacheKey = `stormglass-response-${type}-[${lat},${lng}]`
-    const cachedResponse = getCachedResponse<T>(cacheKey, cacheOptions)
-    if (cachedResponse) return cachedResponse
 
     const urls = {
       weather: `${stormglassBaseUrl}/v2/weather/point?lat=${lat}&lng=${lng}&params=${stormglassWeatherParams.join(',')}`,
@@ -93,38 +83,34 @@ export class StormglassDataFetcher implements DataContextFetcher {
         headers: { Authorization: this.apiKey },
       })
       if (response.ok) {
-        const json = await response.json()
-        cacheResponse(cacheKey, json)
-        return json
+        return await response.json()
+      } else {
+        console.error(
+          `error fetching ${type} data from stormglass api`,
+          response.status,
+        )
       }
     }
     return null
   }
   async fetchWeatherResponse(): Promise<StormglassWeatherResponse> {
-    const response = await this.callStormglassApi<StormglassWeatherResponse>(
-      'weather',
-      cacheOptions,
-    )
+    const response =
+      await this.callStormglassApi<StormglassWeatherResponse>('weather')
     if (response) return response
 
     return stormglassWeatherExample
   }
 
   async fetchTideResponse(): Promise<StormglassTideResponse> {
-    const response = await this.callStormglassApi<StormglassTideResponse>(
-      'tide',
-      cacheOptions,
-    )
+    const response =
+      await this.callStormglassApi<StormglassTideResponse>('tide')
     if (response) return response
 
     return stormglassTideExample as StormglassTideResponse
   }
 
   async fetchSunResponse(): Promise<StormglassSunResponse> {
-    const response = await this.callStormglassApi<StormglassSunResponse>(
-      'sun',
-      cacheOptions,
-    )
+    const response = await this.callStormglassApi<StormglassSunResponse>('sun')
     if (response) return response
 
     return stormglassSunExample as StormglassSunResponse
@@ -192,33 +178,38 @@ export class StormglassDataFetcher implements DataContextFetcher {
   }
 }
 
-class DemoDataFetcher implements DataContextFetcher {
+export class DemoStormglassDataFetcher extends StormglassDataFetcher {
+  async callStormglassApi<T>(
+    type: 'weather' | 'tide' | 'sun',
+  ): Promise<T | null> {
+    return null
+  }
+}
+
+export class ServerDataFetcher implements DataContextFetcher {
   async getDataContext(date: Date): Promise<DataContext> {
-    return {
-      referenceDate: startOfDay(date),
-      sunData: {
-        sunRise: new Date(2025, 4, 22, 6, 10),
-        sunSet: new Date(2025, 4, 22, 20, 43),
-      },
-      tideData: [
-        {
-          height: 1.8,
-          time: 10.5,
-          type: 'high',
-        },
-        {
-          height: 2.0,
-          time: 22.75,
-          type: 'high',
-        },
-        {
-          height: 0.7,
-          time: 16 + 10 / 60,
-          type: 'low',
-        },
-      ],
-      weatherData: { points: [] },
-      windData: { points: [] },
-    } as DataContext
+    const [lat, lng] = CONSTANTS.LOCATION_COORDS
+    const cacheKey = `stormglass-server-[${lat},${lng}]`
+    const cachedResponse = getCachedResponse<DataContext>(cacheKey)
+    if (cachedResponse) {
+      return cachedResponse
+    }
+
+    const response = await fetch(`/api/dataContext/${formatISO(date)}`)
+    if (response.ok) {
+      const json = await response.json()
+
+      if (Object.keys(json).length > 0) {
+        cacheResponse(cacheKey, json)
+        console.log(json)
+        return json
+      }
+    }
+
+    console.log('falling back to pre-scraped data')
+    const demoDataFetcher = new DemoStormglassDataFetcher(
+      CONSTANTS.LOCATION_COORDS,
+    )
+    return await demoDataFetcher.getDataContext(date)
   }
 }

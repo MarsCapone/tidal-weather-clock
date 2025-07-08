@@ -6,12 +6,16 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
 
 import { Link, redirect, useLoaderData, useNavigate } from 'react-router'
 import React, { useEffect, useState } from 'react'
-import { StormglassDataFetcher, DataContextFetcher } from '@/utils/fetchData'
+import {
+  StormglassDataFetcher,
+  DataContextFetcher,
+  ServerDataFetcher,
+} from '@/utils/fetchData'
 import { DataContext } from '@/types/data'
 import CONSTANTS, { Activities } from './constants'
 import { useSwipeable } from 'react-swipeable'
 import { useFeatureFlags } from '@/utils/hooks'
-import * as process from 'node:process'
+import * as console from 'node:console'
 
 function AppContent({
   date,
@@ -38,7 +42,7 @@ function AppContent({
       </div>
     )
   }
-  if (!data) {
+  if (Object.keys(data as object).length === 0 || data === null) {
     return (
       <div className="text-3xl">
         <h1>No data context...</h1>
@@ -104,12 +108,7 @@ export default function App() {
     },
   })
 
-  const API_KEY = undefined
-
-  const stormglass = new StormglassDataFetcher(
-    CONSTANTS.LOCATION_COORDS,
-    API_KEY,
-  )
+  const dataFetcher = new ServerDataFetcher()
 
   return (
     <div
@@ -123,7 +122,7 @@ export default function App() {
         </div>
         <NextPageButton path={nextPath} Icon={ChevronRightIcon} />
       </div>
-      <AppContent date={date} dataFetcher={stormglass} />
+      <AppContent date={date} dataFetcher={dataFetcher} />
     </div>
   )
 }
