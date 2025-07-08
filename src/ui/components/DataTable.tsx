@@ -33,12 +33,12 @@ export default function DataTable({
       label: 'Sunset',
       values: [formatTime(dataContext.sunData.sunSet)],
     },
-    {
-      label: 'Tide Height',
-      values: [...tides.map((t) => `${t.height.toFixed(1)}m`)],
-    },
     { label: 'HW', values: highTides.map((t) => t.display) },
     { label: 'LW', values: lowTides.map((t) => t.display) },
+    {
+      label: 'Tide Heights',
+      values: [...tides.map((t) => `${t.height.toFixed(1)}m`)],
+    },
   ]
 
   const rowSpanByLength = {

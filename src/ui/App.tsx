@@ -103,9 +103,7 @@ export default function App() {
     },
   })
 
-  const stormglass = new StormglassDataFetcher(
-    CONSTANTS.BURNHAM_OVERY_STAITHE_COORDS,
-  )
+  const stormglass = new StormglassDataFetcher(CONSTANTS.LOCATION_COORDS)
 
   return (
     <div
@@ -115,7 +113,7 @@ export default function App() {
       <div className="flex justify-center px-20 gap-x-2">
         <NextPageButton path={prevPath} Icon={ChevronLeftIcon} />
         <div className="py-2">
-          <DateDisplay date={date} />
+          <DateDisplay date={date} location={CONSTANTS.LOCATION_NAME} />
         </div>
         <NextPageButton path={nextPath} Icon={ChevronRightIcon} />
       </div>

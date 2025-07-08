@@ -76,11 +76,11 @@ export class StormglassDataFetcher implements DataContextFetcher {
     type: 'weather' | 'tide' | 'sun',
     cacheOptions: CacheResponseOptions = {},
   ): Promise<T | null> {
-    const cacheKey = `stormglass-response-${type}`
+    const [lat, lng] = this.coords
+    const cacheKey = `stormglass-response-${type}-[${lat},${lng}]`
     const cachedResponse = getCachedResponse<T>(cacheKey, cacheOptions)
     if (cachedResponse) return cachedResponse
 
-    const [lat, lng] = this.coords
     const urls = {
       weather: `${stormglassBaseUrl}/v2/weather/point?lat=${lat}&lng=${lng}&params=${stormglassWeatherParams.join(',')}`,
       tide: `${stormglassBaseUrl}/v2/tide/extremes/point?lat=${lat}&lng=${lng}`,
@@ -107,7 +107,6 @@ export class StormglassDataFetcher implements DataContextFetcher {
     )
     if (response) return response
 
-    console.log('fetching weather response from static data')
     return stormglassWeatherExample
   }
 
