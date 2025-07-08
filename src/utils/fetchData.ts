@@ -35,7 +35,7 @@ curl -H "Authorization: ${API_KEY}" \
 */
 
 const stormglassBaseUrl = 'https://api.stormglass.io'
-const cacheOptions = { expiryHours: 36 }
+const cacheOptions = { expiryHours: 24 }
 
 function getMeanValueFromSource(
   sourceData: Record<never, number | undefined>,
@@ -113,9 +113,7 @@ export class StormglassDataFetcher implements DataContextFetcher {
   async fetchTideResponse(): Promise<StormglassTideResponse> {
     const response = await this.callStormglassApi<StormglassTideResponse>(
       'tide',
-      {
-        expiryHours: 24 * 7,
-      },
+      cacheOptions,
     )
     if (response) return response
 
@@ -125,9 +123,7 @@ export class StormglassDataFetcher implements DataContextFetcher {
   async fetchSunResponse(): Promise<StormglassSunResponse> {
     const response = await this.callStormglassApi<StormglassSunResponse>(
       'sun',
-      {
-        expiryHours: 24 * 7,
-      },
+      cacheOptions,
     )
     if (response) return response
 
