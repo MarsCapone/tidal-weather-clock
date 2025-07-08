@@ -4,6 +4,7 @@ const CONSTANTS = {
   TITLE: 'Tidal Weather Clock',
   LOCATION_COORDS: [52.9636, 0.7442] as [number, number],
   LOCATION_NAME: 'Burnham Overy Staithe',
+  MAX_PERMITTED_DAYS: 10,
 }
 
 export default CONSTANTS

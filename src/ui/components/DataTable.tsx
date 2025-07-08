@@ -22,16 +22,45 @@ export default function DataTable({
   const temperature = dataContext.weatherData.points.map((p) => p.temperature)
 
   const dataTable = [
-    { label: 'Wind', values: [`${calcMean(windSpeeds).toFixed(2)} kts`] },
-    { label: 'Temperature', values: [`${calcMean(temperature).toFixed(2)}°C`] },
-    { label: 'Cloudiness', values: [`${calcMean(cloudiness).toFixed(2)}%`] },
+    {
+      label: 'Wind',
+      values: [
+        windSpeeds.length > 0
+          ? `${calcMean(windSpeeds).toFixed(2)} kts`
+          : undefined,
+      ],
+    },
+    {
+      label: 'Temperature',
+      values: [
+        temperature.length > 0
+          ? `${calcMean(temperature).toFixed(2)}°C`
+          : undefined,
+      ],
+    },
+    {
+      label: 'Cloudiness',
+      values: [
+        cloudiness.length > 0
+          ? `${calcMean(cloudiness).toFixed(2)}%`
+          : undefined,
+      ],
+    },
     {
       label: 'Sunrise',
-      values: [formatTime(dataContext.sunData.sunRise)],
+      values: [
+        dataContext.sunData.sunRise
+          ? formatTime(dataContext.sunData.sunRise)
+          : undefined,
+      ],
     },
     {
       label: 'Sunset',
-      values: [formatTime(dataContext.sunData.sunSet)],
+      values: [
+        dataContext.sunData.sunSet
+          ? formatTime(dataContext.sunData.sunSet)
+          : undefined,
+      ],
     },
     { label: 'HW', values: highTides.map((t) => t.display) },
     { label: 'LW', values: lowTides.map((t) => t.display) },
@@ -49,7 +78,7 @@ export default function DataTable({
   }
 
   const tableElements = dataTable.flatMap((row, i) => {
-    if (row.values.length === 0) {
+    if (row.values.every((v) => v === undefined)) {
       return [
         <div
           className={`text-end ${rowSpanByLength[row.values.length as 1 | 2]}`}
@@ -57,7 +86,9 @@ export default function DataTable({
         >
           {row.label}
         </div>,
-        <div key={`${row.label}-value-${i}`}></div>,
+        <div key={`${row.label}-value-${i}`} className="text-error text-start">
+          NO DATA
+        </div>,
       ]
     }
 

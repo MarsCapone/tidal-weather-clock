@@ -148,8 +148,9 @@ export class StormglassDataFetcher implements DataContextFetcher {
     const result: DataContext = {
       referenceDate: date,
       sunData: {
-        sunSet: parseISO(sunResponse[0].sunset),
-        sunRise: parseISO(sunResponse[0].sunrise),
+        sunSet: sunResponse.length > 0 ? parseISO(sunResponse[0].sunset) : null,
+        sunRise:
+          sunResponse.length > 0 ? parseISO(sunResponse[0].sunrise) : null,
       },
       tideData: [],
       windData: {

@@ -21,6 +21,7 @@ import {
   startOfToday,
   startOfTomorrow,
 } from 'date-fns'
+import CONSTANTS from '@/ui/constants'
 
 const PERMITTED_INTERVAL = {
   end: addDays(startOfToday(), 7),
@@ -60,12 +61,15 @@ const router = createBrowserRouter([
         Component: App,
         loader: async ({ params }) => {
           const days = Number.parseInt(params.days!)
-          if (days < 0 || days > 7) {
+          if (days < 0 || days > CONSTANTS.MAX_PERMITTED_DAYS) {
             return redirect('/')
           }
           return {
             date: addDays(startOfToday(), days),
-            nextPath: days + 1 <= 7 ? `/plus/${days + 1}` : null,
+            nextPath:
+              days + 1 <= CONSTANTS.MAX_PERMITTED_DAYS
+                ? `/plus/${days + 1}`
+                : null,
             prevPath: days - 1 >= 0 ? `/plus/${days - 1}` : null,
           }
         },

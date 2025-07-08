@@ -20,8 +20,8 @@ export type TideInfo = {
 }
 
 type SunData = {
-  sunRise: Date
-  sunSet: Date
+  sunRise: Date | null
+  sunSet: Date | null
 }
 
 type WeatherInfo = {
