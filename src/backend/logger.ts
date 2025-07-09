@@ -18,3 +18,5 @@ const _logger = pino({
 })
 
 const logger = new Logger(_logger)
+
+export default logger

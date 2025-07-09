@@ -1,10 +1,18 @@
 import { serve } from 'bun'
 import index from '@/ui/index.html'
-import { StormglassDataFetcher } from '@/utils/fetchData'
+import {
+  DemoStormglassDataFetcher,
+  StormglassDataFetcher,
+} from '@/utils/fetchData'
 import * as process from 'node:process'
-import { parseISO, startOfDay } from 'date-fns'
+import { formatISO, parseISO, startOfDay } from 'date-fns'
+import { DebugMemoryCache } from '@/backend/cache'
+import logger from '@/backend/logger'
+import { DataContext } from '@/types/data'
 
-const dataFetcher = new StormglassDataFetcher(Bun.env.STORMGLASS_API_KEY)
+// const dataFetcher = new StormglassDataFetcher(Bun.env.STORMGLASS_API_KEY)
+const dataFetcher = new DemoStormglassDataFetcher(logger)
+const cache = new DebugMemoryCache()
 
 const server = serve({
   development: process.env.NODE_ENV !== 'production' && {
@@ -22,9 +30,22 @@ const server = serve({
     '/api/dataContext/:dateString': async (req) => {
       const dateString = req.params.dateString
       const date = startOfDay(parseISO(dateString))
-      console.log(`Fetching data from ${dateString}`)
-      const data = await dataFetcher.getDataContexts(date)
-      return Response.json(data)
+
+      const cachedData = cache.getCacheValue<DataContext[]>('all-contexts', {
+        expiryHours: 4,
+      })
+      if (!cachedData) {
+        logger.info('fetching data', {
+          date: dateString,
+          fetcher: dataFetcher.constructor.name,
+        })
+        const data = await dataFetcher.getDataContexts(date)
+
+        cache.setCacheValue('all-contexts', data)
+
+        return Response.json(data)
+      }
+      return Response.json([])
     },
   },
 })

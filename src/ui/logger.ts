@@ -11,11 +11,6 @@ const _logger = pino({
     level: (label) => {
       return { level: label.toUpperCase() }
     },
-    bindings: (bindings) => {
-      return {
-        source: 'client',
-      }
-    },
   },
   timestamp: pino.stdTimeFunctions.isoTime,
 })
