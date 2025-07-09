@@ -1,6 +1,7 @@
 import pino from 'pino'
 import Logger from '@/types/logger'
 
+// @ts-ignore
 const _logger = pino({
   level: 'debug',
   browser: {

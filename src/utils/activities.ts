@@ -153,7 +153,7 @@ function evaluateSunConstraint(
   timestamp: Date,
   context: DataContext,
 ): boolean {
-  if (!context.sunData) {
+  if (!context.sunData || !context.sunData.sunRise || !context.sunData.sunSet) {
     return false
   }
 
