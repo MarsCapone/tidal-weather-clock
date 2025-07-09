@@ -1,35 +1,39 @@
 import { differenceInHours, formatISO, parseISO } from 'date-fns'
 import CONSTANTS from '@/ui/constants'
 
-export type CacheResponseOptions = {
-  expiryHours?: number
+export type GetCacheOptions = {
+  expiryHours: number
 }
 
-export function setCachedResponse<T>(key: string, response: T): void {
-  const content = {
-    timestamp: formatISO(new Date()),
-    response,
-  }
-  localStorage.setItem(key, JSON.stringify(content))
+export interface ICache {
+  setCacheValue<T>(key: string, value: T): void
+  getCacheValue<T>(key: string, options?: GetCacheOptions): T | null
 }
 
-export function getCachedResponse<T>(
-  key: string,
-  options: CacheResponseOptions = {},
-): T | null {
-  const content = localStorage.getItem(key)
-  if (!content) {
-    return null
+export class LocalStorageCache implements ICache {
+  setCacheValue<T>(key: string, value: T): void {
+    const content = {
+      timestamp: formatISO(new Date()),
+      value,
+    }
+    localStorage.setItem(key, JSON.stringify(content))
   }
-  const cachedContent = JSON.parse(content)
 
-  const expiryHours =
-    options.expiryHours || CONSTANTS.DEFAULT_CACHE_EXPIRY_HOURS
-  if (
-    differenceInHours(parseISO(cachedContent.timestamp), new Date()) >
-    expiryHours
-  ) {
-    return null
+  getCacheValue<T>(key: string, options?: GetCacheOptions): T | null {
+    const content = localStorage.getItem(key)
+    if (!content) {
+      return null
+    }
+    const cachedContent = JSON.parse(content)
+
+    if (
+      options !== undefined &&
+      differenceInHours(parseISO(cachedContent.timestamp), new Date()) >
+        options.expiryHours
+    ) {
+      return null
+    }
+
+    return cachedContent.response as T
   }
-  return cachedContent.response as T
 }

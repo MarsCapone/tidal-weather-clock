@@ -7,7 +7,7 @@ import {
   parseISO,
   startOfDay,
 } from 'date-fns'
-import { setCachedResponse, getCachedResponse } from '@/utils/cache'
+import { ICache } from '@/utils/cache'
 import {
   StormglassSunResponse,
   StormglassTideResponse,
@@ -290,6 +290,7 @@ export default async function tryDataFetchersWithCache(
   logger: Logger,
   date: Date,
   fetchers: DataContextFetcher[],
+  cache: ICache,
   cacheKeyFn: (lat: number, lng: number, date: Date) => string,
 ): Promise<DataContext | null> {
   logger.info('attempting to fetch data context', {
@@ -300,9 +301,10 @@ export default async function tryDataFetchersWithCache(
   const [lat, lng] = CONSTANTS.LOCATION_COORDS
 
   const cacheKey = getCacheKeyFn(cacheKeyFn)(lat, lng, date)
-  const cachedResponse = getCachedResponse<DataContext>(cacheKey, {
+  const cachedResponse = cache.getCacheValue<DataContext>(cacheKey, {
     expiryHours: 24,
   })
+
   if (cachedResponse) {
     logger.warn('returned data from cache', {
       cacheKey,
@@ -343,7 +345,7 @@ export default async function tryDataFetchersWithCache(
     dataContext.forEach((dc) => {
       const key = getCacheKeyFn(cacheKeyFn)(lat, lng, dc.referenceDate)
       logger.debug('caching data context', { cacheKey: key })
-      setCachedResponse(key, dc)
+      cache.setCacheValue<DataContext>(key, dc)
     })
   }
   return dataContext[0]
