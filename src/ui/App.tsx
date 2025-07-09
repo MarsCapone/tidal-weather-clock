@@ -16,6 +16,7 @@ import CONSTANTS, { Activities } from './constants'
 import { useSwipeable } from 'react-swipeable'
 import { useFeatureFlags } from '@/utils/featureFlags'
 import { formatISO } from 'date-fns'
+import logger from '@/ui/logger'
 
 function AppContent({
   date,
@@ -102,19 +103,20 @@ export default function App() {
 
   useEffect(() => {
     tryDataFetchersWithCache(
+      logger,
       date,
       [
-        new ServerDataFetcher(),
-        new StormglassDataFetcher(),
-        new DemoStormglassDataFetcher(),
+        new ServerDataFetcher(logger),
+        // new StormglassDataFetcher(logger),
+        new DemoStormglassDataFetcher(logger),
       ],
       (lat, lng, date) =>
         `[${lat},${lng}]-${formatISO(date, { representation: 'date' })}`,
     ).then((dc) => {
       if (dc === null) {
-        console.warn('dataContext not found')
+        logger.warn('final data context is null')
       }
-      console.log('setting dataContext')
+      logger.info('setting data context')
       setDataContext(dc)
       setIsLoading(false)
     })

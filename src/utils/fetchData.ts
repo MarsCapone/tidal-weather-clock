@@ -19,6 +19,7 @@ import CONSTANTS from '@/ui/constants'
 import stormglassSunExample from './stormGlassAstronomyExample.json'
 import stormglassTideExample from './stormGlassTideExample.json'
 import stormglassWeatherExample from './stormGlassWeatherExample.json'
+import Logger from '@/types/logger'
 
 export interface DataContextFetcher {
   isCacheable(): boolean
@@ -59,56 +60,27 @@ function filterToDate<T extends { time: string }>(
   )
 }
 
-export class StormglassDataFetcher implements DataContextFetcher {
-  private readonly apiKey?: string
+export class DemoStormglassDataFetcher implements DataContextFetcher {
+  readonly logger: Logger
 
-  // https://docs.stormglass.io/#/weather
-
-  constructor(apiKey?: string) {
-    this.apiKey = apiKey
+  constructor(logger: Logger) {
+    this.logger = logger
   }
 
   isCacheable(): boolean {
-    return true
+    return false
   }
 
-  async callStormglassApi<T>(
-    type: 'weather' | 'tide' | 'sun',
-  ): Promise<T | null> {
-    const [lat, lng] = CONSTANTS.LOCATION_COORDS
-
-    const urls = {
-      weather: `${stormglassBaseUrl}/v2/weather/point?lat=${lat}&lng=${lng}&params=${stormglassWeatherParams.join(',')}`,
-      tide: `${stormglassBaseUrl}/v2/tide/extremes/point?lat=${lat}&lng=${lng}`,
-      sun: `${stormglassBaseUrl}/v2/astronomy/point?lat=${lat}&lng=${lng}`,
-    }
-
-    if (this.apiKey) {
-      console.log(`fetching ${type} data from stormglass api`)
-      const response = await fetch(urls[type], {
-        headers: { Authorization: this.apiKey },
-      })
-      if (response.ok) {
-        return await response.json()
-      } else {
-        console.error(
-          `error fetching ${type} data from stormglass api`,
-          response.status,
-        )
-      }
-    }
-    return null
-  }
   async fetchWeatherResponse(): Promise<StormglassWeatherResponse | null> {
-    return await this.callStormglassApi<StormglassWeatherResponse>('weather')
+    return stormglassWeatherExample
   }
 
   async fetchTideResponse(): Promise<StormglassTideResponse | null> {
-    return this.callStormglassApi<StormglassTideResponse>('tide')
+    return stormglassTideExample as StormglassTideResponse
   }
 
   async fetchSunResponse(): Promise<StormglassSunResponse | null> {
-    return await this.callStormglassApi<StormglassSunResponse>('sun')
+    return stormglassSunExample
   }
 
   async getDataContexts(date: Date): Promise<DataContext[]> {
@@ -122,6 +94,12 @@ export class StormglassDataFetcher implements DataContextFetcher {
     if (
       [rawWeather, rawTide, rawSun].some((r) => r === null || r === undefined)
     ) {
+      this.logger.warn('not all data sources returned data', {
+        date,
+        weather: rawWeather !== null,
+        tide: rawTide !== null,
+        sun: rawSun !== null,
+      })
       return []
     }
 
@@ -137,12 +115,17 @@ export class StormglassDataFetcher implements DataContextFetcher {
       ],
     )
 
-    const datesToCheck = eachDayOfInterval({
+    const interval = {
       start: date,
       end: new Date(bestEndSinceEpoch),
+    }
+
+    this.logger.debug('fetching data contexts', {
+      interval,
+      date,
     })
 
-    return datesToCheck.map((d) =>
+    return eachDayOfInterval(interval).map((d) =>
       this.getDataContext(d, [rawWeather!, rawTide!, rawSun!]),
     )
   }
@@ -213,41 +196,85 @@ export class StormglassDataFetcher implements DataContextFetcher {
   }
 }
 
-export class DemoStormglassDataFetcher extends StormglassDataFetcher {
-  constructor() {
-    super()
+export class StormglassDataFetcher extends DemoStormglassDataFetcher {
+  private readonly apiKey?: string
+
+  // https://docs.stormglass.io/#/weather
+
+  constructor(logger: Logger, apiKey: string) {
+    super(logger)
+    this.apiKey = apiKey
   }
 
   isCacheable(): boolean {
-    return false
+    return true
   }
 
+  async callStormglassApi<T>(
+    type: 'weather' | 'tide' | 'sun',
+  ): Promise<T | null> {
+    this.logger.debug('calling stormglass api', { apiType: type })
+
+    const [lat, lng] = CONSTANTS.LOCATION_COORDS
+
+    const urls = {
+      weather: `${stormglassBaseUrl}/v2/weather/point?lat=${lat}&lng=${lng}&params=${stormglassWeatherParams.join(',')}`,
+      tide: `${stormglassBaseUrl}/v2/tide/extremes/point?lat=${lat}&lng=${lng}`,
+      sun: `${stormglassBaseUrl}/v2/astronomy/point?lat=${lat}&lng=${lng}`,
+    }
+    const response = await fetch(urls[type], {
+      headers: { Authorization: this.apiKey! },
+    })
+    const content = await response.json()
+
+    if (response.ok) {
+      return content
+    }
+
+    this.logger.error('error fetching stormglass data', {
+      apiType: type,
+      statusCode: response.status,
+      statusText: response.statusText,
+      content,
+    })
+    return null
+  }
   async fetchWeatherResponse(): Promise<StormglassWeatherResponse | null> {
-    return stormglassWeatherExample
+    return await this.callStormglassApi<StormglassWeatherResponse>('weather')
   }
 
   async fetchTideResponse(): Promise<StormglassTideResponse | null> {
-    return stormglassTideExample as StormglassTideResponse
+    return this.callStormglassApi<StormglassTideResponse>('tide')
   }
 
   async fetchSunResponse(): Promise<StormglassSunResponse | null> {
-    return stormglassSunExample
+    return await this.callStormglassApi<StormglassSunResponse>('sun')
   }
 }
 
 export class ServerDataFetcher implements DataContextFetcher {
+  constructor(private readonly logger: Logger) {
+    this.logger = logger
+  }
+
   isCacheable(): boolean {
     return true
   }
   async getDataContexts(date: Date): Promise<DataContext[]> {
+    this.logger.debug('fetching data context from server', { date })
     const response = await fetch(`/api/dataContext/${formatISO(date)}`)
-    if (response.ok) {
-      const json = await response.json()
+    const content = await response.json()
 
-      if (Object.keys(json).length > 0) {
-        return json
-      }
+    if (response.ok && content) {
+      return content
     }
+
+    this.logger.warn('error fetching data context from server', {
+      date,
+      statusCode: response.status,
+      statusText: response.statusText,
+      content,
+    })
     return []
   }
 }
@@ -260,10 +287,16 @@ function getCacheKeyFn(fn: CacheKeyFn): CacheKeyFn {
 }
 
 export default async function tryDataFetchersWithCache(
+  logger: Logger,
   date: Date,
   fetchers: DataContextFetcher[],
   cacheKeyFn: (lat: number, lng: number, date: Date) => string,
 ): Promise<DataContext | null> {
+  logger.info('attempting to fetch data context', {
+    fetchers: fetchers.map((f) => f.constructor.name),
+    date,
+  })
+
   const [lat, lng] = CONSTANTS.LOCATION_COORDS
 
   const cacheKey = getCacheKeyFn(cacheKeyFn)(lat, lng, date)
@@ -271,7 +304,9 @@ export default async function tryDataFetchersWithCache(
     expiryHours: 24,
   })
   if (cachedResponse) {
-    console.warn(`returning cached data`, cacheKey)
+    logger.warn('returned data from cache', {
+      cacheKey,
+    })
     return cachedResponse
   }
 
@@ -279,14 +314,17 @@ export default async function tryDataFetchersWithCache(
   let shouldCache: boolean = false
 
   for (const fetcher of fetchers) {
-    console.log('trying to fetch dataContext', fetcher.constructor.name)
+    logger.debug('trying fetcher', { fetcher: fetcher.constructor.name, date })
     dataContext = await fetcher.getDataContexts(date)
     if (dataContext.length > 0) {
-      console.log(
-        'found dataContexts with fetcher',
-        fetcher.constructor.name,
-        dataContext.length,
-      )
+      logger.debug('found valid data with fetcher', {
+        fetcher: fetcher.constructor.name,
+        contextCount: dataContext.length,
+        interval: {
+          start: dataContext[0].referenceDate,
+          end: dataContext[dataContext.length - 1].referenceDate,
+        },
+      })
       shouldCache = fetcher.isCacheable()
       break
     }
@@ -294,14 +332,17 @@ export default async function tryDataFetchersWithCache(
 
   if (dataContext === null) {
     // no data was found via any fetcher
-    console.error('no data contexts found via any fetcher')
+    logger.error('no data contexts found via any fetcher', {
+      date,
+      fetchers: fetchers.map((f) => f.constructor.name),
+    })
     return null
   }
 
   if (shouldCache) {
     dataContext.forEach((dc) => {
       const key = getCacheKeyFn(cacheKeyFn)(lat, lng, dc.referenceDate)
-      console.log('caching dataContext', key)
+      logger.debug('caching data context', { cacheKey: key })
       setCachedResponse(key, dc)
     })
   }

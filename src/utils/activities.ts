@@ -20,6 +20,7 @@ import {
   startOfDay,
 } from 'date-fns'
 import arrayEqual from 'array-equal'
+import logger from '@/ui/logger'
 
 const _PERIOD_GRANULARITY_MINUTES = 10
 
@@ -291,6 +292,10 @@ export function suggestActivity(
   context: DataContext,
   activities: Activity[],
 ): IntervalActivitySelection | null {
+  logger.info('suggesting activities', {
+    date,
+    totalActivities: activities.length,
+  })
   const suggestions = suggestActivities(date, context, activities)
 
   const goodSuggestions = suggestions.filter(
