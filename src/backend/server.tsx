@@ -1,14 +1,13 @@
 import { serve } from 'bun'
 import index from '@/ui/index.html'
-import { StormglassDataFetcher } from '@/utils/fetchData'
+import {
+  DemoStormglassDataFetcher,
+  StormglassDataFetcher,
+} from '@/utils/fetchData'
 import * as process from 'node:process'
-import CONSTANTS from '@/ui/constants'
 import { parseISO, startOfDay, startOfToday } from 'date-fns'
 
-const dataFetcher = new StormglassDataFetcher(
-  CONSTANTS.LOCATION_COORDS,
-  Bun.env.STORMGLASS_API_KEY,
-)
+const dataFetcher = new DemoStormglassDataFetcher()
 
 const server = serve({
   development: process.env.NODE_ENV !== 'production' && {
@@ -27,7 +26,8 @@ const server = serve({
       const dateString = req.params.dateString
       const date = startOfDay(parseISO(dateString))
       console.log(`Fetching data from ${dateString}`)
-      return Response.json(dataFetcher.getDataContext(date))
+      const data = await dataFetcher.getDataContexts(date)
+      return Response.json(data)
     },
   },
 })

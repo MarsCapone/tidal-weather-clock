@@ -1,5 +1,6 @@
 import { DataContext } from '@/types/data'
 import {
+  eachDayOfInterval,
   endOfDay,
   formatISO,
   isWithinInterval,
@@ -22,7 +23,8 @@ import stormglassWeatherExample from './stormGlassWeatherExample.json'
 export interface DataContextFetcher {
   isCacheable(): boolean
 
-  getDataContext(date: Date): Promise<DataContext | null>
+  // starting at `date` return as may data contexts as can be found
+  getDataContexts(date: Date): Promise<DataContext[]>
 }
 
 /*
@@ -109,7 +111,7 @@ export class StormglassDataFetcher implements DataContextFetcher {
     return await this.callStormglassApi<StormglassSunResponse>('sun')
   }
 
-  async getDataContext(date: Date): Promise<DataContext | null> {
+  async getDataContexts(date: Date): Promise<DataContext[]> {
     const [rawWeather, rawTide, rawSun] = [
       await this.fetchWeatherResponse(),
       await this.fetchTideResponse(),
@@ -117,10 +119,43 @@ export class StormglassDataFetcher implements DataContextFetcher {
     ]
 
     // we have to have pulled all data
-    if ([rawWeather, rawTide, rawSun].some((r) => r === null)) {
-      return null
+    if (
+      [rawWeather, rawTide, rawSun].some((r) => r === null || r === undefined)
+    ) {
+      return []
     }
 
+    // find the minimum time range that all data sources support.
+    // start should be the same on all of them.
+    // end is either in the meta or needs to be pulled out from the data
+
+    const bestEndSinceEpoch = Math.max(
+      ...[
+        parseISO(rawWeather!.meta.end).getTime(),
+        parseISO(rawTide!.meta.end).getTime(),
+        Math.max(...rawSun!.data.map((r) => parseISO(r.time).getTime())),
+      ],
+    )
+
+    const datesToCheck = eachDayOfInterval({
+      start: date,
+      end: new Date(bestEndSinceEpoch),
+    })
+
+    return datesToCheck.map((d) =>
+      this.getDataContext(d, [rawWeather!, rawTide!, rawSun!]),
+    )
+  }
+
+  getDataContext(
+    date: Date,
+    rawResponses: [
+      StormglassWeatherResponse,
+      StormglassTideResponse,
+      StormglassSunResponse,
+    ],
+  ): DataContext {
+    const [rawWeather, rawTide, rawSun] = rawResponses
     const [weatherResponse, tideResponse, sunResponse] = [
       filterToDate(date, rawWeather?.hours),
       filterToDate(date, rawTide?.data),
@@ -204,27 +239,24 @@ export class ServerDataFetcher implements DataContextFetcher {
   isCacheable(): boolean {
     return true
   }
-  async getDataContext(date: Date): Promise<DataContext | null> {
-    const [lat, lng] = CONSTANTS.LOCATION_COORDS
-    const cacheKey = `stormglass-server-[${lat},${lng}]`
-    const cachedResponse = getCachedResponse<DataContext>(cacheKey)
-    if (cachedResponse) {
-      return cachedResponse
-    }
-
+  async getDataContexts(date: Date): Promise<DataContext[]> {
     const response = await fetch(`/api/dataContext/${formatISO(date)}`)
     if (response.ok) {
       const json = await response.json()
 
       if (Object.keys(json).length > 0) {
-        setCachedResponse(cacheKey, json)
-        console.log(json)
         return json
       }
     }
-
-    return null
+    return []
   }
+}
+
+type CacheKeyFn = (lat: number, lng: number, date: Date) => string
+const CACHE_PREFIX = `dataContext-`
+function getCacheKeyFn(fn: CacheKeyFn): CacheKeyFn {
+  return (lat: number, lng: number, date: Date) =>
+    `${CACHE_PREFIX}${fn(lat, lng, date)}`
 }
 
 export default async function tryDataFetchersWithCache(
@@ -234,7 +266,7 @@ export default async function tryDataFetchersWithCache(
 ): Promise<DataContext | null> {
   const [lat, lng] = CONSTANTS.LOCATION_COORDS
 
-  const cacheKey = `dataContext-${cacheKeyFn(lat, lng, date)}`
+  const cacheKey = getCacheKeyFn(cacheKeyFn)(lat, lng, date)
   const cachedResponse = getCachedResponse<DataContext>(cacheKey, {
     expiryHours: 24,
   })
@@ -243,14 +275,18 @@ export default async function tryDataFetchersWithCache(
     return cachedResponse
   }
 
-  let dataContext: DataContext | null = null
+  let dataContext: DataContext[] | null = null
   let shouldCache: boolean = false
 
   for (const fetcher of fetchers) {
     console.log('trying to fetch dataContext', fetcher.constructor.name)
-    dataContext = await fetcher.getDataContext(date)
-    if (dataContext !== null) {
-      console.log('found dataContext with fetcher', fetcher.constructor.name)
+    dataContext = await fetcher.getDataContexts(date)
+    if (dataContext.length > 0) {
+      console.log(
+        'found dataContexts with fetcher',
+        fetcher.constructor.name,
+        dataContext.length,
+      )
       shouldCache = fetcher.isCacheable()
       break
     }
@@ -258,14 +294,16 @@ export default async function tryDataFetchersWithCache(
 
   if (dataContext === null) {
     // no data was found via any fetcher
-    console.error('no data context found via any fetcher')
+    console.error('no data contexts found via any fetcher')
     return null
   }
 
   if (shouldCache) {
-    console.log('caching dataContext', cacheKey)
-    setCachedResponse(cacheKey, dataContext)
+    dataContext.forEach((dc) => {
+      const key = getCacheKeyFn(cacheKeyFn)(lat, lng, dc.referenceDate)
+      console.log('caching dataContext', key)
+      setCachedResponse(key, dc)
+    })
   }
-
-  return dataContext
+  return dataContext[0]
 }
