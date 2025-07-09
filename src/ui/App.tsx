@@ -4,45 +4,29 @@ import SuggestedActivity from '@/ui/components/SuggestedActivity'
 import DataTable from '@/ui/components/DataTable'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
 
-import { Link, redirect, useLoaderData, useNavigate } from 'react-router'
+import { Link, useLoaderData, useNavigate } from 'react-router'
 import React, { useEffect, useState } from 'react'
-import {
-  StormglassDataFetcher,
-  DataContextFetcher,
+import tryDataFetchersWithCache, {
   ServerDataFetcher,
+  DemoStormglassDataFetcher,
+  StormglassDataFetcher,
 } from '@/utils/fetchData'
 import { DataContext } from '@/types/data'
 import CONSTANTS, { Activities } from './constants'
 import { useSwipeable } from 'react-swipeable'
-import { useFeatureFlags } from '@/utils/hooks'
-import * as console from 'node:console'
+import { useFeatureFlags } from '@/utils/featureFlags'
+import { formatISO } from 'date-fns'
 
 function AppContent({
   date,
-  dataFetcher,
+  dataContext,
 }: {
   date: Date
-  dataFetcher: DataContextFetcher
+  dataContext: DataContext | null
 }) {
-  const [data, setData] = useState<DataContext | null>(null)
-  const [isLoading, setLoading] = useState<boolean>(true)
   const featureFlags = useFeatureFlags()
 
-  useEffect(() => {
-    dataFetcher.getDataContext(date).then((data) => {
-      setData(data)
-      setLoading(false)
-    })
-  }, [date])
-
-  if (isLoading) {
-    return (
-      <div>
-        <h1 className="text-3xl">Loading data...</h1>
-      </div>
-    )
-  }
-  if (Object.keys(data as object).length === 0 || data === null) {
+  if (dataContext === null) {
     return (
       <div className="text-3xl">
         <h1>No data context...</h1>
@@ -51,7 +35,11 @@ function AppContent({
   }
 
   const suggestedActivity = featureFlags.showSuggestedActivity ? (
-    <SuggestedActivity dataContext={data} date={date} activities={Activities} />
+    <SuggestedActivity
+      dataContext={dataContext || {}}
+      date={date}
+      activities={Activities}
+    />
   ) : null
 
   return (
@@ -59,10 +47,13 @@ function AppContent({
       <div className="md:hidden">{suggestedActivity}</div>
       <div className="flex-col md:flex-row flex items-center justify-center gap-6">
         <div className="w-full md:w-2/3">
-          <TideTimesChart key={date.toDateString()} tideData={data.tideData} />
+          <TideTimesChart
+            key={date.toDateString()}
+            tideData={dataContext.tideData}
+          />
         </div>
         <div className="w-full md:w-1/3">
-          <DataTable key={date.toDateString()} dataContext={data} />
+          <DataTable key={date.toDateString()} dataContext={dataContext} />
           <div className="hidden lg:flex mt-8">{suggestedActivity}</div>
         </div>
       </div>
@@ -98,17 +89,44 @@ function NextPageButton({
 
 export default function App() {
   const { date, nextPath, prevPath } = useLoaderData()
+  const [dataContext, setDataContext] = useState<DataContext | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const navigate = useNavigate()
   const handlers = useSwipeable({
     onSwiped: ({ dir }) => {
-      console.log(`Swiped ${dir}`)
       // swipe left means you want to see what's on the right, i.e. next
       if (nextPath && dir === 'Left') navigate(nextPath)
       if (prevPath && dir === 'Right') navigate(prevPath)
     },
   })
 
-  const dataFetcher = new ServerDataFetcher()
+  useEffect(() => {
+    tryDataFetchersWithCache(
+      date,
+      [
+        new ServerDataFetcher(),
+        new StormglassDataFetcher(),
+        new DemoStormglassDataFetcher(),
+      ],
+      (lat, lng, date) =>
+        `[${lat},${lng}]-${formatISO(date, { representation: 'date' })}`,
+    ).then((dc) => {
+      if (dc === null) {
+        console.warn('dataContext not found')
+      }
+      console.log('setting dataContext')
+      setDataContext(dc)
+      setIsLoading(false)
+    })
+  }, [date])
+
+  if (isLoading) {
+    return (
+      <div>
+        <h1 className="text-3xl">Loading data...</h1>
+      </div>
+    )
+  }
 
   return (
     <div
@@ -122,7 +140,7 @@ export default function App() {
         </div>
         <NextPageButton path={nextPath} Icon={ChevronRightIcon} />
       </div>
-      <AppContent date={date} dataFetcher={dataFetcher} />
+      <AppContent date={date} dataContext={dataContext} />
     </div>
   )
 }

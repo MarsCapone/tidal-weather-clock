@@ -5,7 +5,7 @@ export type CacheResponseOptions = {
   expiryHours?: number
 }
 
-export function cacheResponse<T>(key: string, response: T): void {
+export function setCachedResponse<T>(key: string, response: T): void {
   const content = {
     timestamp: formatISO(new Date()),
     response,
