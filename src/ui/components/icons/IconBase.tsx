@@ -8,7 +8,7 @@ export function IconBase(props: React.SVGProps<SVGSVGElement>) {
       height={props.height || 16}
       viewBox="0 0 24 24"
       fill="none"
-      stroke={props.stroke || '#000000'}
+      stroke={props.stroke || 'currentColor'}
       strokeWidth={props.strokeWidth || 1}
       strokeLinecap="round"
       strokeLinejoin="round"
