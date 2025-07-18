@@ -24,6 +24,7 @@ import {
   HighWaterIcon,
   LowTideIcon,
   LowWaterIcon,
+  TideHeightIcon,
 } from '@/ui/components/icons/TideIcon'
 import { SunnyIcon } from '@/ui/components/icons/WeatherIcon'
 import { MoonIcon } from '@heroicons/react/24/outline'
@@ -326,7 +327,7 @@ function explainTideHeightConstraint(
     title: 'Tide Height Constraint',
     description: `The height of ${constraint.tideType.toUpperCase()} tide is ${comparisonDescriptionMap[constraint.comp]} ${constraint.value.toFixed(1)} meters`,
     details: constraintToDetails(constraint),
-    Icon: constraint.type === 'hightide-height' ? HighWaterIcon : LowWaterIcon,
+    Icon: TideHeightIcon,
   }
 }
 
@@ -337,7 +338,7 @@ function explainTideStateConstraint(
     title: 'Tide State Constraint',
     description: `The time is within ${constraint.deltaHours} hours of ${constraint.tideType.toUpperCase()} tide`,
     details: constraintToDetails(constraint),
-    Icon: constraint.tideType === 'high' ? HighTideIcon : LowTideIcon,
+    Icon: constraint.tideType === 'high' ? HighWaterIcon : LowWaterIcon,
   }
 }
 
