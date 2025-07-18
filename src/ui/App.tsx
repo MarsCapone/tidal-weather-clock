@@ -18,6 +18,7 @@ import { useFeatureFlags } from '@/utils/featureFlags'
 import { formatISO } from 'date-fns'
 import logger from '@/ui/logger'
 import { LocalStorageCache } from '@/utils/cache'
+import DatePagination from './components/DatePagination'
 
 const clientCache = new LocalStorageCache()
 
@@ -64,29 +65,6 @@ function AppContent({
       <div className="hidden md:flex lg:hidden justify-center gap-8">
         {suggestedActivity}
       </div>
-    </div>
-  )
-}
-
-function NextPageButton({
-  path,
-  Icon,
-}: {
-  path: string
-  Icon: React.ComponentType<{ className?: string }>
-}) {
-  return (
-    <div className="hidden sm:block">
-      <Link to={path}>
-        <button
-          disabled={path === null}
-          className={`rounded-md bg-background aspect-square p-2 ${path === null ? 'cursor-default' : 'hover:bg-muted hover:shadow-md'}`}
-        >
-          <Icon
-            className={`size-full sm:size-24 md:size-10 ${path === null ? 'text-background' : ''}`}
-          />
-        </button>
-      </Link>
     </div>
   )
 }
@@ -139,13 +117,7 @@ export default function App() {
       {...handlers}
       className="flex flex-col mx-auto p-8 text-center min-w-full md:min-w-0 gap-10"
     >
-      <div className="flex justify-center px-20 gap-x-2">
-        <NextPageButton path={prevPath} Icon={ChevronLeftIcon} />
-        <div className="py-2">
-          <DateDisplay date={date} location={CONSTANTS.LOCATION_NAME} />
-        </div>
-        <NextPageButton path={nextPath} Icon={ChevronRightIcon} />
-      </div>
+      <DatePagination nextPath={nextPath} prevPath={prevPath} date={date} />
       <AppContent date={date} dataContext={dataContext} />
     </div>
   )
