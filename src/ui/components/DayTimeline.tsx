@@ -32,12 +32,12 @@ export default function DayTimeline({
       t.type == 'high'
         ? {
             label: 'text-success',
-            icon: 'border-success',
+            icon: 'border-success bg-success text-secondary-content',
             line: 'bg-success',
           }
         : {
             label: 'text-error',
-            icon: 'border-error',
+            icon: 'border-error bg-error text-secondary-content',
             line: 'bg-error',
           },
   }))
@@ -49,7 +49,7 @@ export default function DayTimeline({
       label: 'Sunrise',
       additionalClasses: {
         label: 'text-secondary',
-        icon: 'border-secondary',
+        icon: 'border-secondary bg-secondary text-secondary-content',
         line: 'bg-secondary',
       },
     },
@@ -59,7 +59,7 @@ export default function DayTimeline({
       label: 'Sunset',
       additionalClasses: {
         label: 'text-secondary',
-        icon: 'border-secondary',
+        icon: 'border-secondary bg-secondary text-secondary-content',
         line: 'bg-secondary',
       },
     },
@@ -83,7 +83,7 @@ export default function DayTimeline({
           <div
             className={`timeline-middle rounded-full p-1.5 border-1 ${additionalClasses.icon || ''} ${additionalClasses.all || ''}`}
           >
-            {Icon && <Icon width={20} height={20} />}
+            {Icon && <Icon width={20} height={20} strokeWidth={2} />}
           </div>
           <div
             className={`timeline-end timeline-box font-mono ${additionalClasses.time || ''} ${additionalClasses.all || ''}`}
