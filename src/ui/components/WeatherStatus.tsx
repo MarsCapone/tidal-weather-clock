@@ -84,7 +84,7 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       Icon: WindIcon,
       values: [
         windSpeeds.length > 0
-          ? `${calcMean(windSpeeds).toFixed(2)} kts`
+          ? `${calcMean(windSpeeds).toFixed(1)} kts`
           : undefined,
       ],
     },
@@ -93,7 +93,7 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       Icon: CelsiusIcon,
       values: [
         temperature.length > 0
-          ? `${calcMean(temperature).toFixed(2)}°C`
+          ? `${calcMean(temperature).toFixed(1)}°C`
           : undefined,
       ],
     },
@@ -102,7 +102,7 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       Icon: SimpleCloudIcon,
       values: [
         cloudiness.length > 0
-          ? `${calcMean(cloudiness).toFixed(2)}%`
+          ? `${calcMean(cloudiness).toFixed(1)}%`
           : undefined,
       ],
     },
