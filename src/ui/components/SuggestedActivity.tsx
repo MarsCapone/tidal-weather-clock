@@ -67,12 +67,14 @@ export default function SuggestedActivity({
   const NavSuggestionButton = ({
     direction,
     disabled,
+    className,
   }: {
     direction: 'next' | 'prev'
     disabled: boolean
+    className?: string
   }) => (
     <button
-      className={`w-24 btn btn-outline ${disabled ? 'btn-disabled' : ''}`}
+      className={`w-24 btn btn-outline ${disabled ? 'btn-disabled' : ''} ${className || ''}`}
       onClick={() => {
         if (!disabled) {
           setSelectionIndex(
@@ -112,7 +114,29 @@ export default function SuggestedActivity({
         </div>
         <div className="card-actions">
           <div className="w-full">
-            <div className="flex flex-row justify-between gap-x-2">
+            <div className="md:flex flex-col hidden lg:hidden gap-y-2 items-center">
+              <div
+                className="btn btn-primary flex-grow"
+                onClick={() => openDialog()}
+              >
+                Explain
+              </div>
+              {hasCardActions && (
+                <div className="join">
+                  <NavSuggestionButton
+                    direction="prev"
+                    disabled={selectionIndex === 0}
+                    className="join-item"
+                  />
+                  <NavSuggestionButton
+                    direction="next"
+                    disabled={selectionIndex === activitySelections.length - 1}
+                    className="join-item"
+                  />
+                </div>
+              )}
+            </div>
+            <div className="md:hidden flex lg:flex flex-row justify-between gap-x-2">
               {hasCardActions && (
                 <NavSuggestionButton
                   direction="prev"
@@ -154,7 +178,7 @@ function ActivityExplanationDialog({
   const constraints = Activities[0].constraints
 
   return (
-    <dialog id={id} className="modal">
+    <dialog id={id} className="modal md:w-full mx-6">
       <div className="modal-box">
         <p className="text-2xl font-extrabold">
           {activitySelection.activity.displayName}
