@@ -185,8 +185,8 @@ export function ActivityExplanationDialog({
     : activitySelection.matchingConstraints
 
   return (
-    <dialog id={id} className="modal mx-6">
-      <div className="modal-box">
+    <dialog id={id} className="modal">
+      <div className="modal-box flex flex-col justify-center items-center">
         <p className="text-2xl font-extrabold">
           {activitySelection.activity.displayName}
         </p>
