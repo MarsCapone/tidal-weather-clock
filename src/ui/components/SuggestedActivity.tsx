@@ -11,12 +11,22 @@ import {
   WindSpeedConstraint,
 } from '@/types/activities'
 import { IntervalActivitySelection, suggestActivity } from '@/utils/activities'
-import { formatTime } from '@/utils/dates'
 import React, { useEffect } from 'react'
 import { useFeatureFlags } from '@/utils/featureFlags'
 import { format } from 'date-fns'
-import { SunIcon } from '@heroicons/react/24/solid'
 import { SunriseIcon } from '@/ui/components/icons/SunStateIcon'
+import { Activities } from '@/ui/constants'
+import { WindIcon } from '@/ui/components/icons/WindIcon'
+import CompassIcon from '@/ui/components/icons/CompassIcon'
+import ClockIcon from '@/ui/components/icons/ClockIcon'
+import {
+  HighTideIcon,
+  HighWaterIcon,
+  LowTideIcon,
+  LowWaterIcon,
+} from '@/ui/components/icons/TideIcon'
+import { SunnyIcon } from '@/ui/components/icons/WeatherIcon'
+import { MoonIcon } from '@heroicons/react/24/outline'
 
 export default function SuggestedActivity({
   dataContext,
@@ -139,6 +149,9 @@ function ActivityExplanationDialog({
   activitySelection: IntervalActivitySelection
   id: string
 }) {
+  // const constraints = activitySelection.matchingConstraints
+  const constraints = Activities[0].constraints
+
   return (
     <dialog id={id} className="modal">
       <div className="modal-box">
@@ -152,7 +165,7 @@ function ActivityExplanationDialog({
           </p>
         </div>
         <ul className="list">
-          {activitySelection.matchingConstraints.map((constraint, i) => {
+          {constraints.map((constraint, i) => {
             const reasonProps = explainConstraint(constraint)
             if (!reasonProps) {
               return null
@@ -238,51 +251,101 @@ function explainConstraint(
   }
 }
 
-function demoExplainConstraint(constraint: Constraint): ExplanationReasonProps {
-  return {
-    title: 'something about ' + constraint.type,
-    description:
-      'perhaps a much longer description of the constraint goes here',
-    details: Object.entries(constraint).map(([key, value]) => ({
-      label: key,
-      value: typeof value === 'object' ? JSON.stringify(value) : String(value),
-    })),
-    Icon: SunriseIcon,
-  }
+function constraintToDetails(
+  constraint: Constraint,
+): { label: string; value: string }[] {
+  return Object.entries(constraint).map(([key, value]) => ({
+    label: key,
+    value: typeof value === 'object' ? JSON.stringify(value) : String(value),
+  }))
 }
 
 function explainTimeConstraint(
   constraint: TimeConstraint,
 ): ExplanationReasonProps {
-  return demoExplainConstraint(constraint)
+  const timeComparisonMap = {
+    lt: 'before',
+    gt: 'after',
+    lte: 'before or at',
+    gte: 'after or at',
+  }
+
+  return {
+    title: 'Time Constraint',
+    description: `The time is ${timeComparisonMap[constraint.comp]} ${constraint.value}`,
+    details: constraintToDetails(constraint),
+    Icon: ClockIcon,
+  }
+}
+
+const comparisonDescriptionMap = {
+  lt: 'less than',
+  gt: 'greater than',
+  lte: 'less than or equal to',
+  gte: 'greater than or equal to',
 }
 
 function explainWindSpeedConstraint(
   constraint: WindSpeedConstraint,
 ): ExplanationReasonProps {
-  return demoExplainConstraint(constraint)
+  return {
+    title: 'Wind Speed Constraint',
+    description: `The wind speed is ${comparisonDescriptionMap[constraint.comp]} ${constraint.value} kts`,
+    details: constraintToDetails(constraint),
+    Icon: WindIcon,
+  }
 }
 
 function explainWindDirectionConstraint(
   constraint: WindDirectionConstraint,
 ): ExplanationReasonProps {
-  return demoExplainConstraint(constraint)
+  const directionMap: Record<string, string> = {
+    N: 'North',
+    NE: 'North East',
+    E: 'East',
+    SE: 'South East',
+    S: 'South',
+    SW: 'South West',
+    W: 'West',
+    NW: 'North West',
+  }
+  return {
+    title: 'Wind Direction Constraint',
+    description: `The wind is coming from the ${directionMap[constraint.direction]}`,
+    details: constraintToDetails(constraint),
+    Icon: CompassIcon,
+  }
 }
 
 function explainTideHeightConstraint(
   constraint: HighTideHeightConstraint | LowTideHeightConstraint,
 ): ExplanationReasonProps {
-  return demoExplainConstraint(constraint)
+  return {
+    title: 'Tide Height Constraint',
+    description: `The height of ${constraint.tideType.toUpperCase()} tide is ${comparisonDescriptionMap[constraint.comp]} ${constraint.value.toFixed(1)} meters`,
+    details: constraintToDetails(constraint),
+    Icon: constraint.type === 'hightide-height' ? HighWaterIcon : LowWaterIcon,
+  }
 }
 
 function explainTideStateConstraint(
   constraint: TideStateConstraint,
 ): ExplanationReasonProps {
-  return demoExplainConstraint(constraint)
+  return {
+    title: 'Tide State Constraint',
+    description: `The time is within ${constraint.deltaHours} hours of ${constraint.tideType.toUpperCase()} tide`,
+    details: constraintToDetails(constraint),
+    Icon: constraint.tideType === 'high' ? HighTideIcon : LowTideIcon,
+  }
 }
 
 function explainSunConstraint(
   constraint: SunConstraint,
 ): ExplanationReasonProps {
-  return demoExplainConstraint(constraint)
+  return {
+    title: 'Sun Constraint',
+    description: `The time is during ${constraint.isDaylight ? 'daylight' : 'nighttime'}`,
+    details: constraintToDetails(constraint),
+    Icon: constraint.isDaylight ? SunnyIcon : MoonIcon,
+  }
 }

@@ -45,6 +45,10 @@ export const Activities: Activity[] = [
         deltaHours: 2,
         tideType: 'high',
       },
+      {
+        type: 'wind-direction',
+        direction: 'NE',
+      },
     ],
     displayName: 'Paddle boarding',
     label: 'paddle-board',
