@@ -290,10 +290,6 @@ export function suggestActivity(
   context: DataContext,
   activities: Activity[],
 ): IntervalActivitySelection[] {
-  logger.info('suggesting activities', {
-    date,
-    totalActivities: activities.length,
-  })
   const suggestions = suggestActivities(date, context, activities)
 
   const goodSuggestions = suggestions.filter(
