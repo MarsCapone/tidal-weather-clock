@@ -8,7 +8,13 @@ type TimelineItem = {
   timestamp: Date | null
   label: string
   Icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>
-  additionalLabelClass?: string
+  additionalClasses: {
+    label?: string
+    icon?: string
+    time?: string
+    line?: string
+    all?: string
+  }
 }
 
 export default function DayTimeline({
@@ -22,7 +28,18 @@ export default function DayTimeline({
     timestamp: withFractionalTime(referenceDate, t.time),
     label: t.type === 'high' ? 'HW' : 'LW',
     Icon: t.type === 'high' ? HighWaterIcon : LowWaterIcon,
-    additionalLabelClass: t.type === 'high' ? 'font-bold' : '',
+    additionalClasses:
+      t.type == 'high'
+        ? {
+            label: 'text-success',
+            icon: 'border-success',
+            line: 'bg-success',
+          }
+        : {
+            label: 'text-error',
+            icon: 'border-error',
+            line: 'bg-error',
+          },
   }))
 
   const timelineItems: TimelineItem[] = [
@@ -30,11 +47,21 @@ export default function DayTimeline({
       timestamp: sunData.sunRise,
       Icon: SunriseIcon,
       label: 'Sunrise',
+      additionalClasses: {
+        label: 'text-secondary',
+        icon: 'border-secondary',
+        line: 'bg-secondary',
+      },
     },
     {
       timestamp: sunData.sunSet,
       Icon: SunsetIcon,
       label: 'Sunset',
+      additionalClasses: {
+        label: 'text-secondary',
+        icon: 'border-secondary',
+        line: 'bg-secondary',
+      },
     },
     ...tides,
   ]
@@ -45,25 +72,27 @@ export default function DayTimeline({
     <ul
       className={`timeline my-2 justify-center ${vertical ? 'timeline-vertical' : 'timeline-horizontal'}`}
     >
-      {timelineItems.map(
-        ({ timestamp, label, Icon, additionalLabelClass }, i) => (
-          <li key={`timeline-item-${i}`}>
-            <hr className="bg-primary" />
-            <div
-              className={`timeline-start text-xs ${additionalLabelClass || ''}`}
-            >
-              {label}
-            </div>
-            <div className="timeline-middle rounded-full p-1.5 border-1 border-primary">
-              {Icon && <Icon width={20} height={20} />}
-            </div>
-            <div className="timeline-end timeline-box font-mono">
-              {formatTime(timestamp!)}
-            </div>
-            <hr className="bg-primary" />
-          </li>
-        ),
-      )}
+      {timelineItems.map(({ timestamp, label, Icon, additionalClasses }, i) => (
+        <li key={`timeline-item-${i}`}>
+          <hr className={additionalClasses.line || 'bg-primary'} />
+          <div
+            className={`timeline-start text-xs ${additionalClasses.label || ''} ${additionalClasses.all || ''}`}
+          >
+            {label}
+          </div>
+          <div
+            className={`timeline-middle rounded-full p-1.5 border-1 ${additionalClasses.icon || ''} ${additionalClasses.all || ''}`}
+          >
+            {Icon && <Icon width={20} height={20} />}
+          </div>
+          <div
+            className={`timeline-end timeline-box font-mono ${additionalClasses.time || ''} ${additionalClasses.all || ''}`}
+          >
+            {formatTime(timestamp!)}
+          </div>
+          <hr className={additionalClasses.line || 'bg-primary'} />
+        </li>
+      ))}
     </ul>
   )
 }
