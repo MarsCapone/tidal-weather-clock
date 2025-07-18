@@ -1,5 +1,6 @@
 const defaultFeatureFlags = {
   showSuggestedActivity: true,
+  alwaysShowActivityNextButton: false,
 }
 
 type FeatureFlagName = keyof typeof defaultFeatureFlags

@@ -3,6 +3,8 @@ import { Activity } from '@/types/activities'
 import { IntervalActivitySelection, suggestActivity } from '@/utils/activities'
 import { formatTime } from '@/utils/dates'
 import React, { useEffect } from 'react'
+import { useFeatureFlags } from '@/utils/featureFlags'
+import { format } from 'date-fns'
 
 function IntervalActivity({
   selection,
@@ -45,6 +47,7 @@ export default function SuggestedActivity({
     IntervalActivitySelection[]
   >([])
   const [selectionIndex, setSelectionIndex] = React.useState(0)
+  const ff = useFeatureFlags()
 
   useEffect(() => {
     setActivitySelections(suggestActivity(date, dataContext, activities))
@@ -72,7 +75,7 @@ export default function SuggestedActivity({
     disabled: boolean
   }) => (
     <button
-      className={`join-item min-w-36 btn btn-outline ${disabled ? 'btn-disabled' : ''}`}
+      className={`w-24 btn btn-outline ${disabled ? 'btn-disabled' : ''}`}
       onClick={() => {
         if (!disabled) {
           setSelectionIndex(
@@ -85,27 +88,42 @@ export default function SuggestedActivity({
     </button>
   )
 
-  const hasCardActions = activitySelections.length > 1
+  const hasCardActions =
+    ff.alwaysShowActivityNextButton || activitySelections.length > 1
 
   return (
     <div className="card card-lg shadow-sm">
       <div className="card-body">
         <div className="card-title">Suggested Activity</div>
-        <IntervalActivity selection={activitySelection} />
-        {hasCardActions || (
-          <div className="card-actions">
-            <div className="join justify-center w-full">
-              <NavSuggestionButton
-                direction="prev"
-                disabled={selectionIndex === 0}
-              />
-              <NavSuggestionButton
-                direction="next"
-                disabled={selectionIndex === activitySelections.length - 1}
-              />
+
+        <p className="text-2xl font-extrabold">
+          {activitySelection.activity.displayName}
+        </p>
+        <div className="flex flex-row text-sm font-mono text-base-content/50">
+          <p>
+            {format(activitySelection.interval.start, 'HH:mm')} -{' '}
+            {format(activitySelection.interval.end, 'HH:mm')}
+          </p>
+        </div>
+        <div className="card-actions">
+          <div className="w-full">
+            <div className="flex flex-row justify-between gap-x-2">
+              {hasCardActions && (
+                <NavSuggestionButton
+                  direction="prev"
+                  disabled={selectionIndex === 0}
+                />
+              )}
+              <div className="btn btn-primary flex-grow">Explain</div>
+              {hasCardActions && (
+                <NavSuggestionButton
+                  direction="next"
+                  disabled={selectionIndex === activitySelections.length - 1}
+                />
+              )}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   )
