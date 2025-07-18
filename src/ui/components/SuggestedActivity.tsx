@@ -1,5 +1,5 @@
 import { DataContext } from '@/types/data'
-import { Activity } from '@/types/activities'
+import { Activity, Constraint } from '@/types/activities'
 import { IntervalActivitySelection, suggestActivity } from '@/utils/activities'
 import { formatTime } from '@/utils/dates'
 import React, { useEffect } from 'react'
@@ -167,10 +167,28 @@ function ActivityExplanationDialog({
             {format(activitySelection.interval.end, 'HH:mm')}
           </p>
         </div>
+        <ul className="list">
+          {activitySelection.matchingConstraints.map((constraint, i) => {
+            const reasonProps = explainConstraint(constraint)
+            return <ExplanationReason key={`reason-${i}`} {...reasonProps} />
+          })}
+        </ul>
       </div>
       <form method="dialog" className="modal-backdrop">
         <button>close</button>
       </form>
     </dialog>
   )
+}
+
+type ExplanationReasonProps = {
+  title: string
+}
+
+function ExplanationReason(props: ExplanationReasonProps) {
+  return <li className="list-row">{props.title}</li>
+}
+
+function explainConstraint(constraint: Constraint): ExplanationReasonProps {
+  return { title: 'something about ' + constraint.type }
 }

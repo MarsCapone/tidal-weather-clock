@@ -234,7 +234,7 @@ function evaluateAllConstraints(
 type ActivitySelection = {
   activity: Activity
   timestamp: Date
-  reasons: string[]
+  matchingConstraints: Constraint[]
 }
 
 export function suggestActivities(
@@ -266,18 +266,16 @@ export function suggestActivities(
           .map(([timeString, crs]) => ({
             activity,
             timestamp: crs[0].timestamp,
-            reasons: crs.map(({ constraint }) => constraint.description),
+            matchingConstraints: crs.map(({ constraint }) => constraint),
           }))
           .toArray()
       })
       .flat() // flatten everything so all objects are at the same level
       // then sort by which activity and timestamp has the most reasons
-      .toSorted((a, b) => b.reasons.length - a.reasons.length)
+      .toSorted(
+        (a, b) => b.matchingConstraints.length - a.matchingConstraints.length,
+      )
   )
-}
-
-function formatActivitySelection(selection: ActivitySelection): string {
-  return `${format(selection.timestamp, 'HH:mm')} ${selection.activity.label} [${selection.reasons.join(', ')}]`
 }
 
 export type IntervalActivitySelection = ActivitySelection & {
@@ -299,7 +297,9 @@ export function suggestActivity(
   const suggestions = suggestActivities(date, context, activities)
 
   const goodSuggestions = suggestions.filter(
-    (s) => s.reasons.length === suggestions[0].reasons.length,
+    (s) =>
+      s.matchingConstraints.length ===
+      suggestions[0].matchingConstraints.length,
   )
 
   if (!goodSuggestions.length) {
@@ -313,7 +313,7 @@ export function suggestActivity(
   for (const suggestion of goodSuggestions) {
     if (
       suggestion.activity.label === current.activity.label &&
-      arrayEqual(suggestion.reasons, current.reasons)
+      arrayEqual(suggestion.matchingConstraints, current.matchingConstraints)
     ) {
       interval.end = suggestion.timestamp
     } else {
@@ -321,7 +321,7 @@ export function suggestActivity(
       activityIntervals.push({
         interval,
         activity: current.activity,
-        reasons: current.reasons,
+        matchingConstraints: current.matchingConstraints,
         timestamp: interval.start,
       })
       current = suggestion
@@ -332,7 +332,7 @@ export function suggestActivity(
   activityIntervals.push({
     interval,
     activity: current.activity,
-    reasons: current.reasons,
+    matchingConstraints: current.matchingConstraints,
     timestamp: interval.start,
   })
 

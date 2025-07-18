@@ -1,7 +1,6 @@
 import { CardinalDirection, TideType } from '@/types/data'
 
 type _Constraint<TypeName extends string> = {
-  description: string
   type: TypeName
 }
 
