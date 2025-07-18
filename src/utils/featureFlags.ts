@@ -1,5 +1,5 @@
 const defaultFeatureFlags = {
-  showSuggestedActivity: true,
+  showSuggestedActivity: false,
   alwaysShowActivityNextButton: false,
 }
 

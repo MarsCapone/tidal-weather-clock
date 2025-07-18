@@ -7,11 +7,12 @@ export function IconBase(props: React.SVGProps<SVGSVGElement>) {
       width={props.width || 16}
       height={props.height || 16}
       viewBox="0 0 24 24"
-      fill="none"
+      fill={props.fill || 'none'}
       stroke={props.stroke || 'currentColor'}
       strokeWidth={props.strokeWidth || 1}
       strokeLinecap="round"
       strokeLinejoin="round"
+      className={props.className}
     >
       {props.children}
     </svg>

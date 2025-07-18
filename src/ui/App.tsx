@@ -9,7 +9,7 @@ import tryDataFetchersWithCache, {
   StormglassDataFetcher,
 } from '@/utils/fetchData'
 import { DataContext } from '@/types/data'
-import CONSTANTS, { Activities } from './constants'
+import { Activities } from './constants'
 import { useSwipeable } from 'react-swipeable'
 import { useFeatureFlags } from '@/utils/featureFlags'
 import { formatISO } from 'date-fns'
@@ -17,6 +17,7 @@ import logger from '@/ui/logger'
 import { LocalStorageCache } from '@/utils/cache'
 import DatePagination from './components/DatePagination'
 import WeatherStatus from '@/ui/components/WeatherStatus'
+import DayTimeline from '@/ui/components/DayTimeline'
 
 const clientCache = new LocalStorageCache()
 
@@ -37,31 +38,39 @@ function AppContent({
     )
   }
 
-  const suggestedActivity = featureFlags.showSuggestedActivity ? (
-    <SuggestedActivity
-      dataContext={dataContext || {}}
-      date={date}
-      activities={Activities}
-    />
-  ) : null
-
   return (
     <div>
-      <div className="md:hidden">{suggestedActivity}</div>
-      <div className="flex-col md:flex-row flex items-center justify-center gap-6">
+      {featureFlags.showSuggestedActivity && (
+        <SuggestedActivity
+          dataContext={dataContext || {}}
+          date={date}
+          activities={Activities}
+          className="md:hidden"
+        />
+      )}
+      <div className="flex-col md:flex-row flex items-start justify-center gap-6">
         <div className="w-full md:w-2/3">
+          <DayTimeline
+            tideData={dataContext.tideData}
+            sunData={dataContext.sunData}
+            referenceDate={dataContext.referenceDate}
+          />
           <TideTimesChart
             key={date.toDateString()}
             tideData={dataContext.tideData}
           />
         </div>
         <div className="w-full md:w-1/3">
+          {featureFlags.showSuggestedActivity && (
+            <SuggestedActivity
+              dataContext={dataContext || {}}
+              date={date}
+              activities={Activities}
+              className="hidden md:flex"
+            />
+          )}
           <WeatherStatus dataContext={dataContext} />
-          <div className="hidden lg:flex mt-8">{suggestedActivity}</div>
         </div>
-      </div>
-      <div className="hidden md:flex lg:hidden justify-center gap-8">
-        {suggestedActivity}
       </div>
     </div>
   )

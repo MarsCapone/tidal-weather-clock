@@ -38,10 +38,12 @@ export default function SuggestedActivity({
   dataContext,
   date,
   activities,
+  className,
 }: {
   dataContext: DataContext
   date: Date
   activities: Activity[]
+  className?: string
 }) {
   const [activitySelections, setActivitySelections] = React.useState<
     IntervalActivitySelection[]
@@ -58,7 +60,7 @@ export default function SuggestedActivity({
 
   if (!activitySelection) {
     return (
-      <div className="card card-lg shadow-sm">
+      <div className={`card card-lg shadow-sm ${className || ''}`}>
         <div className="card-body">
           <div className="card-title">Suggested Activity</div>
           <p>Loading...</p>
@@ -100,7 +102,7 @@ export default function SuggestedActivity({
   }
 
   return (
-    <div className="card card-lg shadow-sm">
+    <div className={`card card-lg shadow-sm ${className || ''}`}>
       <div className="card-body">
         <div className="card-title">Suggested Activity</div>
 
