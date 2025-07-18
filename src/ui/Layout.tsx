@@ -5,17 +5,32 @@ import { HomeIcon } from '@heroicons/react/24/solid'
 
 export default function Layout() {
   return (
-    <div className="text-center mx-auto p-8 bg-background text-content">
-      <div className="flex justify-between">
-        <h1 className="text-5xl font-bold">{CONSTANTS.TITLE}</h1>
-        <div className="flex gap-2">
-          <Link to={'/'}>
-            <HomeIcon className="h-6 w-6 m-3" />
+    <div>
+      <div className="navbar bg-base-100 shadow-sm">
+        <div className="flex-1">
+          <Link to="/" className="btn btn-ghost text-xl">
+            {CONSTANTS.TITLE}
           </Link>
-          <ColorschemeToggle />
+        </div>
+        <div className="flex-none">
+          <ul className="menu menu-horizontal px-1">
+            <li>
+              <Link
+                to={'/'}
+                className="btn btn-ghost btn-disabled cursor-not-allowed"
+              >
+                Settings
+              </Link>
+            </li>
+            <li>
+              <ColorschemeToggle />
+            </li>
+          </ul>
         </div>
       </div>
-      <Outlet />
+      <div>
+        <Outlet />
+      </div>
     </div>
   )
 }
