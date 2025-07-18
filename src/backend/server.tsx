@@ -10,8 +10,11 @@ import { DebugMemoryCache } from '@/backend/cache'
 import logger from '@/backend/logger'
 import { DataContext } from '@/types/data'
 
-// const dataFetcher = new StormglassDataFetcher(Bun.env.STORMGLASS_API_KEY)
-const dataFetcher = new DemoStormglassDataFetcher(logger)
+const dataFetcher = new StormglassDataFetcher(
+  logger,
+  Bun.env.STORMGLASS_API_KEY!,
+)
+// const dataFetcher = new DemoStormglassDataFetcher(logger)
 const cache = new DebugMemoryCache()
 
 const server = serve({
@@ -36,7 +39,7 @@ const server = serve({
       })
       if (!cachedData) {
         logger.info('fetching data', {
-          date: dateString,
+          dateString,
           fetcher: dataFetcher.constructor.name,
         })
         const data = await dataFetcher.getDataContexts(date)

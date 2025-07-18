@@ -1,6 +1,6 @@
 import { ILogger, LogFn } from '@/types/logger'
 
-class ClientLogger implements ILogger {
+export class ConsoleLogger implements ILogger {
   private readonly context: Record<string, any>
 
   constructor(context: Record<string, any> = {}) {
@@ -31,13 +31,13 @@ class ClientLogger implements ILogger {
     this.log('debug', message, context)
   }
   makeNew = (context: Record<string, any>) => {
-    return new ClientLogger({
+    return new ConsoleLogger({
       ...this.context,
       ...context,
     })
   }
 }
 
-const logger = new ClientLogger()
+const logger = new ConsoleLogger()
 
 export default logger

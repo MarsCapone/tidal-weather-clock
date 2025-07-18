@@ -304,6 +304,10 @@ export default async function tryDataFetchersWithCache(
   const cachedResponse = cache.getCacheValue<DataContext>(cacheKey, {
     expiryHours: 24,
   })
+  logger.debug('fetched cached data context', {
+    key: cacheKey,
+    value: cachedResponse,
+  })
 
   if (cachedResponse) {
     logger.warn('returned data from cache', {
