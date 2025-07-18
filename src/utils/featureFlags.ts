@@ -1,6 +1,7 @@
 const defaultFeatureFlags = {
   showSuggestedActivity: false,
   alwaysShowActivityNextButton: false,
+  useDemoActivities: true,
 }
 
 type FeatureFlagName = keyof typeof defaultFeatureFlags
@@ -11,21 +12,12 @@ type FeatureFlags = {
 
 export function useFeatureFlags(): FeatureFlags {
   const keys = Object.keys(defaultFeatureFlags) as FeatureFlagName[]
-  keys.forEach((flagName) => {
-    const item = localStorage.getItem(`featureFlags/${flagName}`)
-    if (item === null) {
-      localStorage.setItem(
-        `featureFlags/${flagName}`,
-        JSON.stringify(defaultFeatureFlags[flagName]),
-      )
-    }
-  })
 
   return Object.fromEntries(
     keys.map((flagName) => {
       const item = localStorage.getItem(`featureFlags/${flagName}`)
       if (item !== null) return [flagName, JSON.parse(item)]
-      return [flagName, null]
+      return [flagName, defaultFeatureFlags[flagName]]
     }),
   ) as FeatureFlags
 }

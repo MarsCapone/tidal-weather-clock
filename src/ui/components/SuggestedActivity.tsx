@@ -157,12 +157,12 @@ export default function SuggestedActivity({
               )}
             </div>
           </div>
-          <ActivityExplanationDialog
-            activitySelection={activitySelection}
-            id={dialogId}
-          />
         </div>
       </div>
+      <ActivityExplanationDialog
+        activitySelection={activitySelection}
+        id={dialogId}
+      />
     </div>
   )
 }
@@ -174,11 +174,14 @@ function ActivityExplanationDialog({
   activitySelection: IntervalActivitySelection
   id: string
 }) {
-  // const constraints = activitySelection.matchingConstraints
-  const constraints = Activities[0].constraints
+  const ff = useFeatureFlags()
+
+  const constraints = ff.useDemoActivities
+    ? Activities[0].constraints
+    : activitySelection.matchingConstraints
 
   return (
-    <dialog id={id} className="modal md:w-full mx-6">
+    <dialog id={id} className="modal mx-6">
       <div className="modal-box">
         <p className="text-2xl font-extrabold">
           {activitySelection.activity.displayName}
