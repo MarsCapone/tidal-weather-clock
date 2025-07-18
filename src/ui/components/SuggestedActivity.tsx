@@ -1,38 +1,22 @@
 import { DataContext } from '@/types/data'
-import { Activity, Constraint } from '@/types/activities'
+import {
+  Activity,
+  Constraint,
+  HighTideHeightConstraint,
+  LowTideHeightConstraint,
+  SunConstraint,
+  TideStateConstraint,
+  TimeConstraint,
+  WindDirectionConstraint,
+  WindSpeedConstraint,
+} from '@/types/activities'
 import { IntervalActivitySelection, suggestActivity } from '@/utils/activities'
 import { formatTime } from '@/utils/dates'
 import React, { useEffect } from 'react'
 import { useFeatureFlags } from '@/utils/featureFlags'
 import { format } from 'date-fns'
-
-function IntervalActivity({
-  selection,
-}: {
-  selection: IntervalActivitySelection | null
-}) {
-  if (!selection) {
-    return (
-      <div>
-        <h2 className="text-3xl font-bold text-error">No activity found</h2>
-      </div>
-    )
-  }
-  return (
-    <div>
-      <h2 className="text-3xl font-bold">{selection.activity.displayName}</h2>
-      <h3 className="text-xl">
-        {formatTime(selection.interval.start)} -{' '}
-        {formatTime(selection.interval.end)}
-      </h3>
-      <ul>
-        {selection.reasons.map((reason, i) => (
-          <li key={`reason-${i}`}>{reason}</li>
-        ))}
-      </ul>
-    </div>
-  )
-}
+import { SunIcon } from '@heroicons/react/24/solid'
+import { SunriseIcon } from '@/ui/components/icons/SunStateIcon'
 
 export default function SuggestedActivity({
   dataContext,
@@ -170,6 +154,9 @@ function ActivityExplanationDialog({
         <ul className="list">
           {activitySelection.matchingConstraints.map((constraint, i) => {
             const reasonProps = explainConstraint(constraint)
+            if (!reasonProps) {
+              return null
+            }
             return <ExplanationReason key={`reason-${i}`} {...reasonProps} />
           })}
         </ul>
@@ -183,12 +170,119 @@ function ActivityExplanationDialog({
 
 type ExplanationReasonProps = {
   title: string
+  description?: string
+  details: { label: string; value: string }[]
+  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
 }
 
-function ExplanationReason(props: ExplanationReasonProps) {
-  return <li className="list-row">{props.title}</li>
+function ExplanationReason({
+  title,
+  description,
+  details,
+  Icon,
+}: ExplanationReasonProps) {
+  return (
+    <li className="list-row text-start">
+      <div>{Icon && <Icon width={48} height={48} />}</div>
+      <div>
+        <div className="text-xl text-primary">{title}</div>
+        <div className="flex flex-row gap-x-2">
+          {description && (
+            <p className={'list-col-wrap flex-1 w-1/2'}>{description}</p>
+          )}
+          <div
+            className={`list-col-wrap text-xs font-mono opacity-60 ${description ? '' : 'w-full'}`}
+          >
+            {details.map((detail, i) => (
+              <Detail {...detail} key={`detail-${i}`} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </li>
+  )
 }
 
-function explainConstraint(constraint: Constraint): ExplanationReasonProps {
-  return { title: 'something about ' + constraint.type }
+function Detail({ label, value }: { label: string; value: string }) {
+  return (
+    <div className={`flex flex-row gap-x-2 justify-between`}>
+      <span className="font-bold">{label}</span>
+      <span>{value}</span>
+    </div>
+  )
+}
+
+function explainConstraint(
+  constraint: Constraint,
+): ExplanationReasonProps | null {
+  switch (constraint.type) {
+    case 'time':
+      return explainTimeConstraint(constraint as TimeConstraint)
+    case 'wind-speed':
+      return explainWindSpeedConstraint(constraint as WindSpeedConstraint)
+    case 'wind-direction':
+      return explainWindDirectionConstraint(
+        constraint as WindDirectionConstraint,
+      )
+    case 'hightide-height':
+    case 'lowtide-height':
+      return explainTideHeightConstraint(
+        constraint as HighTideHeightConstraint | LowTideHeightConstraint,
+      )
+    case 'tide-state':
+      return explainTideStateConstraint(constraint as TideStateConstraint)
+    case 'sun':
+      return explainSunConstraint(constraint as SunConstraint)
+    default:
+      return null
+  }
+}
+
+function demoExplainConstraint(constraint: Constraint): ExplanationReasonProps {
+  return {
+    title: 'something about ' + constraint.type,
+    description:
+      'perhaps a much longer description of the constraint goes here',
+    details: Object.entries(constraint).map(([key, value]) => ({
+      label: key,
+      value: typeof value === 'object' ? JSON.stringify(value) : String(value),
+    })),
+    Icon: SunriseIcon,
+  }
+}
+
+function explainTimeConstraint(
+  constraint: TimeConstraint,
+): ExplanationReasonProps {
+  return demoExplainConstraint(constraint)
+}
+
+function explainWindSpeedConstraint(
+  constraint: WindSpeedConstraint,
+): ExplanationReasonProps {
+  return demoExplainConstraint(constraint)
+}
+
+function explainWindDirectionConstraint(
+  constraint: WindDirectionConstraint,
+): ExplanationReasonProps {
+  return demoExplainConstraint(constraint)
+}
+
+function explainTideHeightConstraint(
+  constraint: HighTideHeightConstraint | LowTideHeightConstraint,
+): ExplanationReasonProps {
+  return demoExplainConstraint(constraint)
+}
+
+function explainTideStateConstraint(
+  constraint: TideStateConstraint,
+): ExplanationReasonProps {
+  return demoExplainConstraint(constraint)
+}
+
+function explainSunConstraint(
+  constraint: SunConstraint,
+): ExplanationReasonProps {
+  return demoExplainConstraint(constraint)
 }
