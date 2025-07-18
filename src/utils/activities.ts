@@ -291,7 +291,7 @@ export function suggestActivity(
   date: Date,
   context: DataContext,
   activities: Activity[],
-): IntervalActivitySelection | null {
+): IntervalActivitySelection[] {
   logger.info('suggesting activities', {
     date,
     totalActivities: activities.length,
@@ -303,11 +303,11 @@ export function suggestActivity(
   )
 
   if (!goodSuggestions.length) {
-    return null
+    return []
   }
 
   // loop through all the suggestions to create a list of {interval, activity, reasons}
-  const activityIntervals = []
+  const activityIntervals: IntervalActivitySelection[] = []
   let current = goodSuggestions[0]
   let interval = { start: current.timestamp, end: current.timestamp }
   for (const suggestion of goodSuggestions) {
@@ -322,6 +322,7 @@ export function suggestActivity(
         interval,
         activity: current.activity,
         reasons: current.reasons,
+        timestamp: interval.start,
       })
       current = suggestion
       interval = { start: suggestion.timestamp, end: suggestion.timestamp }
@@ -332,10 +333,8 @@ export function suggestActivity(
     interval,
     activity: current.activity,
     reasons: current.reasons,
+    timestamp: interval.start,
   })
 
-  return {
-    ...activityIntervals[0],
-    timestamp: activityIntervals[0].interval.start,
-  }
+  return activityIntervals
 }
