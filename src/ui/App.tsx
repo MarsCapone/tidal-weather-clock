@@ -17,6 +17,9 @@ import { useSwipeable } from 'react-swipeable'
 import { useFeatureFlags } from '@/utils/featureFlags'
 import { formatISO } from 'date-fns'
 import logger from '@/ui/logger'
+import { LocalStorageCache } from '@/utils/cache'
+
+const clientCache = new LocalStorageCache()
 
 function AppContent({
   date,
@@ -110,6 +113,7 @@ export default function App() {
         // new StormglassDataFetcher(logger),
         new DemoStormglassDataFetcher(logger),
       ],
+      clientCache,
       (lat, lng, date) =>
         `[${lat},${lng}]-${formatISO(date, { representation: 'date' })}`,
     ).then((dc) => {

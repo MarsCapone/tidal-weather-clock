@@ -19,7 +19,7 @@ import CONSTANTS from '@/ui/constants'
 import stormglassSunExample from './stormGlassAstronomyExample.json'
 import stormglassTideExample from './stormGlassTideExample.json'
 import stormglassWeatherExample from './stormGlassWeatherExample.json'
-import Logger from '@/types/logger'
+import Logger, { ILogger } from '@/types/logger'
 
 export interface DataContextFetcher {
   isCacheable(): boolean
@@ -61,9 +61,9 @@ function filterToDate<T extends { time: string }>(
 }
 
 export class DemoStormglassDataFetcher implements DataContextFetcher {
-  readonly logger: Logger
+  readonly logger: ILogger
 
-  constructor(logger: Logger) {
+  constructor(logger: ILogger) {
     this.logger = logger
   }
 
@@ -201,7 +201,7 @@ export class StormglassDataFetcher extends DemoStormglassDataFetcher {
 
   // https://docs.stormglass.io/#/weather
 
-  constructor(logger: Logger, apiKey: string) {
+  constructor(logger: ILogger, apiKey: string) {
     super(logger)
     this.apiKey = apiKey
   }
@@ -253,7 +253,7 @@ export class StormglassDataFetcher extends DemoStormglassDataFetcher {
 }
 
 export class ServerDataFetcher implements DataContextFetcher {
-  constructor(private readonly logger: Logger) {
+  constructor(private readonly logger: ILogger) {
     this.logger = logger
   }
 

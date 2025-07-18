@@ -4,7 +4,7 @@ export type LogFn<T extends Record<string, any> = Record<string, any>> = (
   message: string,
   context?: T,
 ) => void
-type LoggerMaker = (context: Record<string, any>) => Logger
+type LoggerMaker = (context: Record<string, any>) => ILogger
 
 export interface ILogger {
   info: LogFn
