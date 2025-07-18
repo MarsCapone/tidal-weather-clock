@@ -196,7 +196,9 @@ function ExplanationReason({
 }: ExplanationReasonProps) {
   return (
     <li className="list-row text-start">
-      <div>{Icon && <Icon width={48} height={48} />}</div>
+      <div>
+        {Icon && <Icon width={48} height={48} className={'text-primary'} />}
+      </div>
       <div>
         <div className="text-xl text-primary">{title}</div>
         <div className="flex flex-row gap-x-2">
