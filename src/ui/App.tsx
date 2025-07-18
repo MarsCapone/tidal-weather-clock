@@ -1,8 +1,6 @@
-import DateDisplay from '@/ui/components/DateDisplay'
 import TideTimesChart from '@/ui/components/TideTimesChart'
 import SuggestedActivity from '@/ui/components/SuggestedActivity'
 import DataTable from '@/ui/components/DataTable'
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
 
 import { Link, useLoaderData, useNavigate } from 'react-router'
 import React, { useEffect, useState } from 'react'

@@ -1,5 +1,4 @@
 import { addHours, addMinutes, format, startOfDay } from 'date-fns'
-import { addWithOptions } from 'date-fns/fp'
 
 export function formatTime(date: Date): string {
   return format(date, 'HH:mm')

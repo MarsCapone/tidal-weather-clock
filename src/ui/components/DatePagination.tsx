@@ -19,7 +19,9 @@ export default function DatePagination({
             <ChevronLeftIcon height={20} width={20} />
           </Link>
         </div>
-        <div className="join-item btn">{format(date, 'PPPP')}</div>
+        <div className="join-item btn btn-disabled text-base-content">
+          {format(date, 'PPPP')}
+        </div>
         <div className={`join-item btn ${!nextPath ? 'btn-disabled' : ''}`}>
           <Link to={nextPath || '/'}>
             <ChevronRightIcon height={20} width={20} />
