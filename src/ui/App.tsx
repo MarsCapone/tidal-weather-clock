@@ -1,6 +1,5 @@
 import TideTimesChart from '@/ui/components/TideTimesChart'
 import SuggestedActivity from '@/ui/components/SuggestedActivity'
-import DataTable from '@/ui/components/DataTable'
 
 import { Link, useLoaderData, useNavigate } from 'react-router'
 import React, { useEffect, useState } from 'react'
@@ -17,6 +16,7 @@ import { formatISO } from 'date-fns'
 import logger from '@/ui/logger'
 import { LocalStorageCache } from '@/utils/cache'
 import DatePagination from './components/DatePagination'
+import WeatherStatus from '@/ui/components/WeatherStatus'
 
 const clientCache = new LocalStorageCache()
 
@@ -56,7 +56,7 @@ function AppContent({
           />
         </div>
         <div className="w-full md:w-1/3">
-          <DataTable key={date.toDateString()} dataContext={dataContext} />
+          <WeatherStatus dataContext={dataContext} />
           <div className="hidden lg:flex mt-8">{suggestedActivity}</div>
         </div>
       </div>

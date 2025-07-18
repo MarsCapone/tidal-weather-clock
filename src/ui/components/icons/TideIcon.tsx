@@ -29,3 +29,44 @@ export function LowTideIcon(props: React.SVGProps<SVGSVGElement>) {
     </IconBase>
   )
 }
+
+export function TideHeightIcon(props: React.SVGProps<SVGSVGElement>) {
+  // https://tablericons.com/icon/ruler-measure-2
+  return (
+    <IconBase {...props}>
+      <path d="M12 19.875c0 .621 -.512 1.125 -1.143 1.125h-5.714a1.134 1.134 0 0 1 -1.143 -1.125v-15.875a1 1 0 0 1 1 -1h5.857c.631 0 1.143 .504 1.143 1.125z" />
+      <path d="M12 9h-2" />
+      <path d="M12 6h-3" />
+      <path d="M12 12h-3" />
+      <path d="M12 18h-3" />
+      <path d="M12 15h-2" />
+      <path d="M21 3h-4" />
+      <path d="M19 3v18" />
+      <path d="M21 21h-4" />
+    </IconBase>
+  )
+}
+
+export function HighWaterIcon(props: React.SVGProps<SVGSVGElement>) {
+  // https://tablericons.com/icon/arrow-bar-to-up
+  return (
+    <IconBase {...props}>
+      <path d="M12 10l0 10" />
+      <path d="M12 10l4 4" />
+      <path d="M12 10l-4 4" />
+      <path d="M4 4l16 0" />
+    </IconBase>
+  )
+}
+
+export function LowWaterIcon(props: React.SVGProps<SVGSVGElement>) {
+  // https://tablericons.com/icon/arrow-bar-up
+  return (
+    <IconBase {...props}>
+      <path d="M4 20l16 0" />
+      <path d="M12 14l0 -10" />
+      <path d="M12 14l4 -4" />
+      <path d="M12 14l-4 -4" />
+    </IconBase>
+  )
+}
