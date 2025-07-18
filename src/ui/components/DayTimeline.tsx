@@ -74,16 +74,23 @@ export default function DayTimeline({
     >
       {timelineItems.map(({ timestamp, label, Icon, additionalClasses }, i) => (
         <li key={`timeline-item-${i}`}>
-          <hr className={additionalClasses.line || 'bg-primary'} />
+          <hr className={`${additionalClasses.line || 'bg-primary'}`} />
           <div
-            className={`timeline-start text-xs ${additionalClasses.label || ''} ${additionalClasses.all || ''}`}
+            className={`timeline-start text-xs lg:w-24 lg:text-xl xl:text-2xl xl:w-32 ${additionalClasses.label || ''} ${additionalClasses.all || ''}`}
           >
             {label}
           </div>
           <div
             className={`timeline-middle rounded-full p-1.5 border-1 ${additionalClasses.icon || ''} ${additionalClasses.all || ''}`}
           >
-            {Icon && <Icon width={20} height={20} strokeWidth={2} />}
+            {Icon && (
+              <Icon
+                width={20}
+                height={20}
+                strokeWidth={2}
+                className={'w-6 h-6 xl:w-10 xl:h-10'}
+              />
+            )}
           </div>
           <div
             className={`timeline-end timeline-box font-mono ${additionalClasses.time || ''} ${additionalClasses.all || ''}`}
