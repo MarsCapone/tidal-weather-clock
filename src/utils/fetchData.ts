@@ -287,7 +287,7 @@ function getCacheKeyFn(fn: CacheKeyFn): CacheKeyFn {
 }
 
 export default async function tryDataFetchersWithCache(
-  logger: Logger,
+  logger: ILogger,
   date: Date,
   fetchers: DataContextFetcher[],
   cache: ICache,
