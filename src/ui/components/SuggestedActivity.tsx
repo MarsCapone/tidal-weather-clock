@@ -91,6 +91,14 @@ export default function SuggestedActivity({
   const hasCardActions =
     ff.alwaysShowActivityNextButton || activitySelections.length > 1
 
+  const dialogId = 'activity-explanation-dialog'
+  const openDialog = () => {
+    const dialog = document.getElementById(dialogId) as HTMLDialogElement
+    if (dialog) {
+      dialog.showModal()
+    }
+  }
+
   return (
     <div className="card card-lg shadow-sm">
       <div className="card-body">
@@ -114,7 +122,12 @@ export default function SuggestedActivity({
                   disabled={selectionIndex === 0}
                 />
               )}
-              <div className="btn btn-primary flex-grow">Explain</div>
+              <div
+                className="btn btn-primary flex-grow"
+                onClick={() => openDialog()}
+              >
+                Explain
+              </div>
               {hasCardActions && (
                 <NavSuggestionButton
                   direction="next"
@@ -123,8 +136,39 @@ export default function SuggestedActivity({
               )}
             </div>
           </div>
+          <ActivityExplanationDialog
+            activitySelection={activitySelection}
+            id={dialogId}
+          />
         </div>
       </div>
     </div>
+  )
+}
+
+function ActivityExplanationDialog({
+  activitySelection,
+  id,
+}: {
+  activitySelection: IntervalActivitySelection
+  id: string
+}) {
+  return (
+    <dialog id={id} className="modal">
+      <div className="modal-box">
+        <p className="text-2xl font-extrabold">
+          {activitySelection.activity.displayName}
+        </p>
+        <div className="flex flex-row text-sm font-mono text-base-content/50">
+          <p>
+            {format(activitySelection.interval.start, 'HH:mm')} -{' '}
+            {format(activitySelection.interval.end, 'HH:mm')}
+          </p>
+        </div>
+      </div>
+      <form method="dialog" className="modal-backdrop">
+        <button>close</button>
+      </form>
+    </dialog>
   )
 }
