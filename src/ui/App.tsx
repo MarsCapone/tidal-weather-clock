@@ -18,6 +18,7 @@ import { LocalStorageCache } from '@/utils/cache'
 import DatePagination from './components/DatePagination'
 import WeatherStatus from '@/ui/components/WeatherStatus'
 import DayTimeline from '@/ui/components/DayTimeline'
+import ClockChart, { TimePointer, TimeRange } from '@/ui/components/ClockChart'
 
 const clientCache = new LocalStorageCache()
 
@@ -58,6 +59,7 @@ function AppContent({
           <TideTimesChart
             key={date.toDateString()}
             tideData={dataContext.tideData}
+            sunData={dataContext.sunData}
           />
         </div>
         <div className="w-full md:w-1/3">

@@ -3,7 +3,11 @@ import {
   IgrRadialGaugeModule,
   IgrRadialGaugeRange,
 } from 'igniteui-react-gauges'
-import { TideInfo } from '@/types/data'
+import { SunData, TideInfo } from '@/types/data'
+import ClockChart, { TimePointer, TimeRange } from '@/ui/components/ClockChart'
+import React from 'react'
+import { getFractionalTime } from '@/utils/dates'
+import { parseISO } from 'date-fns'
 
 IgrRadialGaugeModule.register()
 
@@ -11,10 +15,12 @@ export default function TideTimesChart({
   highTideBounds = 2,
   lowTideBounds = 1,
   tideData,
+  sunData,
 }: {
   highTideBounds?: number
   lowTideBounds?: number
   tideData: TideInfo[]
+  sunData: SunData
 }) {
   const highTides = tideData.filter((t) => t.type === 'high')
   const lowTides = tideData.filter((t) => t.type === 'low')
@@ -22,56 +28,63 @@ export default function TideTimesChart({
   const highTideTime = highTides.length > 0 ? highTides[0].time : 12
   const lowTideTime = lowTides.length > 0 ? lowTides[0].time : 12
 
+  const timeRanges: TimeRange[] = [
+    {
+      id: 'high-tide',
+      startHour: highTideTime - highTideBounds,
+      endHour: highTideTime + highTideBounds,
+      color: 'emerald-500',
+      label: 'High Tide',
+    },
+    {
+      id: 'low-tide',
+      startHour: lowTideTime - lowTideBounds,
+      endHour: lowTideTime + lowTideBounds,
+      color: 'red-500',
+      label: 'Low Tide',
+    },
+  ]
+
+  const timePointers: TimePointer[] = [
+    {
+      label: 'Sunrise',
+      timestamp: sunData.sunRise
+        ? typeof sunData.sunRise === 'string'
+          ? parseISO(sunData.sunRise)
+          : sunData.sunRise
+        : null,
+    },
+    {
+      label: 'Sunset',
+      timestamp: sunData.sunSet
+        ? typeof sunData.sunSet === 'string'
+          ? parseISO(sunData.sunSet)
+          : sunData.sunSet
+        : null,
+    },
+  ]
+    .filter((s) => !!s.timestamp)
+    .map((s) => ({
+      id: s.label.toLowerCase(),
+      hour: getFractionalTime(s.timestamp!),
+      color: 'amber-500',
+      label: s.label,
+      isOutside: true,
+    }))
+
   return (
-    <div>
-      <div className="aspect-square">
-        <IgrRadialGauge
-          backingBrush={'#f8fafc'}
-          backingOuterExtent={0.8}
-          backingShape="circular"
-          backingStrokeThickness={0.4}
-          font={'18px'}
-          fontBrush={'black'}
-          height="100%"
-          highlightValue={lowTideTime}
-          highlightValueOpacity={1}
-          interval={1}
-          isNeedleDraggingEnabled={false}
-          labelExtent={0.65}
-          maximumValue={12}
-          minimumValue={1}
-          minorTickCount={0}
-          needlePivotShape={'none'}
-          needleStartWidthRatio={0.05}
-          rangeBrushes={['red', 'green', 'white']}
-          rangeOutlines={'#000'}
-          scaleEndAngle={270}
-          scaleEndExtent={0.5}
-          scaleOversweep={30}
-          scaleStartAngle={-60}
-          scaleStartExtent={0.3}
-          tickStrokeThickness={1.5}
-          value={highTideTime}
-          width="100%"
-        >
-          {highTideTime !== undefined && (
-            <IgrRadialGaugeRange
-              brush="green"
-              endValue={highTideTime + highTideBounds}
-              key={'high-tide'}
-              startValue={highTideTime - highTideBounds}
-            />
-          )}
-          {lowTideTime !== undefined && (
-            <IgrRadialGaugeRange
-              brush="red"
-              endValue={lowTideTime + lowTideBounds}
-              key={'low-tide'}
-              startValue={lowTideTime - lowTideBounds}
-            />
-          )}
-        </IgrRadialGauge>
-      </div>
-    </div>
+    <ClockChart
+      timePointers={timePointers}
+      timeRanges={timeRanges}
+      showCenterDot={true}
+      size={500}
+      clockRadius={180}
+      options={{
+        range: {
+          width: 70,
+          offset: -35,
+        },
+      }}
+    />
   )
 }

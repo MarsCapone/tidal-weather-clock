@@ -19,6 +19,7 @@
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/cli": "^4.1.11",
     "@tailwindcss/postcss": "^4.1.11",
+    "ag-charts-enterprise": "^12.0.2",
     "array-equal": "^2.0.0",
     "bun-plugin-tailwind": "^0.0.14",
     "date-fns": "^4.1.0",
