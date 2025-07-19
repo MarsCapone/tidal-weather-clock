@@ -2,7 +2,7 @@ import { DataContext } from '@/types/data'
 import { formatTime, withFractionalTime } from '@/utils/dates'
 import { HighWaterIcon, LowWaterIcon } from '@/ui/components/icons/TideIcon'
 import { SunriseIcon, SunsetIcon } from '@/ui/components/icons/SunStateIcon'
-import { compareAsc } from 'date-fns'
+import { compareAsc, parseISO } from 'date-fns'
 
 type TimelineItem = {
   timestamp: Date | null
@@ -66,6 +66,13 @@ export default function DayTimeline({
     ...tides,
   ]
     .filter(({ timestamp }) => timestamp !== null)
+    .map((item) => ({
+      ...item,
+      timestamp:
+        typeof item.timestamp === 'string'
+          ? parseISO(item.timestamp)
+          : item.timestamp,
+    }))
     .toSorted((a, b) => compareAsc(a.timestamp!, b.timestamp!))
 
   return (
