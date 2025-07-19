@@ -10,7 +10,7 @@ import {
   LowWaterIcon,
   TideHeightIcon,
 } from '@/ui/components/icons/TideIcon'
-import { compareAsc } from 'date-fns'
+import { compareAsc, parseISO } from 'date-fns'
 import { Fragment } from 'react'
 
 export default function WeatherStatus({
@@ -111,7 +111,11 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       Icon: SunriseIcon,
       values: [
         dataContext.sunData.sunRise
-          ? formatTime(dataContext.sunData.sunRise)
+          ? formatTime(
+              typeof dataContext.sunData.sunRise === 'string'
+                ? parseISO(dataContext.sunData.sunRise)
+                : dataContext.sunData.sunRise,
+            )
           : undefined,
       ],
     },
@@ -120,7 +124,11 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       Icon: SunsetIcon,
       values: [
         dataContext.sunData.sunSet
-          ? formatTime(dataContext.sunData.sunSet)
+          ? formatTime(
+              typeof dataContext.sunData.sunSet === 'string'
+                ? parseISO(dataContext.sunData.sunSet)
+                : dataContext.sunData.sunSet,
+            )
           : undefined,
       ],
     },

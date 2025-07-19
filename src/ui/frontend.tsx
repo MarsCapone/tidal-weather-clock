@@ -11,7 +11,7 @@ import './global.css'
 
 import { StrictMode } from 'react'
 import { createBrowserRouter, redirect, RouterProvider } from 'react-router'
-import Layout from '@/ui/Layout'
+import RootLayout from '@/ui/layouts/RootLayout'
 import {
   addDays,
   formatISO,
@@ -22,6 +22,8 @@ import {
   startOfTomorrow,
 } from 'date-fns'
 import CONSTANTS from '@/ui/constants'
+import SettingsLayout from '@/ui/layouts/SettingsLayout'
+import InternalSettings from '@/ui/pages/InternalSettings'
 import Settings from '@/ui/pages/Settings'
 
 const PERMITTED_INTERVAL = {
@@ -31,6 +33,7 @@ const PERMITTED_INTERVAL = {
 
 const router = createBrowserRouter([
   {
+    id: 'Home',
     children: [
       {
         Component: Home,
@@ -77,11 +80,32 @@ const router = createBrowserRouter([
         path: 'plus/:days',
       },
       {
-        Component: Settings,
+        id: 'Settings',
+        Component: SettingsLayout,
         path: 'settings',
+        children: [
+          {
+            id: 'SettingsHome',
+            path: '',
+            Component: Settings,
+            loader: async () => {
+              return {
+                title: 'Settings',
+              }
+            },
+          },
+          {
+            id: 'Internal',
+            path: 'internal',
+            Component: InternalSettings,
+            loader: async () => ({
+              title: 'Internal Settings',
+            }),
+          },
+        ],
       },
     ],
-    Component: Layout,
+    Component: RootLayout,
   },
 ])
 

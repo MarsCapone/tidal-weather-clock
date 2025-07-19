@@ -3,7 +3,7 @@ import ColorschemeToggle from '@/ui/components/Colorscheme'
 import CONSTANTS from '@/ui/constants'
 import { HomeIcon } from '@heroicons/react/24/solid'
 
-export default function Layout() {
+export default function RootLayout() {
   return (
     <div>
       <div className="navbar bg-base-100 shadow-sm">
