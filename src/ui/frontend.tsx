@@ -22,6 +22,7 @@ import {
   startOfTomorrow,
 } from 'date-fns'
 import CONSTANTS from '@/ui/constants'
+import Settings from '@/ui/pages/Settings'
 
 const PERMITTED_INTERVAL = {
   end: addDays(startOfToday(), 7),
@@ -74,6 +75,10 @@ const router = createBrowserRouter([
           }
         },
         path: 'plus/:days',
+      },
+      {
+        Component: Settings,
+        path: 'settings',
       },
     ],
     Component: Layout,

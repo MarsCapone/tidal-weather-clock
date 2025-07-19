@@ -15,10 +15,7 @@ export default function Layout() {
         <div className="flex-none">
           <ul className="menu menu-horizontal px-1">
             <li>
-              <Link
-                to={'/'}
-                className="btn btn-ghost btn-disabled cursor-not-allowed"
-              >
+              <Link to={'/settings'} className="btn btn-ghost">
                 Settings
               </Link>
             </li>
