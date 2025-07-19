@@ -1,27 +1,26 @@
 import TideTimesChart from '@/ui/components/TideTimesChart'
 import SuggestedActivity from '@/ui/components/SuggestedActivity'
 
-import { Link, useLoaderData, useNavigate } from 'react-router'
+import { useLoaderData, useNavigate } from 'react-router'
 import React, { useEffect, useState } from 'react'
 import tryDataFetchersWithCache, {
   ServerDataFetcher,
   DemoStormglassDataFetcher,
-  StormglassDataFetcher,
 } from '@/utils/fetchData'
 import { DataContext } from '@/types/data'
-import { Activities } from './constants'
+import { Activities } from '../constants'
 import { useSwipeable } from 'react-swipeable'
 import { useFeatureFlags } from '@/utils/featureFlags'
 import { formatISO } from 'date-fns'
 import logger from '@/ui/logger'
 import { LocalStorageCache } from '@/utils/cache'
-import DatePagination from './components/DatePagination'
+import DatePagination from '../components/DatePagination'
 import WeatherStatus from '@/ui/components/WeatherStatus'
 import DayTimeline from '@/ui/components/DayTimeline'
 
 const clientCache = new LocalStorageCache()
 
-export default function App() {
+export default function Home() {
   const ff = useFeatureFlags()
   const { date, nextPath, prevPath } = useLoaderData()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)

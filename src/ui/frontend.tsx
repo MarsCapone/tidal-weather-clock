@@ -1,13 +1,13 @@
 /**
  * This file is the entry point for the React app, it sets up the root
- * element and renders the App component to the DOM.
+ * element and renders the Home component to the DOM.
  *
  * It is included in `src/index.html`.
  */
 
 import { createRoot } from 'react-dom/client'
-import App from './App'
-import './App.css'
+import Home from './pages/Home'
+import './global.css'
 
 import { StrictMode } from 'react'
 import { createBrowserRouter, redirect, RouterProvider } from 'react-router'
@@ -32,7 +32,7 @@ const router = createBrowserRouter([
   {
     children: [
       {
-        Component: App,
+        Component: Home,
         loader: async ({ params }) => {
           const date = params.dateString
             ? startOfDay(parseISO(params.dateString))
@@ -58,7 +58,7 @@ const router = createBrowserRouter([
         path: ':dateString?',
       },
       {
-        Component: App,
+        Component: Home,
         loader: async ({ params }) => {
           const days = Number.parseInt(params.days!)
           if (days < 0 || days > CONSTANTS.MAX_PERMITTED_DAYS) {
