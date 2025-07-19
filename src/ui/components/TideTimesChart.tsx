@@ -33,14 +33,14 @@ export default function TideTimesChart({
       id: 'high-tide',
       startHour: highTideTime - highTideBounds,
       endHour: highTideTime + highTideBounds,
-      color: 'emerald-500',
+      color: 'success',
       label: 'High Tide',
     },
     {
       id: 'low-tide',
       startHour: lowTideTime - lowTideBounds,
       endHour: lowTideTime + lowTideBounds,
-      color: 'red-500',
+      color: 'error',
       label: 'Low Tide',
     },
   ]
@@ -67,7 +67,7 @@ export default function TideTimesChart({
     .map((s) => ({
       id: s.label.toLowerCase(),
       hour: getFractionalTime(s.timestamp!),
-      color: 'amber-500',
+      color: 'warning',
       label: s.label,
       isOutside: true,
     }))
@@ -81,8 +81,8 @@ export default function TideTimesChart({
       clockRadius={180}
       options={{
         range: {
-          width: 70,
-          offset: -35,
+          width: 69,
+          offset: -37,
         },
       }}
     />

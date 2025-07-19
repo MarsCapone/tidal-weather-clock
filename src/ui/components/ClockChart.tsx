@@ -17,29 +17,29 @@ export type TimePointer = {
 }
 
 const colorClasses = {
-  'emerald-500': {
-    fill: 'fill-emerald-500',
-    stroke: 'stroke-emerald-500',
-    text: 'text-emerald-500',
-    bg: 'bg-emerald-500',
+  primary: {
+    fill: 'fill-primary',
+    stroke: 'stroke-primary',
+    text: 'text-primary',
+    bg: 'bg-primary',
   },
-  'amber-500': {
-    fill: 'fill-amber-500',
-    stroke: 'stroke-amber-500',
-    text: 'text-amber-500',
-    bg: 'bg-amber-500',
+  success: {
+    fill: 'fill-success',
+    stroke: 'stroke-success',
+    text: 'text-success',
+    bg: 'bg-success',
   },
-  'red-500': {
-    fill: 'fill-red-500',
-    stroke: 'stroke-red-500',
-    text: 'text-red-500',
-    bg: 'bg-red-500',
+  warning: {
+    fill: 'fill-warning',
+    stroke: 'stroke-warning',
+    text: 'text-warning',
+    bg: 'bg-warning',
   },
-  'violet-500': {
-    fill: 'fill-violet-500',
-    stroke: 'stroke-violet-500',
-    text: 'text-violet-500',
-    bg: 'bg-violet-500',
+  error: {
+    fill: 'fill-error',
+    stroke: 'stroke-error',
+    text: 'text-error',
+    bg: 'bg-error',
   },
 }
 
@@ -96,7 +96,7 @@ export default function ClockChart({
           y={textY}
           textAnchor="middle"
           dominantBaseline="central"
-          className="text-lg font-bold stroke-base-content"
+          className="text-2xl font-bold stroke-base-content fill-base-content"
         >
           {hour}
         </text>
@@ -169,7 +169,7 @@ export default function ClockChart({
           y={labelY}
           textAnchor={textAnchor}
           dominantBaseline="central"
-          className="text-xs font-medium fill-base-content"
+          className="text-xs font-medium fill-base-content stroke-base-content"
         >
           {pointer.label}
         </text>
@@ -178,49 +178,76 @@ export default function ClockChart({
   })
 
   // Generate time range arcs
-  const timeRangeArcs = timeRanges.map((range) => {
-    const startAngle = (range.startHour % 12) * 30 - 90
-    const endAngle = (range.endHour % 12) * 30 - 90
+  const timeRangeArcs = timeRanges
+    .map((range) => {
+      // ensure the startHour and endHour are within 0-12 range
+      // Normalize hours to 0-12 range
+      if (range.startHour < 12 && range.endHour > 12) {
+        // If the range crosses noon, adjust the hours
+        return [
+          {
+            ...range,
+            startHour: range.startHour,
+            endHour: 11.99999, // we can't actually use 12, so we use a value just below it
+          },
+          {
+            ...range,
+            id: `${range.id}-pm`,
+            startHour: 0,
+            endHour: range.endHour - 12,
+          },
+        ]
+      }
+      return [range]
+    })
+    .flat()
+    .map((range) => {
+      const startAngle = (range.startHour % 12) * 30 - 90
+      const endAngle = (range.endHour % 12) * 30 - 90
 
-    const startRadian = (startAngle * Math.PI) / 180
-    const endRadian = (endAngle * Math.PI) / 180
+      const startRadian = (startAngle * Math.PI) / 180
+      const endRadian = (endAngle * Math.PI) / 180
 
-    const outerRadius =
-      clockRadius + (options.range.width ?? 6) / 2 + (options.range.offset ?? 0)
-    const innerRadius =
-      clockRadius - (options.range.width ?? 6) / 2 + (options.range.offset ?? 0)
+      const outerRadius =
+        clockRadius +
+        (options.range.width ?? 6) / 2 +
+        (options.range.offset ?? 0)
+      const innerRadius =
+        clockRadius -
+        (options.range.width ?? 6) / 2 +
+        (options.range.offset ?? 0)
 
-    const x1Outer = centerX + outerRadius * Math.cos(startRadian)
-    const y1Outer = centerY + outerRadius * Math.sin(startRadian)
-    const x2Outer = centerX + outerRadius * Math.cos(endRadian)
-    const y2Outer = centerY + outerRadius * Math.sin(endRadian)
+      const x1Outer = centerX + outerRadius * Math.cos(startRadian)
+      const y1Outer = centerY + outerRadius * Math.sin(startRadian)
+      const x2Outer = centerX + outerRadius * Math.cos(endRadian)
+      const y2Outer = centerY + outerRadius * Math.sin(endRadian)
 
-    const x1Inner = centerX + innerRadius * Math.cos(startRadian)
-    const y1Inner = centerY + innerRadius * Math.sin(startRadian)
-    const x2Inner = centerX + innerRadius * Math.cos(endRadian)
-    const y2Inner = centerY + innerRadius * Math.sin(endRadian)
+      const x1Inner = centerX + innerRadius * Math.cos(startRadian)
+      const y1Inner = centerY + innerRadius * Math.sin(startRadian)
+      const x2Inner = centerX + innerRadius * Math.cos(endRadian)
+      const y2Inner = centerY + innerRadius * Math.sin(endRadian)
 
-    const largeArcFlag = Math.abs(endAngle - startAngle) > 180 ? 1 : 0
+      const largeArcFlag = Math.abs(endAngle - startAngle) > 180 ? 1 : 0
 
-    const pathData = [
-      `M ${x1Inner} ${y1Inner}`,
-      `L ${x1Outer} ${y1Outer}`,
-      `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${x2Outer} ${y2Outer}`,
-      `L ${x2Inner} ${y2Inner}`,
-      `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x1Inner} ${y1Inner}`,
-      'Z',
-    ].join(' ')
+      const pathData = [
+        `M ${x1Inner} ${y1Inner}`,
+        `L ${x1Outer} ${y1Outer}`,
+        `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${x2Outer} ${y2Outer}`,
+        `L ${x2Inner} ${y2Inner}`,
+        `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x1Inner} ${y1Inner}`,
+        'Z',
+      ].join(' ')
 
-    return (
-      <path
-        key={range.id}
-        d={pathData}
-        className={`${colorClasses[range.color].fill} ${colorClasses[range.color].stroke}`}
-        fillOpacity={0.8}
-        strokeWidth={1}
-      />
-    )
-  })
+      return (
+        <path
+          key={range.id}
+          d={pathData}
+          className={`${colorClasses[range.color].fill} ${colorClasses[range.color].stroke}`}
+          fillOpacity={0.8}
+          strokeWidth={1}
+        />
+      )
+    })
 
   return (
     <div className="flex justify-center">
@@ -230,7 +257,7 @@ export default function ClockChart({
           cx={centerX}
           cy={centerY}
           r={clockRadius}
-          className="fill-base-100 stroke-base-300"
+          className="fill-base-100 stroke-base-content"
           strokeWidth="3"
         />
 
@@ -245,7 +272,12 @@ export default function ClockChart({
 
         {/* Center dot */}
         {showCenterDot && (
-          <circle cx={centerX} cy={centerY} r="6" className="fill-neutral" />
+          <circle
+            cx={centerX}
+            cy={centerY}
+            r="6"
+            className="fill-base-content"
+          />
         )}
       </svg>
     </div>

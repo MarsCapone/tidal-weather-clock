@@ -5,7 +5,7 @@ import {
   StormglassDataFetcher,
 } from '@/utils/fetchData'
 import * as process from 'node:process'
-import { formatISO, parseISO, startOfDay } from 'date-fns'
+import { formatISO, min, parseISO, startOfDay } from 'date-fns'
 import { DebugMemoryCache } from '@/backend/cache'
 import logger from '@/backend/logger'
 import { DataContext } from '@/types/data'
@@ -32,7 +32,12 @@ const server = serve({
 
     '/api/dataContext/:dateString': async (req) => {
       const dateString = req.params.dateString
-      const date = startOfDay(parseISO(dateString))
+
+      // query the earliest of either the provided date or today
+      const queryDay = min([
+        startOfDay(parseISO(dateString)),
+        startOfDay(new Date()),
+      ])
 
       const cachedData = cache.getCacheValue<DataContext[]>('all-contexts', {
         expiryHours: 4,
@@ -42,7 +47,7 @@ const server = serve({
           dateString,
           fetcher: dataFetcher.constructor.name,
         })
-        const data = await dataFetcher.getDataContexts(date)
+        const data = await dataFetcher.getDataContexts(queryDay)
 
         cache.setCacheValue('all-contexts', data)
 
