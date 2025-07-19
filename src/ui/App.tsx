@@ -18,67 +18,11 @@ import { LocalStorageCache } from '@/utils/cache'
 import DatePagination from './components/DatePagination'
 import WeatherStatus from '@/ui/components/WeatherStatus'
 import DayTimeline from '@/ui/components/DayTimeline'
-import ClockChart, { TimePointer, TimeRange } from '@/ui/components/ClockChart'
 
 const clientCache = new LocalStorageCache()
 
-function AppContent({
-  date,
-  dataContext,
-}: {
-  date: Date
-  dataContext: DataContext | null
-}) {
-  const featureFlags = useFeatureFlags()
-
-  if (dataContext === null) {
-    return (
-      <div className="text-3xl">
-        <h1>No data context...</h1>
-      </div>
-    )
-  }
-
-  return (
-    <div>
-      {featureFlags.showSuggestedActivity && (
-        <SuggestedActivity
-          dataContext={dataContext || {}}
-          date={date}
-          activities={Activities}
-          className="md:hidden"
-        />
-      )}
-      <div className="flex-col md:flex-row flex items-start justify-center gap-6">
-        <div className="w-full md:w-2/3">
-          <DayTimeline
-            tideData={dataContext.tideData}
-            sunData={dataContext.sunData}
-            referenceDate={dataContext.referenceDate}
-          />
-          <TideTimesChart
-            key={date.toDateString()}
-            tideData={dataContext.tideData}
-            sunData={dataContext.sunData}
-          />
-        </div>
-        <div className="w-full md:w-1/3">
-          {featureFlags.showSuggestedActivity && (
-            <SuggestedActivity
-              dataContext={dataContext || {}}
-              date={date}
-              activities={Activities}
-              className="hidden md:flex"
-            />
-          )}
-          <WeatherStatus dataContext={dataContext} />
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function App() {
+  const ff = useFeatureFlags()
   const { date, nextPath, prevPath } = useLoaderData()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -121,13 +65,55 @@ export default function App() {
     )
   }
 
+  if (dataContext === null) {
+    return (
+      <div>
+        <h1 className="text-3xl">No data context available</h1>
+      </div>
+    )
+  }
+
   return (
     <div
       {...handlers}
       className="flex flex-col mx-auto p-8 text-center min-w-full md:min-w-0 gap-10"
     >
       <DatePagination nextPath={nextPath} prevPath={prevPath} date={date} />
-      <AppContent date={date} dataContext={dataContext} />
+      <div>
+        {ff.showSuggestedActivity && (
+          <SuggestedActivity
+            dataContext={dataContext}
+            date={date}
+            activities={Activities}
+            className="md:hidden"
+          />
+        )}
+        <div className="flex-col md:flex-row flex items-start justify-center gap-6">
+          <div className="w-full md:w-2/3">
+            <DayTimeline
+              tideData={dataContext.tideData}
+              sunData={dataContext.sunData}
+              referenceDate={dataContext.referenceDate}
+            />
+            <TideTimesChart
+              key={date.toDateString()}
+              tideData={dataContext.tideData}
+              sunData={dataContext.sunData}
+            />
+          </div>
+          <div className="w-full md:w-1/3">
+            {ff.showSuggestedActivity && (
+              <SuggestedActivity
+                dataContext={dataContext || {}}
+                date={date}
+                activities={Activities}
+                className="hidden md:flex"
+              />
+            )}
+            <WeatherStatus dataContext={dataContext} />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
