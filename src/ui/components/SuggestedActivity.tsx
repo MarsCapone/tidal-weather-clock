@@ -176,10 +176,9 @@ export function ActivityExplanationDialog({
         </div>
         <ul className="list">
           {constraints.map((constraint, i) => (
-            <ExplanationReason
-              key={`constraint-${i}`}
-              constraint={constraint}
-            />
+            <li key={`constraint-${i}`} className="list-row">
+              <ExplanationReason constraint={constraint} />
+            </li>
           ))}
         </ul>
       </div>

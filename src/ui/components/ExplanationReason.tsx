@@ -33,24 +33,22 @@ export default function ExplanationReason({
   const { title, description, details, Icon } = reason
 
   return (
-    <li className="list-row">
-      <div className="flex flex-row gap-2">
-        <div>
-          <Icon width={48} height={48} className={'text-primary'} />
-        </div>
-        <div className="text-start w-dvw">
-          <div className="text-xl text-primary">{title}</div>
-          <div className="flex flex-col gap-x-2">
-            <p className={'list-col-wrap'}>{description}</p>
-            <div className={`list-col-wrap text-xs font-mono opacity-60`}>
-              {details.map((detail, i) => (
-                <Detail {...detail} key={`detail-${i}`} />
-              ))}
-            </div>
+    <div className="flex flex-row gap-2">
+      <div>
+        <Icon width={48} height={48} className={'text-primary'} />
+      </div>
+      <div className="text-start w-dvw">
+        <div className="text-xl text-primary">{title}</div>
+        <div className="flex flex-col gap-x-2">
+          <p className={'list-col-wrap'}>{description}</p>
+          <div className={`list-col-wrap text-xs font-mono opacity-60`}>
+            {details.map((detail, i) => (
+              <Detail {...detail} key={`detail-${i}`} />
+            ))}
           </div>
         </div>
       </div>
-    </li>
+    </div>
   )
 }
 

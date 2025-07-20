@@ -1,10 +1,14 @@
 import { Link } from 'react-router'
 import React from 'react'
 import { Activities } from '@/ui/constants'
-import ExplanationReason from '@/ui/components/ExplanationReason'
+import ExplanationReason, {
+  explainConstraint,
+} from '@/ui/components/ExplanationReason'
+import { Activity } from '@/types/activities'
 
 export default function Settings() {
   const constraints = Activities[0].constraints
+  const activities = Activities
 
   return (
     <div>
@@ -18,20 +22,20 @@ export default function Settings() {
             description="Constraints are individual reasons that must be matched in order to do an activity"
           >
             {constraints.map((constraint, index) => (
-              <ExplanationReason
-                key={`constraint-${index}`}
-                constraint={constraint}
-              />
+              <li key={`constraint-${index}`} className={'list-row'}>
+                <ExplanationReason constraint={constraint} />
+              </li>
             ))}
           </Pane>
           <Pane
             title="Activities"
             description="Activities are something you can do based on a collection of constraints"
           >
-            <li className={'list-row'}> activity 1 </li>
-            <li className={'list-row'}> activity 1 </li>
-            <li className={'list-row'}> activity 1 </li>
-            <li className={'list-row'}> activity 1 </li>
+            {activities.map((activity, index) => (
+              <li key={`activity-${index}`} className={'list-row'}>
+                <ActivityForm activity={activity} />
+              </li>
+            ))}
           </Pane>
         </div>
       </div>
@@ -62,6 +66,27 @@ function Pane({
       <div className="text-xs opacity-60">{description}</div>
 
       <ul className="list overflow-scroll">{children}</ul>
+    </div>
+  )
+}
+
+function ActivityForm({ activity }: { activity: Activity }) {
+  return (
+    <div className="">
+      <div className="flex flex-row justify-between items-center">
+        <div className="text-lg">{activity.displayName}</div>
+        <div className="flex gap-1">
+          <div className="btn btn-warning btn-xs">Edit</div>
+          <div className="btn btn-error btn-xs">Delete</div>
+        </div>
+      </div>
+      <div className="text-md w-dvw">
+        <ul>
+          {activity.constraints.map((constraint, i) => (
+            <li>{explainConstraint(constraint)?.description}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }
