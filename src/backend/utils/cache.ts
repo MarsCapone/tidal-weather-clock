@@ -1,6 +1,6 @@
-import { GetCacheOptions, ICache } from '@/utils/cache'
-import logger from '@/backend/logger'
+import logger from '@/backend/utils/pinoLogger'
 import { differenceInDays } from 'date-fns'
+import { GetCacheOptions, ICache } from '@/types/interfaces'
 
 type CacheValue<T> = {
   timestamp: string

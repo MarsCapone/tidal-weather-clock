@@ -1,15 +1,6 @@
 import { differenceInHours, formatISO, parseISO } from 'date-fns'
-import CONSTANTS from '@/ui/constants'
-import { ConsoleLogger } from '@/ui/logger'
-
-export type GetCacheOptions = {
-  expiryHours: number
-}
-
-export interface ICache {
-  setCacheValue<T>(key: string, value: T): void
-  getCacheValue<T>(key: string, options?: GetCacheOptions): T | null
-}
+import { ConsoleLogger } from '@/ui/utils/logger'
+import { GetCacheOptions, ICache } from '@/types/interfaces'
 
 export class LocalStorageCache implements ICache {
   private readonly logger: ConsoleLogger

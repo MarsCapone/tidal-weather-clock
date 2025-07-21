@@ -1,6 +1,6 @@
 import { Link } from 'react-router'
 import React from 'react'
-import { Activities } from '@/ui/constants'
+import { Activities } from '@/constants'
 import ExplanationReason, {
   explainConstraint,
 } from '@/ui/components/ExplanationReason'

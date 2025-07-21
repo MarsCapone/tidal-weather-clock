@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 export type TimeRange = {
   id: string
@@ -43,11 +43,20 @@ const colorClasses = {
   },
 }
 
-export type ClockChartOptions = {
+type ClockChartOptions = {
   range: {
     width?: number
     offset?: number
   }
+}
+
+export type ClockChartProps = {
+  timeRanges: TimeRange[]
+  timePointers: TimePointer[]
+  showCenterDot?: boolean
+  size?: number
+  clockRadius?: number
+  options?: ClockChartOptions
 }
 
 export default function ClockChart({
@@ -57,14 +66,7 @@ export default function ClockChart({
   size = 400,
   clockRadius = 150,
   options = { range: { width: 20, offset: -10 } },
-}: {
-  timeRanges: TimeRange[]
-  timePointers: TimePointer[]
-  showCenterDot?: boolean
-  size?: number
-  clockRadius?: number
-  options?: ClockChartOptions
-}) {
+}: ClockChartProps) {
   const centerX = size / 2
   const centerY = size / 2
 

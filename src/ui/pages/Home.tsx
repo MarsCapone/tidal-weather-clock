@@ -5,15 +5,14 @@ import { useLoaderData, useNavigate } from 'react-router'
 import React, { useEffect, useState } from 'react'
 import tryDataFetchersWithCache, {
   ServerDataFetcher,
-  DemoStormglassDataFetcher,
-} from '@/utils/fetchData'
+} from '@/ui/utils/fetchData'
 import { DataContext } from '@/types/data'
-import { Activities } from '../constants'
+import { Activities } from '../../constants'
 import { useSwipeable } from 'react-swipeable'
-import { useFeatureFlags } from '@/utils/featureFlags'
+import { useFeatureFlags } from '@/ui/utils/featureFlags'
 import { formatISO } from 'date-fns'
-import logger from '@/ui/logger'
-import { LocalStorageCache } from '@/utils/cache'
+import logger from '@/ui/utils/logger'
+import { LocalStorageCache } from '@/ui/utils/cache'
 import DatePagination from '../components/DatePagination'
 import WeatherStatus from '@/ui/components/WeatherStatus'
 import DayTimeline from '@/ui/components/DayTimeline'
@@ -38,11 +37,7 @@ export default function Home() {
     tryDataFetchersWithCache(
       logger,
       date,
-      [
-        new ServerDataFetcher(logger),
-        // new StormglassDataFetcher(logger),
-        new DemoStormglassDataFetcher(logger),
-      ],
+      [new ServerDataFetcher(logger)],
       clientCache,
       (lat, lng, date) =>
         `[${lat},${lng}]-${formatISO(date, { representation: 'date' })}`,

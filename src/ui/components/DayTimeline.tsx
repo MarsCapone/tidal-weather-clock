@@ -1,5 +1,5 @@
 import { DataContext } from '@/types/data'
-import { formatTime, withFractionalTime } from '@/utils/dates'
+import { formatTime, withFractionalTime } from '@/ui/utils/dates'
 import { HighWaterIcon, LowWaterIcon } from '@/ui/components/icons/TideIcon'
 import { SunriseIcon, SunsetIcon } from '@/ui/components/icons/SunStateIcon'
 import { compareAsc, parseISO } from 'date-fns'
@@ -17,12 +17,16 @@ type TimelineItem = {
   }
 }
 
+export type DayTimelineProps = {
+  vertical?: boolean
+} & Omit<DataContext, 'weatherData' | 'windData'>
+
 export default function DayTimeline({
   referenceDate,
   tideData,
   sunData,
   vertical = false,
-}: Omit<DataContext, 'weatherData' | 'windData'> & { vertical?: boolean }) {
+}: DayTimelineProps) {
   const tides = tideData.map((t) => ({
     ...t,
     timestamp: withFractionalTime(referenceDate, t.time),

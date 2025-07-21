@@ -1,23 +1,28 @@
 import { DataContext } from '@/types/data'
 import { Activity } from '@/types/activities'
-import { IntervalActivitySelection, suggestActivity } from '@/utils/activities'
+import {
+  IntervalActivitySelection,
+  suggestActivity,
+} from '@/ui/utils/activities'
 import React, { useEffect } from 'react'
-import { useFeatureFlags } from '@/utils/featureFlags'
+import { useFeatureFlags } from '@/ui/utils/featureFlags'
 import { format } from 'date-fns'
-import { Activities } from '@/ui/constants'
+import { Activities } from '@/constants'
 import ExplanationReason from '@/ui/components/ExplanationReason'
+
+export type SuggestedActivityProps = {
+  dataContext: DataContext
+  date: Date
+  activities: Activity[]
+  className?: string
+}
 
 export default function SuggestedActivity({
   dataContext,
   date,
   activities,
   className,
-}: {
-  dataContext: DataContext
-  date: Date
-  activities: Activity[]
-  className?: string
-}) {
+}: SuggestedActivityProps) {
   const [activitySelections, setActivitySelections] = React.useState<
     IntervalActivitySelection[]
   >([])
@@ -149,13 +154,15 @@ export default function SuggestedActivity({
   )
 }
 
+type ActivityExplanationDialogProps = {
+  activitySelection: IntervalActivitySelection
+  id: string
+}
+
 export function ActivityExplanationDialog({
   activitySelection,
   id,
-}: {
-  activitySelection: IntervalActivitySelection
-  id: string
-}) {
+}: ActivityExplanationDialogProps) {
   const ff = useFeatureFlags()
 
   const constraints = ff.useDemoActivities

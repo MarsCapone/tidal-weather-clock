@@ -1,16 +1,18 @@
+export type InputWithDescriptionProps<T> = {
+  title: string
+  description: string
+  placeholder?: T
+  value?: T
+  setValue?: (value: string) => void
+}
+
 export function InputWithDescription<T>({
   title,
   description,
   placeholder,
   value,
   setValue,
-}: {
-  title: string
-  description: string
-  placeholder?: T
-  value?: T
-  setValue?: (value: string) => void
-}) {
+}: InputWithDescriptionProps<T>) {
   return (
     <fieldset className="fieldset">
       <legend className="fieldset-legend">{title}</legend>

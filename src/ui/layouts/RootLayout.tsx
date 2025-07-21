@@ -1,7 +1,6 @@
 import { Link, Outlet } from 'react-router'
 import ColorschemeToggle from '@/ui/components/Colorscheme'
-import CONSTANTS from '@/ui/constants'
-import { HomeIcon } from '@heroicons/react/24/solid'
+import CONSTANTS from '@/constants'
 
 export default function RootLayout() {
   return (

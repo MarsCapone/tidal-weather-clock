@@ -1,6 +1,5 @@
 import { InputWithDescription } from '../components/forms/FormComponents'
-import { useState } from 'react'
-import { useFeatureFlags } from '@/utils/featureFlags'
+import { useFeatureFlags } from '@/ui/utils/featureFlags'
 
 export default function InternalSettings() {
   const ff = useFeatureFlags()

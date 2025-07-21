@@ -20,7 +20,7 @@ import {
   startOfDay,
 } from 'date-fns'
 import arrayEqual from 'array-equal'
-import logger from '@/ui/logger'
+import logger from '@/ui/utils/logger'
 
 const _PERIOD_GRANULARITY_MINUTES = 10
 

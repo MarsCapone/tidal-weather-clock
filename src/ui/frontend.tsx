@@ -21,7 +21,7 @@ import {
   startOfToday,
   startOfTomorrow,
 } from 'date-fns'
-import CONSTANTS from '@/ui/constants'
+import CONSTANTS from '@/constants'
 import SettingsLayout from '@/ui/layouts/SettingsLayout'
 import InternalSettings from '@/ui/pages/InternalSettings'
 import Settings from '@/ui/pages/Settings'

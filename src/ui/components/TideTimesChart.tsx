@@ -1,27 +1,22 @@
-import {
-  IgrRadialGauge,
-  IgrRadialGaugeModule,
-  IgrRadialGaugeRange,
-} from 'igniteui-react-gauges'
 import { SunData, TideInfo } from '@/types/data'
 import ClockChart, { TimePointer, TimeRange } from '@/ui/components/ClockChart'
 import React from 'react'
-import { getFractionalTime } from '@/utils/dates'
+import { getFractionalTime } from '@/ui/utils/dates'
 import { parseISO } from 'date-fns'
 
-IgrRadialGaugeModule.register()
+export type TideTimesChartProps = {
+  highTideBounds?: number
+  lowTideBounds?: number
+  tideData: TideInfo[]
+  sunData: SunData
+}
 
 export default function TideTimesChart({
   highTideBounds = 2,
   lowTideBounds = 1,
   tideData,
   sunData,
-}: {
-  highTideBounds?: number
-  lowTideBounds?: number
-  tideData: TideInfo[]
-  sunData: SunData
-}) {
+}: TideTimesChartProps) {
   const highTides = tideData.filter((t) => t.type === 'high')
   const lowTides = tideData.filter((t) => t.type === 'low')
 
