@@ -83,7 +83,7 @@ export default function ActivityScoreList({ scores }: ActivityScoreListProps) {
           Limit suggestions
           <input
             type="number"
-            className="w-4"
+            className="w-8"
             min={1}
             defaultValue={DEFAULT_LIMIT}
             onChange={(e) => setLimit(parseInt(e.target.value))}

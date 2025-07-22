@@ -221,6 +221,13 @@ function SuggestedActivityExplanationDialog({
         ]
   ).sort((a, b) => compareAsc(a.interval.start, b.interval.start))
 
+  const constraintsMap = Object.fromEntries(
+    selection.activity.constraints.map((constraint) => [
+      constraint.type,
+      constraint,
+    ]),
+  )
+
   return (
     <dialog className="modal" id={dialogId}>
       <div className="modal-box w-11/12 max-w-5xl">
@@ -233,6 +240,7 @@ function SuggestedActivityExplanationDialog({
                   <th>Time</th>
                   <th>Average Score</th>
                   <th>Detailed Score</th>
+                  <th>Configuration</th>
                   <th>Context</th>
                 </tr>
               </thead>
@@ -250,14 +258,28 @@ function SuggestedActivityExplanationDialog({
                         {interval.constraintScores && (
                           <GenericObject
                             obj={interval.constraintScores}
-                            className={'w-32'}
+                            className={'w-40 text-sm'}
                           />
                         )}
+                      </td>
+                      <td className="align-text-top">
+                        <GenericObject
+                          obj={constraintsMap}
+                          options={{
+                            decimalPlaces: 0,
+                            useJsonEditor: true,
+                          }}
+                        />
                       </td>
                       <td className="align-text-top">
                         {selection.debug?.slot && (
                           <GenericObject
                             obj={selection.debug.slot}
+                            options={{
+                              jsonEditorProps: {
+                                minWidth: 400,
+                              },
+                            }}
                             className={'w-20'}
                           />
                         )}
