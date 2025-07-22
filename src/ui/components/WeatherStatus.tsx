@@ -1,4 +1,4 @@
-import { DataContext } from '@/types/data'
+import { DataContext } from '@/types/context'
 import { formatTime, withFractionalTime } from '@/ui/utils/dates'
 import { WindIcon } from '@/ui/components/icons/WindIcon'
 import { calcMean } from '@/ui/utils/math'
@@ -10,8 +10,7 @@ import {
   LowWaterIcon,
   TideHeightIcon,
 } from '@/ui/components/icons/TideIcon'
-import { compareAsc, parseISO } from 'date-fns'
-import { Fragment } from 'react'
+import { parseISO } from 'date-fns'
 
 export default function WeatherStatus({
   dataContext,
@@ -27,9 +26,9 @@ export default function WeatherStatus({
         <ul className="list list-unstyled">
           {dataTable.map((row, i) => (
             <WeatherStatusRow
+              Icon={row.Icon}
               key={`${row.label}-${i}`}
               label={row.label}
-              Icon={row.Icon}
               values={row.values}
             />
           ))}
@@ -39,10 +38,10 @@ export default function WeatherStatus({
   )
 }
 
-function WeatherStatusRow({ label, Icon, values }: DataTableRow) {
+function WeatherStatusRow({ Icon, label, values }: DataTableRow) {
   return (
     <li className="list-row items-center">
-      <div>{Icon && <Icon width={36} height={36} />}</div>
+      <div>{Icon && <Icon height={36} width={36} />}</div>
       <div>
         <div>{label}</div>
       </div>
@@ -60,8 +59,8 @@ function WeatherStatusRow({ label, Icon, values }: DataTableRow) {
 }
 
 type DataTableRow = {
-  label: string
   Icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>
+  label: string
   values: (string | undefined)[]
 }
 
@@ -80,8 +79,8 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
 
   return [
     {
-      label: 'Wind',
       Icon: WindIcon,
+      label: 'Wind',
       values: [
         windSpeeds.length > 0
           ? `${calcMean(windSpeeds).toFixed(1)} kts`
@@ -89,8 +88,8 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       ],
     },
     {
-      label: 'Temperature',
       Icon: CelsiusIcon,
+      label: 'Temperature',
       values: [
         temperature.length > 0
           ? `${calcMean(temperature).toFixed(1)}°C`
@@ -98,8 +97,8 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       ],
     },
     {
-      label: 'Cloudiness',
       Icon: SimpleCloudIcon,
+      label: 'Cloudiness',
       values: [
         cloudiness.length > 0
           ? `${calcMean(cloudiness).toFixed(1)}%`
@@ -107,8 +106,8 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       ],
     },
     {
-      label: 'Sunrise',
       Icon: SunriseIcon,
+      label: 'Sunrise',
       values: [
         dataContext.sunData.sunRise
           ? formatTime(
@@ -120,8 +119,8 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       ],
     },
     {
-      label: 'Sunset',
       Icon: SunsetIcon,
+      label: 'Sunset',
       values: [
         dataContext.sunData.sunSet
           ? formatTime(
@@ -133,15 +132,15 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       ],
     },
     {
-      label: 'HW',
       Icon: HighWaterIcon,
+      label: 'HW',
       values: highTides.map((t) => t.display),
     },
-    { label: 'LW', Icon: LowWaterIcon, values: lowTides.map((t) => t.display) },
+    { Icon: LowWaterIcon, label: 'LW', values: lowTides.map((t) => t.display) },
     {
-      label: 'Tide Heights',
       Icon: TideHeightIcon,
-      values: [...tides.map((t) => `${t.height.toFixed(1)}m`)],
+      label: 'Tide Heights',
+      values: tides.map((t) => `${t.height.toFixed(1)}m`),
     },
   ]
 }

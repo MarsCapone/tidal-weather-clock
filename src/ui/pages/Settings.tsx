@@ -4,7 +4,7 @@ import { Activities } from '@/constants'
 import ExplanationReason, {
   explainConstraint,
 } from '@/ui/components/ExplanationReason'
-import { Activity } from '@/types/activities'
+import { Activity } from '@/types/legacyActivities'
 
 export default function Settings() {
   const constraints = Activities[0].constraints
@@ -18,21 +18,21 @@ export default function Settings() {
       <div className="">
         <div className="grid grid-rows-2 md:grid-rows-0 md:grid-cols-2 gap-4">
           <Pane
-            title="Constraints"
             description="Constraints are individual reasons that must be matched in order to do an activity"
+            title="Constraints"
           >
             {constraints.map((constraint, index) => (
-              <li key={`constraint-${index}`} className={'list-row'}>
+              <li className={'list-row'} key={`constraint-${index}`}>
                 <ExplanationReason constraint={constraint} />
               </li>
             ))}
           </Pane>
           <Pane
-            title="Activities"
             description="Activities are something you can do based on a collection of constraints"
+            title="Activities"
           >
             {activities.map((activity, index) => (
-              <li key={`activity-${index}`} className={'list-row'}>
+              <li className={'list-row'} key={`activity-${index}`}>
                 <ActivityForm activity={activity} />
               </li>
             ))}
@@ -44,15 +44,15 @@ export default function Settings() {
 }
 
 function Pane({
-  title,
+  children,
   description,
   onClick,
-  children,
+  title,
 }: {
-  title: string
+  children?: React.ReactNode
   description: string
   onClick?: () => void
-  children?: React.ReactNode
+  title: string
 }) {
   return (
     <div className="card card-xl shadow-md p-4 gap-4 h-[70dvh]">
@@ -83,7 +83,9 @@ function ActivityForm({ activity }: { activity: Activity }) {
       <div className="text-md w-dvw">
         <ul>
           {activity.constraints.map((constraint, i) => (
-            <li>{explainConstraint(constraint)?.description}</li>
+            <li key={`constraint-${i}`}>
+              {explainConstraint(constraint)?.description}
+            </li>
           ))}
         </ul>
       </div>

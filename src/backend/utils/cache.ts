@@ -7,10 +7,10 @@ type CacheValue<T> = {
   value: T
 }
 
-export class DebugMemoryCache implements ICache {
-  private cache: Record<string, any> = {}
+export class DebugMemoryCache<T> implements ICache<T> {
+  private cache: Record<string, CacheValue<T>> = {}
 
-  setCacheValue<T>(key: string, value: T): void {
+  setCacheValue(key: string, value: T): void {
     logger.info('setting cache value', { key, value })
     this.cache[key] = {
       timestamp: new Date().toISOString(),
@@ -18,7 +18,7 @@ export class DebugMemoryCache implements ICache {
     }
   }
 
-  getCacheValue<T>(key: string, options?: GetCacheOptions): T | null {
+  getCacheValue(key: string, options?: GetCacheOptions): T | null {
     const cachedContent: CacheValue<T> = this.cache[key]
     if (!cachedContent) {
       logger.warn('failed to get cache value', { key, reason: 'not found' })
@@ -28,10 +28,10 @@ export class DebugMemoryCache implements ICache {
     const diff = differenceInDays(cachedContent.timestamp, new Date())
     if (options !== undefined && diff > options.expiryHours) {
       logger.warn('failed to get cache value', {
-        key,
-        reason: 'expired',
         diff,
         expiryHours: options.expiryHours,
+        key,
+        reason: 'expired',
       })
       return null
     }

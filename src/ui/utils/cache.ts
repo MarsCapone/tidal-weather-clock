@@ -2,12 +2,17 @@ import { differenceInHours, formatISO, parseISO } from 'date-fns'
 import { ConsoleLogger } from '@/ui/utils/logger'
 import { GetCacheOptions, ICache } from '@/types/interfaces'
 
-export class LocalStorageCache implements ICache {
+type CacheValue<T> = {
+  timestamp: string
+  value: T
+}
+
+export class LocalStorageCache<T> implements ICache<T> {
   private readonly logger: ConsoleLogger
   constructor() {
     this.logger = new ConsoleLogger()
   }
-  setCacheValue<T>(key: string, value: T): void {
+  setCacheValue(key: string, value: T): void {
     const content = {
       timestamp: formatISO(new Date()),
       value,
@@ -16,27 +21,34 @@ export class LocalStorageCache implements ICache {
     localStorage.setItem(key, JSON.stringify(content))
   }
 
-  getCacheValue<T>(key: string, options?: GetCacheOptions): T | null {
+  getCacheValue(key: string, options?: GetCacheOptions): T | null {
     const content = localStorage.getItem(key)
     if (!content) {
-      this.logger.debug('no cache content found (internal)', { key, content })
+      this.logger.debug('no cache content found (internal)', { content, key })
       return null
     }
-    const cachedContent = JSON.parse(content)
+    const cachedContent: CacheValue<T> = JSON.parse(content)
 
     if (
       options !== undefined &&
-      differenceInHours(parseISO(cachedContent.timestamp), new Date()) >
+      differenceInHours(new Date(), parseISO(cachedContent.timestamp)) >
         options.expiryHours
     ) {
       this.logger.debug('cache content expired (internal)', {
-        key,
         cachedContent,
+        key,
       })
       return null
     }
 
-    this.logger.debug('cache content found (internal)', { key, cachedContent })
+    this.logger.debug('cache content found (internal)', {
+      cachedContent,
+      key,
+      cacheAgeHours: differenceInHours(
+        new Date(),
+        parseISO(cachedContent.timestamp),
+      ),
+    })
     return cachedContent.value as T
   }
 }

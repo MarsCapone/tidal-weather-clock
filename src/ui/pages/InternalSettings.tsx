@@ -1,5 +1,5 @@
 import { InputWithDescription } from '../components/forms/FormComponents'
-import { useFeatureFlags } from '@/ui/utils/featureFlags'
+import { useFeatureFlags } from '@/ui/hooks/useFeatureFlags'
 
 export default function InternalSettings() {
   const ff = useFeatureFlags()
@@ -10,16 +10,16 @@ export default function InternalSettings() {
         <h2 className="text-2xl pb-4">Clock Face</h2>
         <div className="flex gap-4">
           <InputWithDescription
-            title={'High tide delta hours'}
             description={
               'Number of hours before and after high tide to show on the clock face.'
             }
+            title={'High tide delta hours'}
           />
           <InputWithDescription
-            title={'Low tide delta hours'}
             description={
               'Number of hours before and after low tide to show on the clock face.'
             }
+            title={'Low tide delta hours'}
           />
         </div>
       </div>
@@ -27,12 +27,12 @@ export default function InternalSettings() {
         <h2 className="text-2xl pb-4">Feature Flags</h2>
         <div className="flex flex-col gap-1">
           {Object.entries(ff).map(([key, value]) => (
-            <label className={'label'}>
+            <label className={'label'} key={key}>
               <input
-                className="checkbox checkbox-accent"
-                type="checkbox"
                 checked={value}
+                className="checkbox checkbox-accent"
                 disabled
+                type="checkbox"
               />
               {key}
             </label>

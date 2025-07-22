@@ -1,20 +1,20 @@
-import { DataContext } from '@/types/data'
+import { DataContext } from '@/types/context'
 import { formatTime, withFractionalTime } from '@/ui/utils/dates'
 import { HighWaterIcon, LowWaterIcon } from '@/ui/components/icons/TideIcon'
 import { SunriseIcon, SunsetIcon } from '@/ui/components/icons/SunStateIcon'
 import { compareAsc, parseISO } from 'date-fns'
 
 type TimelineItem = {
-  timestamp: Date | null
-  label: string
-  Icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>
   additionalClasses: {
-    label?: string
-    icon?: string
-    time?: string
-    line?: string
     all?: string
+    icon?: string
+    label?: string
+    line?: string
+    time?: string
   }
+  Icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>
+  label: string
+  timestamp: Date | null
 }
 
 export type DayTimelineProps = {
@@ -23,49 +23,49 @@ export type DayTimelineProps = {
 
 export default function DayTimeline({
   referenceDate,
-  tideData,
   sunData,
+  tideData,
   vertical = false,
 }: DayTimelineProps) {
   const tides = tideData.map((t) => ({
     ...t,
-    timestamp: withFractionalTime(referenceDate, t.time),
-    label: t.type === 'high' ? 'HW' : 'LW',
-    Icon: t.type === 'high' ? HighWaterIcon : LowWaterIcon,
     additionalClasses:
       t.type == 'high'
         ? {
-            label: 'text-success',
             icon: 'border-success bg-success text-secondary-content',
+            label: 'text-success',
             line: 'bg-success',
           }
         : {
-            label: 'text-error',
             icon: 'border-error bg-error text-secondary-content',
+            label: 'text-error',
             line: 'bg-error',
           },
+    Icon: t.type === 'high' ? HighWaterIcon : LowWaterIcon,
+    label: t.type === 'high' ? 'HW' : 'LW',
+    timestamp: withFractionalTime(referenceDate, t.time),
   }))
 
   const timelineItems: TimelineItem[] = [
     {
-      timestamp: sunData.sunRise,
+      additionalClasses: {
+        icon: 'border-secondary bg-secondary text-secondary-content',
+        label: 'text-secondary',
+        line: 'bg-secondary',
+      },
       Icon: SunriseIcon,
       label: 'Sunrise',
-      additionalClasses: {
-        label: 'text-secondary',
-        icon: 'border-secondary bg-secondary text-secondary-content',
-        line: 'bg-secondary',
-      },
+      timestamp: sunData.sunRise,
     },
     {
-      timestamp: sunData.sunSet,
-      Icon: SunsetIcon,
-      label: 'Sunset',
       additionalClasses: {
-        label: 'text-secondary',
         icon: 'border-secondary bg-secondary text-secondary-content',
+        label: 'text-secondary',
         line: 'bg-secondary',
       },
+      Icon: SunsetIcon,
+      label: 'Sunset',
+      timestamp: sunData.sunSet,
     },
     ...tides,
   ]
@@ -81,13 +81,13 @@ export default function DayTimeline({
 
   return (
     <ul
-      className={`timeline my-2 justify-center ${vertical ? 'timeline-vertical' : 'timeline-horizontal'}`}
+      className={`timeline timeline-vertical sm:timeline-horizontal my-2 justify-center ${vertical ? 'timeline-vertical' : 'timeline-horizontal'}`}
     >
-      {timelineItems.map(({ timestamp, label, Icon, additionalClasses }, i) => (
+      {timelineItems.map(({ additionalClasses, Icon, label, timestamp }, i) => (
         <li key={`timeline-item-${i}`}>
           <hr className={`${additionalClasses.line || 'bg-primary'}`} />
           <div
-            className={`timeline-start text-xs lg:w-24 lg:text-xl xl:text-2xl xl:w-32 ${additionalClasses.label || ''} ${additionalClasses.all || ''}`}
+            className={`timeline-start text-xl w-24 xl:text-2xl xl:w-32 ${additionalClasses.label || ''} ${additionalClasses.all || ''}`}
           >
             {label}
           </div>
@@ -96,10 +96,10 @@ export default function DayTimeline({
           >
             {Icon && (
               <Icon
-                width={20}
+                className={'w-6 h-6 xl:w-10 xl:h-10'}
                 height={20}
                 strokeWidth={2}
-                className={'w-6 h-6 xl:w-10 xl:h-10'}
+                width={20}
               />
             )}
           </div>

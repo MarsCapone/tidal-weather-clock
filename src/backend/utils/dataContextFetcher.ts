@@ -8,10 +8,11 @@ import {
 import stormglassWeatherExample from '@/assets/stormGlassWeatherExample.json'
 import stormglassTideExample from '@/assets/stormGlassTideExample.json'
 import stormglassSunExample from '@/assets/stormGlassAstronomyExample.json'
-import { DataContext } from '@/types/data'
+import { DataContext } from '@/types/context'
 import {
   eachDayOfInterval,
   endOfDay,
+  formatISO,
   isWithinInterval,
   parseISO,
   startOfDay,
@@ -24,7 +25,9 @@ const stormglassBaseUrl = 'https://api.stormglass.io'
 function getMeanValueFromSource(
   sourceData: Record<never, number | undefined>,
 ): number {
-  if (!sourceData) return 0
+  if (!sourceData) {
+    return 0
+  }
 
   const values = Object.values(sourceData).filter(
     (value) => typeof value === 'number',
@@ -36,10 +39,12 @@ function filterToDate<T extends { time: string }>(
   date: Date,
   hasTime: T[] | null | undefined,
 ): T[] {
-  if (hasTime === null || hasTime === undefined) return []
+  if (hasTime === null || hasTime === undefined) {
+    return []
+  }
   const interval = {
-    start: startOfDay(date),
     end: endOfDay(date),
+    start: startOfDay(date),
   }
   return hasTime.filter(({ time }) =>
     isWithinInterval(parseISO(time), interval),
@@ -82,9 +87,9 @@ export class DemoStormglassDataFetcher implements IDataContextFetcher {
     ) {
       this.logger.warn('not all data sources returned data', {
         date,
-        weather: rawWeather !== null,
-        tide: rawTide !== null,
         sun: rawSun !== null,
+        tide: rawTide !== null,
+        weather: rawWeather !== null,
       })
       return []
     }
@@ -94,21 +99,19 @@ export class DemoStormglassDataFetcher implements IDataContextFetcher {
     // end is either in the meta or needs to be pulled out from the data
 
     const bestEndSinceEpoch = Math.max(
-      ...[
-        parseISO(rawWeather!.meta.end).getTime(),
-        parseISO(rawTide!.meta.end).getTime(),
-        Math.max(...rawSun!.data.map((r) => parseISO(r.time).getTime())),
-      ],
+      parseISO(rawWeather!.meta.end).getTime(),
+      parseISO(rawTide!.meta.end).getTime(),
+      Math.max(...rawSun!.data.map((r) => parseISO(r.time).getTime())),
     )
 
     const interval = {
-      start: date,
       end: new Date(bestEndSinceEpoch),
+      start: date,
     }
 
     this.logger.debug('fetching data contexts', {
-      interval,
       date,
+      interval,
     })
 
     return eachDayOfInterval(interval).map((d) =>
@@ -132,17 +135,16 @@ export class DemoStormglassDataFetcher implements IDataContextFetcher {
     ]
 
     const result: DataContext = {
-      referenceDate: date,
+      referenceDate: formatISO(startOfDay(parseISO(sunResponse[0].sunrise))),
       sunData: {
-        sunSet: sunResponse.length > 0 ? parseISO(sunResponse[0].sunset) : null,
-        sunRise:
-          sunResponse.length > 0 ? parseISO(sunResponse[0].sunrise) : null,
+        sunRise: sunResponse[0].sunrise,
+        sunSet: sunResponse[0].sunset,
       },
       tideData: [],
-      windData: {
+      weatherData: {
         points: [],
       },
-      weatherData: {
+      windData: {
         points: [],
       },
     }
@@ -152,29 +154,29 @@ export class DemoStormglassDataFetcher implements IDataContextFetcher {
         airTemperature: getMeanValueFromSource(r.airTemperature),
         cloudCover: getMeanValueFromSource(r.cloudCover),
         gust: getMeanValueFromSource(r.gust),
+        timestamp: r.time,
         windDirection: getMeanValueFromSource(r.windDirection),
         windSpeed: getMeanValueFromSource(r.windSpeed),
-        timestamp: parseISO(r.time),
       }))
       .forEach((hour) => {
         result.windData.points.push({
-          timestamp: hour.timestamp,
           direction: hour.windDirection,
-          speed: hour.windSpeed,
           gustSpeed: hour.gust,
+          speed: hour.windSpeed,
+          timestamp: hour.timestamp,
         })
         result.weatherData.points.push({
-          timestamp: hour.timestamp,
           cloudCover: hour.cloudCover,
           temperature: hour.airTemperature,
+          timestamp: hour.timestamp,
         })
       })
 
     tideResponse.forEach((r) => {
       result.tideData.push({
+        height: r.height,
         time: getFractionalTime(parseISO(r.time)),
         type: r.type,
-        height: r.height,
       })
     })
 
@@ -204,9 +206,9 @@ export class StormglassDataFetcher extends DemoStormglassDataFetcher {
     const [lat, lng] = CONSTANTS.LOCATION_COORDS
 
     const urls = {
-      weather: `${stormglassBaseUrl}/v2/weather/point?lat=${lat}&lng=${lng}&params=${stormglassWeatherParams.join(',')}`,
-      tide: `${stormglassBaseUrl}/v2/tide/extremes/point?lat=${lat}&lng=${lng}`,
       sun: `${stormglassBaseUrl}/v2/astronomy/point?lat=${lat}&lng=${lng}`,
+      tide: `${stormglassBaseUrl}/v2/tide/extremes/point?lat=${lat}&lng=${lng}`,
+      weather: `${stormglassBaseUrl}/v2/weather/point?lat=${lat}&lng=${lng}&params=${stormglassWeatherParams.join(',')}`,
     }
     const response = await fetch(urls[type], {
       headers: { Authorization: this.apiKey! },
@@ -219,9 +221,9 @@ export class StormglassDataFetcher extends DemoStormglassDataFetcher {
 
     this.logger.error('error fetching stormglass data', {
       apiType: type,
+      content,
       statusCode: response.status,
       statusText: response.statusText,
-      content,
     })
     return null
   }

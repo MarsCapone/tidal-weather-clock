@@ -1,4 +1,4 @@
-import { SunData, TideInfo } from '@/types/data'
+import { SunData, TideInfo } from '@/types/context'
 import ClockChart, { TimePointer, TimeRange } from '@/ui/components/ClockChart'
 import React from 'react'
 import { getFractionalTime } from '@/ui/utils/dates'
@@ -7,15 +7,15 @@ import { parseISO } from 'date-fns'
 export type TideTimesChartProps = {
   highTideBounds?: number
   lowTideBounds?: number
-  tideData: TideInfo[]
   sunData: SunData
+  tideData: TideInfo[]
 }
 
 export default function TideTimesChart({
   highTideBounds = 2,
   lowTideBounds = 1,
-  tideData,
   sunData,
+  tideData,
 }: TideTimesChartProps) {
   const highTides = tideData.filter((t) => t.type === 'high')
   const lowTides = tideData.filter((t) => t.type === 'low')
@@ -25,18 +25,18 @@ export default function TideTimesChart({
 
   const timeRanges: TimeRange[] = [
     {
-      id: 'high-tide',
-      startHour: highTideTime - highTideBounds,
-      endHour: highTideTime + highTideBounds,
       color: 'success',
+      endHour: highTideTime + highTideBounds,
+      id: 'high-tide',
       label: 'High Tide',
+      startHour: highTideTime - highTideBounds,
     },
     {
-      id: 'low-tide',
-      startHour: lowTideTime - lowTideBounds,
-      endHour: lowTideTime + lowTideBounds,
       color: 'error',
+      endHour: lowTideTime + lowTideBounds,
+      id: 'low-tide',
       label: 'Low Tide',
+      startHour: lowTideTime - lowTideBounds,
     },
   ]
 
@@ -60,26 +60,26 @@ export default function TideTimesChart({
   ]
     .filter((s) => !!s.timestamp)
     .map((s) => ({
-      id: s.label.toLowerCase(),
-      hour: getFractionalTime(s.timestamp!),
       color: 'warning',
-      label: s.label,
+      hour: getFractionalTime(s.timestamp!),
+      id: s.label.toLowerCase(),
       isOutside: true,
+      label: s.label,
     }))
 
   return (
     <ClockChart
-      timePointers={timePointers}
-      timeRanges={timeRanges}
-      showCenterDot={true}
-      size={500}
       clockRadius={180}
       options={{
         range: {
-          width: 69,
           offset: -37,
+          width: 69,
         },
       }}
+      showCenterDot={true}
+      size={500}
+      timePointers={timePointers}
+      timeRanges={timeRanges}
     />
   )
 }

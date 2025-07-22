@@ -1,195 +1,276 @@
-import { DataContext } from '@/types/data'
-import { Activity } from '@/types/activities'
+import { ActivityScore } from '@/types/activity'
+import { useFeatureFlags } from '@/ui/hooks/useFeatureFlags'
+import React, { useState } from 'react'
 import {
-  IntervalActivitySelection,
-  suggestActivity,
-} from '@/ui/utils/activities'
-import React, { useEffect } from 'react'
-import { useFeatureFlags } from '@/ui/utils/featureFlags'
-import { format } from 'date-fns'
-import { Activities } from '@/constants'
-import ExplanationReason from '@/ui/components/ExplanationReason'
+  DefaultActivityScore,
+  EnrichedActivityScore,
+  groupScores,
+} from '@/ui/utils/suggestions'
+import { formatInterval } from '@/ui/utils/dates'
+import { compareAsc } from 'date-fns'
+import GenericObject from './GenericObject'
 
 export type SuggestedActivityProps = {
-  dataContext: DataContext
-  date: Date
-  activities: Activity[]
   className?: string
+  dialogId: string
+  suggestions: DefaultActivityScore[]
+  index: number
+  setIndex: (v: number) => void
 }
 
+const INTERVAL_LIMIT = 3
+
 export default function SuggestedActivity({
-  dataContext,
-  date,
-  activities,
   className,
+  dialogId,
+  suggestions,
+  index,
+  setIndex,
 }: SuggestedActivityProps) {
-  const [activitySelections, setActivitySelections] = React.useState<
-    IntervalActivitySelection[]
-  >([])
-  const [selectionIndex, setSelectionIndex] = React.useState(0)
   const ff = useFeatureFlags()
 
-  useEffect(() => {
-    setActivitySelections(suggestActivity(date, dataContext, activities))
-  }, [date, dataContext, activities])
+  const filteredSuggestions = groupScores(
+    suggestions.filter((r) => r.feasible),
+    'timeAndActivity',
+  )
 
-  const activitySelection =
-    activitySelections.length > 0 ? activitySelections[selectionIndex] : null
+  const selection =
+    filteredSuggestions.length > 0 ? filteredSuggestions[index] : null
 
-  if (!activitySelection) {
+  // don't show this panel at all if there is nothing to show
+  if (!selection) {
+    return null
+  }
+
+  const hasCardActions =
+    ff.alwaysShowActivityNextButton || filteredSuggestions.length > 1
+
+  const prevButton = (
+    <NavButton
+      direction="prev"
+      disabled={index === 0}
+      index={index}
+      setIndex={setIndex}
+    />
+  )
+  const nextButton = (
+    <NavButton
+      direction="next"
+      disabled={index === filteredSuggestions.length - 1}
+      index={index}
+      setIndex={setIndex}
+    />
+  )
+
+  const renderScore = (score: number) => {
+    // max score is 1. 5 half stars gives 10 possible options
+    const outOf10 = Math.round(score * 10)
     return (
-      <div className={`card card-lg shadow-sm ${className || ''}`}>
-        <div className="card-body">
-          <div className="card-title">Suggested Activity</div>
-          <p>Loading...</p>
-        </div>
+      <div className="rating rating-xs md:rating-sm rating-half">
+        {[...Array(10)].map((_, v: number) => (
+          <div
+            key={`star-part-${v}`}
+            className={`mask mask-star-2 ${v % 2 == 0 ? 'mask-half-1' : 'mask-half-2'}`}
+            aria-current={v + 1 === outOf10}
+          />
+        ))}
       </div>
     )
   }
 
-  const NavSuggestionButton = ({
-    direction,
-    disabled,
-    className,
-  }: {
-    direction: 'next' | 'prev'
-    disabled: boolean
-    className?: string
-  }) => (
-    <button
-      className={`w-24 btn btn-outline ${disabled ? 'btn-disabled' : ''} ${className || ''}`}
-      onClick={() => {
-        if (!disabled) {
-          setSelectionIndex(
-            direction === 'next' ? selectionIndex + 1 : selectionIndex - 1,
-          )
-        }
-      }}
+  const intervals =
+    'intervals' in selection
+      ? selection.intervals!.slice(0, INTERVAL_LIMIT)
+      : [
+          {
+            interval: selection.interval,
+            score: selection.score,
+            constraintScores: selection.constraintScores,
+          },
+        ]
+
+  const intervalView = intervals.map((agi, i) => (
+    <div
+      key={`interval-${i}`}
+      className="flex flex-col md:flex-row lg:flex-col justify-center md:gap-x-2"
     >
-      {direction === 'next' ? 'Next' : 'Previous'}
-    </button>
+      <div>{formatInterval(agi.interval, 1)}</div>
+      <div>{renderScore(agi.score)}</div>
+    </div>
+  ))
+
+  return (
+    <>
+      <SuggestedActivityContent className={className}>
+        <p className="text-2xl font-extrabold">{selection.activity.name}</p>
+        <div className="flex flex-row md:flex-col lg:flex-row text-sm font-mono text-base-content/50 justify-around gap-4">
+          {intervalView}
+        </div>
+        <div className="card-actions">
+          <div className="w-full">
+            <div className="flex flex-col lg:hidden gap-y-2 items-center">
+              <ExplainButton selection={selection} />
+              {hasCardActions && (
+                <div className="join">
+                  {prevButton}
+                  {nextButton}
+                </div>
+              )}
+            </div>
+            <div className="hidden lg:flex flex-row justify-between gap-x-2">
+              {hasCardActions && prevButton}
+              <ExplainButton selection={selection} />
+              {hasCardActions && nextButton}
+            </div>
+          </div>
+        </div>
+      </SuggestedActivityContent>
+    </>
   )
+}
 
-  const hasCardActions =
-    ff.alwaysShowActivityNextButton || activitySelections.length > 1
+export type ExplainButtonProps = {
+  selection: EnrichedActivityScore
+}
 
-  const dialogId = `activity-explanation-dialog`
+export function ExplainButton({ selection }: ExplainButtonProps) {
+  if (!selection || !selection.activity) return null
+
+  const dialogId = `explain-${Math.random().toString(36)}`
   const openDialog = () => {
     const dialog = document.getElementById(dialogId) as HTMLDialogElement
     if (dialog) {
       dialog.showModal()
     }
   }
-
   return (
     <>
-      <div className={`card card-lg shadow-sm ${className || ''}`}>
-        <div className="card-body">
-          <div className="card-title">Suggested Activity</div>
-
-          <p className="text-2xl font-extrabold">
-            {activitySelection.activity.displayName}
-          </p>
-          <div className="flex flex-row text-sm font-mono text-base-content/50">
-            <p>
-              {format(activitySelection.interval.start, 'HH:mm')} -{' '}
-              {format(activitySelection.interval.end, 'HH:mm')}
-            </p>
-          </div>
-          <div className="card-actions">
-            <div className="w-full">
-              <div className="md:flex flex-col hidden lg:hidden gap-y-2 items-center">
-                <div
-                  className="btn btn-primary flex-grow"
-                  onClick={() => openDialog()}
-                >
-                  Explain
-                </div>
-                {hasCardActions && (
-                  <div className="join">
-                    <NavSuggestionButton
-                      direction="prev"
-                      disabled={selectionIndex === 0}
-                      className="join-item"
-                    />
-                    <NavSuggestionButton
-                      direction="next"
-                      disabled={
-                        selectionIndex === activitySelections.length - 1
-                      }
-                      className="join-item"
-                    />
-                  </div>
-                )}
-              </div>
-              <div className="md:hidden flex lg:flex flex-row justify-between gap-x-2">
-                {hasCardActions && (
-                  <NavSuggestionButton
-                    direction="prev"
-                    disabled={selectionIndex === 0}
-                  />
-                )}
-                <div
-                  className="btn btn-primary flex-grow"
-                  onClick={() => openDialog()}
-                >
-                  Explain
-                </div>
-                {hasCardActions && (
-                  <NavSuggestionButton
-                    direction="next"
-                    disabled={selectionIndex === activitySelections.length - 1}
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="btn btn-primary flex-grow" onClick={() => openDialog()}>
+        Explain
       </div>
-      <ActivityExplanationDialog
-        activitySelection={activitySelection}
-        id={dialogId}
+      <SuggestedActivityExplanationDialog
+        dialogId={dialogId}
+        selection={selection}
       />
     </>
   )
 }
 
-type ActivityExplanationDialogProps = {
-  activitySelection: IntervalActivitySelection
-  id: string
+function SuggestedActivityContent({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
+  return (
+    <div className={`card card-lg shadow-sm ${className || ''}`}>
+      <div className="card-body">
+        <div className="card-title">Suggested Activity</div>
+        {children}
+      </div>
+    </div>
+  )
 }
 
-export function ActivityExplanationDialog({
-  activitySelection,
-  id,
-}: ActivityExplanationDialogProps) {
-  const ff = useFeatureFlags()
+type NavButtonProps = {
+  className?: string
+  direction: 'next' | 'prev'
+  disabled: boolean
+  index: number
+  setIndex?: (n: number) => void
+}
+function NavButton({
+  className,
+  direction,
+  disabled,
+  index,
+  setIndex,
+}: NavButtonProps) {
+  return (
+    <button
+      className={`btn btn-outline join-item ${disabled ? 'disabled' : ''} ${className || ''}`}
+      onClick={() => {
+        if (!disabled && setIndex) {
+          setIndex(direction === 'next' ? index + 1 : index - 1)
+        }
+      }}
+    >
+      {direction === 'next' ? 'Next' : 'Previous'}
+    </button>
+  )
+}
 
-  const constraints = ff.useDemoActivities
-    ? Activities[0].constraints
-    : activitySelection.matchingConstraints
+type SuggestedActivityExplanationDialogProps = {
+  dialogId: string
+  selection: EnrichedActivityScore
+}
+function SuggestedActivityExplanationDialog({
+  dialogId,
+  selection,
+}: SuggestedActivityExplanationDialogProps) {
+  const intervals = (
+    'intervals' in selection
+      ? selection.intervals!
+      : [
+          {
+            interval: selection.interval,
+            score: selection.score,
+            constraintScores: selection.constraintScores,
+          },
+        ]
+  ).sort((a, b) => compareAsc(a.interval.start, b.interval.start))
 
   return (
-    <dialog id={id} className="modal">
-      <div className="modal-box flex flex-col justify-center items-center">
-        <p className="text-2xl font-extrabold">
-          {activitySelection.activity.displayName}
-        </p>
-        <div className="flex flex-row text-sm font-mono text-base-content/50">
-          <p>
-            {format(activitySelection.interval.start, 'HH:mm')} -{' '}
-            {format(activitySelection.interval.end, 'HH:mm')}
-          </p>
+    <dialog className="modal" id={dialogId}>
+      <div className="modal-box w-11/12 max-w-5xl">
+        <p className="text-2xl font-extrabold">{selection.activity.name}</p>
+        <div className="">
+          <div className="overflow-x-auto">
+            <table className="table table-primary table-lg">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Average Score</th>
+                  <th>Detailed Score</th>
+                  <th>Context</th>
+                </tr>
+              </thead>
+              <tbody>
+                {intervals.map((interval, i) => {
+                  return (
+                    <tr key={`$interval-${i}`}>
+                      <td className="align-text-top">
+                        {formatInterval(interval.interval, 1)}
+                      </td>
+                      <td className="align-text-top">
+                        {(interval.score * 100).toFixed(1)} %
+                      </td>
+                      <td className="align-text-top">
+                        {interval.constraintScores && (
+                          <GenericObject
+                            obj={interval.constraintScores}
+                            className={'w-32'}
+                          />
+                        )}
+                      </td>
+                      <td className="align-text-top">
+                        {selection.debug?.slot && (
+                          <GenericObject
+                            obj={selection.debug.slot}
+                            className={'w-20'}
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
-        <ul className="list">
-          {constraints.map((constraint, i) => (
-            <li key={`constraint-${i}`} className="list-row">
-              <ExplanationReason constraint={constraint} />
-            </li>
-          ))}
-        </ul>
       </div>
-      <form method="dialog" className="modal-backdrop">
+      <form className="modal-backdrop" method="dialog">
         <button>close</button>
       </form>
     </dialog>

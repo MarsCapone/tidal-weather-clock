@@ -1,11 +1,9 @@
-import { Activity } from '@/types/activities'
-
 const CONSTANTS = {
-  TITLE: 'Tidal Weather Clock',
+  DEFAULT_CACHE_EXPIRY_HOURS: 24,
   LOCATION_COORDS: [52.9636, 0.7442] as [number, number],
   LOCATION_NAME: 'Burnham Overy Staithe',
   MAX_PERMITTED_DAYS: 10,
-  DEFAULT_CACHE_EXPIRY_HOURS: 24,
+  TITLE: 'Tidal Weather Clock',
 }
 
 export default CONSTANTS
@@ -15,7 +13,7 @@ const daylightConstraint = {
   type: 'sun',
 } as const
 
-export const Activities: Activity[] = [
+export const Activities = [
   {
     constraints: [
       {
@@ -41,13 +39,13 @@ export const Activities: Activity[] = [
         value: 1.8,
       },
       {
-        type: 'tide-state',
         deltaHours: 2,
         tideType: 'high',
+        type: 'tide-state',
       },
       {
-        type: 'wind-direction',
         direction: 'NE',
+        type: 'wind-direction',
       },
     ],
     displayName: 'Paddle boarding',

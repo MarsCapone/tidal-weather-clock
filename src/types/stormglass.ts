@@ -11,12 +11,12 @@ type StormglassSourceData = {
 }
 
 type StormglassWeatherTimestampResponse = {
-  time: string
+  airTemperature: StormglassSourceData
   cloudCover: StormglassSourceData
   gust: StormglassSourceData
+  time: string
   windDirection: StormglassSourceData
   windSpeed: StormglassSourceData
-  airTemperature: StormglassSourceData
 }
 
 type _MoonPhase = {
@@ -48,10 +48,10 @@ type StormglassTideTimestampResponse = {
 
 type StormglassMeta = {
   cost: number
-  requestCount: number
   dailyQuota: number
   lat: number
   lng: number
+  requestCount: number
   start: string
 }
 

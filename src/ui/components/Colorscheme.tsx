@@ -7,9 +7,9 @@ export default function ColorschemeToggle() {
       <label className="flex cursor-pointer gap-2">
         <SunIcon height={20} />
         <input
+          className="toggle theme-controller"
           type="checkbox"
           value="night"
-          className="toggle theme-controller"
         />
         <MoonIcon height={20} />
       </label>

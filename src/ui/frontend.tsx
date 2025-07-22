@@ -15,11 +15,9 @@ import RootLayout from '@/ui/layouts/RootLayout'
 import {
   addDays,
   formatISO,
-  isWithinInterval,
   parseISO,
   startOfDay,
   startOfToday,
-  startOfTomorrow,
 } from 'date-fns'
 import CONSTANTS from '@/constants'
 import SettingsLayout from '@/ui/layouts/SettingsLayout'
@@ -33,7 +31,6 @@ const PERMITTED_INTERVAL = {
 
 const router = createBrowserRouter([
   {
-    id: 'Home',
     children: [
       {
         Component: Home,
@@ -80,32 +77,33 @@ const router = createBrowserRouter([
         path: 'plus/:days',
       },
       {
-        id: 'Settings',
-        Component: SettingsLayout,
-        path: 'settings',
         children: [
           {
-            id: 'SettingsHome',
-            path: '',
             Component: Settings,
+            id: 'SettingsHome',
             loader: async () => {
               return {
                 title: 'Settings',
               }
             },
+            path: '',
           },
           {
-            id: 'Internal',
-            path: 'internal',
             Component: InternalSettings,
+            id: 'Internal',
             loader: async () => ({
               title: 'Internal Settings',
             }),
+            path: 'internal',
           },
         ],
+        Component: SettingsLayout,
+        id: 'Settings',
+        path: 'settings',
       },
     ],
     Component: RootLayout,
+    id: 'Home',
   },
 ])
 

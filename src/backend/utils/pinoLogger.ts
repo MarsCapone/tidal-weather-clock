@@ -22,25 +22,25 @@ class CustomPinoLogger implements ILogger {
     this.pinoLogger.debug(context, message)
   }
 
-  makeNew = (context: Record<string, any>) => {
+  makeNew = (context: Record<string, unknown>) => {
     const child = this.pinoLogger.child(context)
     return new CustomPinoLogger(child)
   }
 }
 
 const _logger = pino({
-  level: process.env.LOG_LEVEL || 'info',
   formatters: {
+    bindings: (bindings) => {
+      return {
+        node_version: process.version,
+        source: 'server',
+      }
+    },
     level: (label) => {
       return { level: label.toUpperCase() }
     },
-    bindings: (bindings) => {
-      return {
-        source: 'server',
-        node_version: process.version,
-      }
-    },
   },
+  level: process.env.LOG_LEVEL || 'debug',
   timestamp: pino.stdTimeFunctions.isoTime,
 })
 

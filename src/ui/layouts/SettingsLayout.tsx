@@ -1,12 +1,10 @@
-import { Link, Outlet, useLoaderData, useMatches } from 'react-router'
+import { Link, Outlet, useMatches } from 'react-router'
 
-export default function SettingsLayout(props: any) {
+export default function SettingsLayout() {
   const matches = useMatches()
 
   const showBreadcrumbs = !matches.some((m) => m.id === 'SettingsHome')
-  const pageData = matches[matches.length - 1].data as
-    | { title: string }
-    | undefined
+  const pageData = matches.at(-1)?.data as { title: string } | undefined
   const title = pageData ? pageData.title : ''
 
   return (
@@ -18,7 +16,7 @@ export default function SettingsLayout(props: any) {
               {matches.map((page, i) => {
                 if (i === matches.length - 1) {
                   return (
-                    <li key={i} className="font-bold">
+                    <li className="font-bold" key={i}>
                       {page.id}
                     </li>
                   )

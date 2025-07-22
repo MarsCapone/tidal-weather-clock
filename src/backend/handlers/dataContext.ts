@@ -1,4 +1,4 @@
-import { DataContext } from '@/types/data'
+import { DataContext } from '@/types/context'
 import { min, parseISO, startOfDay } from 'date-fns'
 import { DebugMemoryCache } from '@/backend/utils/cache'
 import logger from '@/backend/utils/pinoLogger'

@@ -1,27 +1,27 @@
 export type InputWithDescriptionProps<T> = {
-  title: string
   description: string
   placeholder?: T
-  value?: T
   setValue?: (value: string) => void
+  title: string
+  value?: T
 }
 
 export function InputWithDescription<T>({
-  title,
   description,
   placeholder,
-  value,
   setValue,
+  title,
+  value,
 }: InputWithDescriptionProps<T>) {
   return (
     <fieldset className="fieldset">
       <legend className="fieldset-legend">{title}</legend>
       <input
         className="input"
-        type="text"
-        placeholder={String(placeholder)}
-        value={String(value)}
         onChange={(e) => (setValue ? setValue(e.target.value) : null)}
+        placeholder={String(placeholder)}
+        type="text"
+        value={String(value)}
       />
       <label className="label">{description}</label>
     </fieldset>

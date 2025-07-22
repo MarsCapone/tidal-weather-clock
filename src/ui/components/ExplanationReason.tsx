@@ -7,7 +7,7 @@ import {
   TimeConstraint,
   WindDirectionConstraint,
   WindSpeedConstraint,
-} from '@/types/activities'
+} from '@/types/legacyActivities'
 import CompassIcon from '@/ui/components/icons/CompassIcon'
 import { SunnyIcon } from '@/ui/components/icons/WeatherIcon'
 import { MoonIcon } from '@heroicons/react/24/outline'
@@ -28,14 +28,16 @@ export default function ExplanationReason({
   constraint,
 }: ExplanationReasonProps) {
   const reason = explainConstraint(constraint)
-  if (reason === null) return null
+  if (reason === null) {
+    return null
+  }
 
-  const { title, description, details, Icon } = reason
+  const { description, details, Icon, title } = reason
 
   return (
     <div className="flex flex-row gap-2">
       <div>
-        <Icon width={48} height={48} className={'text-primary'} />
+        <Icon className={'text-primary'} height={48} width={48} />
       </div>
       <div className="text-start w-dvw">
         <div className="text-xl text-primary">{title}</div>
@@ -62,10 +64,10 @@ function Detail({ label, value }: { label: string; value: string }) {
 }
 
 type ConstraintDetail = {
-  title: string
   description: string
   details: { label: string; value: string }[]
   Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
+  title: string
 }
 
 export function explainConstraint(
@@ -105,35 +107,35 @@ function constraintToDetails(
 
 function explainTimeConstraint(constraint: TimeConstraint): ConstraintDetail {
   const timeComparisonMap = {
-    lt: 'before',
     gt: 'after',
-    lte: 'before or at',
     gte: 'after or at',
+    lt: 'before',
+    lte: 'before or at',
   }
 
   return {
-    title: 'Time Constraint',
     description: `The time is ${timeComparisonMap[constraint.comp]} ${constraint.value}`,
     details: constraintToDetails(constraint),
     Icon: ClockIcon,
+    title: 'Time Constraint',
   }
 }
 
 const comparisonDescriptionMap = {
-  lt: 'less than',
   gt: 'greater than',
-  lte: 'less than or equal to',
   gte: 'greater than or equal to',
+  lt: 'less than',
+  lte: 'less than or equal to',
 }
 
 function explainWindSpeedConstraint(
   constraint: WindSpeedConstraint,
 ): ConstraintDetail {
   return {
-    title: 'Wind Speed Constraint',
     description: `The wind speed is ${comparisonDescriptionMap[constraint.comp]} ${constraint.value} kts`,
     details: constraintToDetails(constraint),
     Icon: WindIcon,
+    title: 'Wind Speed Constraint',
   }
 }
 
@@ -141,20 +143,20 @@ function explainWindDirectionConstraint(
   constraint: WindDirectionConstraint,
 ): ConstraintDetail {
   const directionMap: Record<string, string> = {
+    E: 'East',
     N: 'North',
     NE: 'North East',
-    E: 'East',
-    SE: 'South East',
+    NW: 'North West',
     S: 'South',
+    SE: 'South East',
     SW: 'South West',
     W: 'West',
-    NW: 'North West',
   }
   return {
-    title: 'Wind Direction Constraint',
     description: `The wind is coming from the ${directionMap[constraint.direction]}`,
     details: constraintToDetails(constraint),
     Icon: CompassIcon,
+    title: 'Wind Direction Constraint',
   }
 }
 
@@ -162,10 +164,10 @@ function explainTideHeightConstraint(
   constraint: HighTideHeightConstraint | LowTideHeightConstraint,
 ): ConstraintDetail {
   return {
-    title: 'Tide Height Constraint',
     description: `The height of ${constraint.tideType.toUpperCase()} tide is ${comparisonDescriptionMap[constraint.comp]} ${constraint.value.toFixed(1)} meters`,
     details: constraintToDetails(constraint),
     Icon: TideHeightIcon,
+    title: 'Tide Height Constraint',
   }
 }
 
@@ -173,18 +175,18 @@ function explainTideStateConstraint(
   constraint: TideStateConstraint,
 ): ConstraintDetail {
   return {
-    title: 'Tide State Constraint',
     description: `The time is within ${constraint.deltaHours} hours of ${constraint.tideType.toUpperCase()} tide`,
     details: constraintToDetails(constraint),
     Icon: constraint.tideType === 'high' ? HighWaterIcon : LowWaterIcon,
+    title: 'Tide State Constraint',
   }
 }
 
 function explainSunConstraint(constraint: SunConstraint): ConstraintDetail {
   return {
-    title: 'Sun Constraint',
     description: `The time is during ${constraint.isDaylight ? 'daylight' : 'nighttime'}`,
     details: constraintToDetails(constraint),
     Icon: constraint.isDaylight ? SunnyIcon : MoonIcon,
+    title: 'Sun Constraint',
   }
 }

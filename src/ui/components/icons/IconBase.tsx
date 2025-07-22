@@ -3,16 +3,16 @@
 export function IconBase(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={props.width || 16}
-      height={props.height || 16}
-      viewBox="0 0 24 24"
+      className={props.className}
       fill={props.fill || 'none'}
+      height={props.height || 16}
       stroke={props.stroke || 'currentColor'}
-      strokeWidth={props.strokeWidth || 1}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={props.className}
+      strokeWidth={props.strokeWidth || 1}
+      viewBox="0 0 24 24"
+      width={props.width || 16}
+      xmlns="http://www.w3.org/2000/svg"
     >
       {props.children}
     </svg>

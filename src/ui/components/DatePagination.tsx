@@ -3,15 +3,15 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
 import { format } from 'date-fns'
 
 export type DatePaginationProps = {
+  date: Date
   nextPath: string | null
   prevPath: string | null
-  date: Date
 }
 
 export default function DatePagination({
+  date,
   nextPath,
   prevPath,
-  date,
 }: DatePaginationProps) {
   return (
     <div>

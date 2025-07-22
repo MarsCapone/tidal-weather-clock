@@ -1,4 +1,13 @@
-import { CardinalDirection, TideType } from '@/types/data'
+import { TideType } from '@/types/context'
+export type CardinalDirection =
+  | 'N'
+  | 'NE'
+  | 'E'
+  | 'SE'
+  | 'S'
+  | 'SW'
+  | 'W'
+  | 'NW'
 
 type _Constraint<TypeName extends string> = {
   type: TypeName
