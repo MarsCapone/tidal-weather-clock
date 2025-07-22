@@ -208,7 +208,7 @@ export class ActivityRecommender
 
         activity.constraints.forEach((constraint, index) => {
           const score = this.scoreConstraint(constraint, slot)
-          constraintScores[`${activity.id}:${constraint.type}`] = score
+          constraintScores[`${activity.id}:${index}:${constraint.type}`] = score
           totalScore += score
 
           // if any one score is 0, then the activity is infeasible at this time
@@ -216,7 +216,7 @@ export class ActivityRecommender
             feasible = false
           }
         })
-        constraintScores[`${activity.id}:priority+`] = activity.priority / 10
+        constraintScores[`${activity.id}:+:priority`] = activity.priority / 10
 
         const averageScore = calcMean(Object.values(constraintScores))
         const finalScore = Math.min(1, averageScore)

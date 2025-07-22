@@ -270,8 +270,8 @@ export default function ClockChart({
   // Generate hour markers
   const clockHands = (hour: number, minute: number) => {
     return [
-      { frac: (minute / 60) * 12, len: 0.9, stroke: 6 }, // minute hand
-      { frac: (hour % 12) + minute / 60, len: 0.7, stroke: 8 }, // hour hand
+      { frac: (minute / 60) * 12, len: 0.75, stroke: 6 }, // minute hand
+      { frac: (hour % 12) + minute / 60, len: 0.6, stroke: 7 }, // hour hand
     ].map(({ frac, len, stroke }, i) => {
       const angle = frac * 30 - 90 // Start from 12 o'clock position
       const radian = (angle * Math.PI) / 180
@@ -287,6 +287,7 @@ export default function ClockChart({
           <line
             className="stroke-base-content"
             strokeWidth={stroke}
+            radius={100}
             x1={centerX}
             x2={x1}
             y1={centerY}

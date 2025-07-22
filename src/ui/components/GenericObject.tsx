@@ -67,9 +67,10 @@ export default function GenericObject({
       minWidth: 350,
       collapse: 1,
       theme: githubLightTheme, // isDarkTheme ? githubDarkTheme : githubLightTheme,
+      rootFontSize: 15,
       ...(options?.jsonEditorProps || {}),
     }
-    return <JsonEditor {...jsonEditorProps} />
+    return <JsonEditor {...jsonEditorProps} className="" />
   }
 
   if (obj === null || obj === undefined) {

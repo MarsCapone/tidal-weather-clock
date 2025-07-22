@@ -62,22 +62,6 @@ export default function SuggestedActivity({
     />
   )
 
-  const renderScore = (score: number) => {
-    // max score is 1. 5 half stars gives 10 possible options
-    const outOf10 = Math.round(score * 10)
-    return (
-      <div className="rating rating-xs md:rating-sm rating-half">
-        {[...Array(10)].map((_, v: number) => (
-          <div
-            key={`star-part-${v}`}
-            className={`mask mask-star-2 ${v % 2 == 0 ? 'mask-half-1' : 'mask-half-2'}`}
-            aria-current={v + 1 === outOf10}
-          />
-        ))}
-      </div>
-    )
-  }
-
   const intervals =
     'intervals' in selection
       ? selection.intervals!.slice(0, INTERVAL_LIMIT)
@@ -126,6 +110,22 @@ export default function SuggestedActivity({
         </div>
       </SuggestedActivityContent>
     </>
+  )
+}
+
+const renderScore = (score: number) => {
+  // max score is 1. 5 half stars gives 10 possible options
+  const outOf10 = Math.round(score * 10)
+  return (
+    <div className="rating rating-xs md:rating-sm rating-half">
+      {[...Array(10)].map((_, v: number) => (
+        <div
+          key={`star-part-${v}`}
+          className={`mask mask-star-2 ${v % 2 == 0 ? 'mask-half-1' : 'mask-half-2'}`}
+          aria-current={v + 1 === outOf10}
+        />
+      ))}
+    </div>
   )
 }
 
@@ -222,22 +222,23 @@ function SuggestedActivityExplanationDialog({
   ).sort((a, b) => compareAsc(a.interval.start, b.interval.start))
 
   const constraintsMap = Object.fromEntries(
-    selection.activity.constraints.map((constraint) => [
-      constraint.type,
-      constraint,
-    ]),
+    selection.activity.constraints.map((constraint, index) => {
+      const { type, ...constraintWithoutType } = constraint
+
+      return [`${index}:${type}`, constraintWithoutType]
+    }),
   )
 
   return (
     <dialog className="modal" id={dialogId}>
-      <div className="modal-box w-11/12 max-w-5xl">
+      <div className="modal-box w-11/12 max-w-5xl h-11/12 max-h-5xl">
         <p className="text-2xl font-extrabold">{selection.activity.name}</p>
         <div className="">
           <div className="overflow-x-auto">
-            <table className="table table-primary table-lg">
+            <table className="table table-primary table-md table-pin-rows">
               <thead>
                 <tr>
-                  <th>Time</th>
+                  <th className="min-w-32">Time</th>
                   <th>Average Score</th>
                   <th>Detailed Score</th>
                   <th>Configuration</th>
@@ -252,23 +253,33 @@ function SuggestedActivityExplanationDialog({
                         {formatInterval(interval.interval, 1)}
                       </td>
                       <td className="align-text-top">
-                        {(interval.score * 100).toFixed(1)} %
+                        {interval.score.toFixed(3)}
+                        {renderScore(interval.score)}
                       </td>
                       <td className="align-text-top">
                         {interval.constraintScores && (
                           <GenericObject
                             obj={interval.constraintScores}
+                            options={{
+                              decimalPlaces: 2,
+                            }}
                             className={'w-40 text-sm'}
                           />
                         )}
                       </td>
                       <td className="align-text-top">
                         <GenericObject
-                          obj={constraintsMap}
+                          obj={{
+                            ...constraintsMap,
+                            '+:priority': selection.activity.priority,
+                          }}
                           options={{
                             decimalPlaces: 0,
-                            useJsonEditor: true,
+                            jsonEditorProps: {
+                              minWidth: 300,
+                            },
                           }}
+                          className={'w-20'}
                         />
                       </td>
                       <td className="align-text-top">
@@ -277,7 +288,7 @@ function SuggestedActivityExplanationDialog({
                             obj={selection.debug.slot}
                             options={{
                               jsonEditorProps: {
-                                minWidth: 400,
+                                minWidth: 300,
                               },
                             }}
                             className={'w-20'}
