@@ -138,15 +138,25 @@ export default function ActivityScoreList({ scores }: ActivityScoreListProps) {
                   <td>{scoreVal}</td>
                   <td>
                     {score.feasible ? (
-                      <CheckCircleIcon className="w-6 h-6 text-success" />
+                      <div
+                        className="tooltip"
+                        data-tip="None of the detailed scores were 0"
+                      >
+                        <CheckCircleIcon className="w-6 h-6 text-success" />
+                      </div>
                     ) : (
-                      <XCircleIcon className="w-6 h-6 text-error" />
+                      <div
+                        className="tooltip"
+                        data-tip="At least one of the detailed scores was 0"
+                      >
+                        <XCircleIcon className="w-6 h-6 text-error" />
+                      </div>
                     )}
                   </td>
                   <td>
                     <div className="flex flex-col md:flex-row gap-2">
                       <ExplainButton selection={score} />
-                      <div className="flex gap-2">
+                      <div className="gap-2 hidden">
                         <div className="btn btn-warning btn-disabled flex-1">
                           <PencilIcon className="w-4 h-4 text-warning-content" />
                         </div>
