@@ -15,7 +15,7 @@ import DatePagination from '../components/DatePagination'
 import WeatherStatus from '@/ui/components/WeatherStatus'
 import DayTimeline from '@/ui/components/DayTimeline'
 import SuggestedActivity from '@/ui/components/SuggestedActivity'
-import { Activity } from '@/types/claude'
+import { Activity } from '@/types/activity'
 import { ActivityRecommender } from '@/ui/utils/suggestions'
 import ActivityScoreList from '@/ui/components/ActivityScoreList'
 

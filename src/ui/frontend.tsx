@@ -23,6 +23,7 @@ import CONSTANTS from '@/constants'
 import SettingsLayout from '@/ui/layouts/SettingsLayout'
 import InternalSettings from '@/ui/pages/InternalSettings'
 import Settings from '@/ui/pages/Settings'
+import ActivitySettings from '@/ui/pages/ActivitySettings'
 
 const PERMITTED_INTERVAL = {
   end: addDays(startOfToday(), 7),
@@ -95,6 +96,14 @@ const router = createBrowserRouter([
               title: 'Internal Settings',
             }),
             path: 'internal',
+          },
+          {
+            Component: ActivitySettings,
+            id: 'Activities',
+            loader: async () => ({
+              title: 'Activity Settings',
+            }),
+            path: 'activities',
           },
         ],
         Component: SettingsLayout,
