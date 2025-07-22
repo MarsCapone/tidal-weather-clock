@@ -1,74 +1,93 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { min } from 'date-fns'
 
 export type TimeRange = {
-  id: string
-  startHour: number
-  endHour: number
   color: keyof typeof colorClasses
+  endHour: number
+  id: string
   label: string
+  startHour: number
 }
 
 export type TimePointer = {
-  id: string
-  hour: number
   color: keyof typeof colorClasses
-  label: string
+  hour: number
+  id: string
   isOutside: boolean
+  label: string
 }
 
 const colorClasses = {
-  primary: {
-    fill: 'fill-primary',
-    stroke: 'stroke-primary',
-    text: 'text-primary',
-    bg: 'bg-primary',
-  },
-  success: {
-    fill: 'fill-success',
-    stroke: 'stroke-success',
-    text: 'text-success',
-    bg: 'bg-success',
-  },
-  warning: {
-    fill: 'fill-warning',
-    stroke: 'stroke-warning',
-    text: 'text-warning',
-    bg: 'bg-warning',
-  },
   error: {
+    bg: 'bg-error',
     fill: 'fill-error',
     stroke: 'stroke-error',
     text: 'text-error',
-    bg: 'bg-error',
+  },
+  primary: {
+    bg: 'bg-primary',
+    fill: 'fill-primary',
+    stroke: 'stroke-primary',
+    text: 'text-primary',
+  },
+  success: {
+    bg: 'bg-success',
+    fill: 'fill-success',
+    stroke: 'stroke-success',
+    text: 'text-success',
+  },
+  warning: {
+    bg: 'bg-warning',
+    fill: 'fill-warning',
+    stroke: 'stroke-warning',
+    text: 'text-warning',
   },
 }
 
 type ClockChartOptions = {
   range: {
-    width?: number
     offset?: number
+    width?: number
   }
 }
 
 export type ClockChartProps = {
-  timeRanges: TimeRange[]
-  timePointers: TimePointer[]
-  showCenterDot?: boolean
-  size?: number
   clockRadius?: number
   options?: ClockChartOptions
+  showCenterDot?: boolean
+  showClockHands?: boolean
+  size?: number
+  timePointers: TimePointer[]
+  timeRanges: TimeRange[]
 }
 
 export default function ClockChart({
-  timeRanges,
-  timePointers,
-  showCenterDot = true,
-  size = 400,
   clockRadius = 150,
-  options = { range: { width: 20, offset: -10 } },
+  options = { range: { offset: -10, width: 20 } },
+  showCenterDot = true,
+  showClockHands = true,
+  size = 400,
+  timePointers,
+  timeRanges,
 }: ClockChartProps) {
+  const [hours, setHours] = useState<number>(0)
+  const [minutes, setMinutes] = useState<number>(0)
+
+  useEffect(() => {
+    if (!showClockHands) return () => null
+    const updateTime = () => {
+      const current = new Date()
+      setHours(current.getHours())
+      setMinutes(current.getMinutes())
+    }
+    updateTime()
+    const interval = setInterval(updateTime, 1000)
+    return () => clearInterval(interval)
+  }, [])
+
   const centerX = size / 2
   const centerY = size / 2
+  const center: [number, number] = [centerX, centerY]
 
   // Generate hour markers
   const hourMarkers = Array.from({ length: 12 }, (_, i) => {
@@ -86,39 +105,25 @@ export default function ClockChart({
     return (
       <g key={`hour-${i}`}>
         <line
-          x1={x1}
-          y1={y1}
-          x2={x2}
-          y2={y2}
           className="stroke-base-content"
           strokeWidth="2"
+          x1={x1}
+          x2={x2}
+          y1={y1}
+          y2={y2}
         />
         <text
+          className="text-2xl font-bold stroke-base-content fill-base-content"
+          dominantBaseline="central"
+          textAnchor="middle"
           x={textX}
           y={textY}
-          textAnchor="middle"
-          dominantBaseline="central"
-          className="text-2xl font-bold stroke-base-content fill-base-content"
         >
           {hour}
         </text>
       </g>
     )
   })
-
-  function getPlusMinusPoint(
-    center: [number, number],
-    radius: number,
-    radian: number,
-    offset: number = 0,
-  ): [number, number, number, number] {
-    const [centerX, centerY] = center
-    const minusX = centerX + radius * Math.cos(radian - offset)
-    const plusX = centerX + radius * Math.cos(radian + offset)
-    const minusY = centerY + radius * Math.sin(radian - offset)
-    const plusY = centerY + radius * Math.sin(radian + offset)
-    return [minusX, minusY, plusX, plusY]
-  }
 
   // Generate triangular pointers
   const triangularPointers = timePointers.map((pointer) => {
@@ -162,16 +167,16 @@ export default function ClockChart({
     return (
       <g key={pointer.id}>
         <path
-          d={pathData}
           className={`${colorClasses[pointer.color].fill} ${colorClasses[pointer.color].stroke}`}
+          d={pathData}
           strokeWidth={1}
         />
         <text
+          className="text-xs font-medium fill-base-content stroke-base-content"
+          dominantBaseline="central"
+          textAnchor={textAnchor}
           x={labelX}
           y={labelY}
-          textAnchor={textAnchor}
-          dominantBaseline="central"
-          className="text-xs font-medium fill-base-content stroke-base-content"
         >
           {pointer.label}
         </text>
@@ -181,7 +186,7 @@ export default function ClockChart({
 
   // Generate time range arcs
   const timeRangeArcs = timeRanges
-    .map((range) => {
+    .flatMap((range) => {
       // ensure the startHour and endHour are within 0-12 range
       // Normalize hours to 0-12 range
       if (range.startHour < 12 && range.endHour > 12) {
@@ -189,20 +194,19 @@ export default function ClockChart({
         return [
           {
             ...range,
+            endHour: 11.999_99, // we can't actually use 12, so we use a value just below it
             startHour: range.startHour,
-            endHour: 11.99999, // we can't actually use 12, so we use a value just below it
           },
           {
             ...range,
+            endHour: range.endHour - 12,
             id: `${range.id}-pm`,
             startHour: 0,
-            endHour: range.endHour - 12,
           },
         ]
       }
       return [range]
     })
-    .flat()
     .map((range) => {
       const startAngle = (range.startHour % 12) * 30 - 90
       const endAngle = (range.endHour % 12) * 30 - 90
@@ -219,15 +223,27 @@ export default function ClockChart({
         (options.range.width ?? 6) / 2 +
         (options.range.offset ?? 0)
 
-      const x1Outer = centerX + outerRadius * Math.cos(startRadian)
-      const y1Outer = centerY + outerRadius * Math.sin(startRadian)
-      const x2Outer = centerX + outerRadius * Math.cos(endRadian)
-      const y2Outer = centerY + outerRadius * Math.sin(endRadian)
+      const [x1Outer, y1Outer] = getPlusMinusPoint(
+        center,
+        outerRadius,
+        startRadian,
+      )
+      const [x2Outer, y2Outer] = getPlusMinusPoint(
+        center,
+        outerRadius,
+        endRadian,
+      )
 
-      const x1Inner = centerX + innerRadius * Math.cos(startRadian)
-      const y1Inner = centerY + innerRadius * Math.sin(startRadian)
-      const x2Inner = centerX + innerRadius * Math.cos(endRadian)
-      const y2Inner = centerY + innerRadius * Math.sin(endRadian)
+      const [x1Inner, y1Inner] = getPlusMinusPoint(
+        center,
+        innerRadius,
+        startRadian,
+      )
+      const [x2Inner, y2Inner] = getPlusMinusPoint(
+        center,
+        innerRadius,
+        endRadian,
+      )
 
       const largeArcFlag = Math.abs(endAngle - startAngle) > 180 ? 1 : 0
 
@@ -242,24 +258,54 @@ export default function ClockChart({
 
       return (
         <path
-          key={range.id}
-          d={pathData}
           className={`${colorClasses[range.color].fill} ${colorClasses[range.color].stroke}`}
+          d={pathData}
           fillOpacity={0.8}
+          key={range.id}
           strokeWidth={1}
         />
       )
     })
 
+  // Generate hour markers
+  const clockHands = (hour: number, minute: number) => {
+    return [
+      { frac: (minute / 60) * 12, len: 0.9, stroke: 6 }, // minute hand
+      { frac: (hour % 12) + minute / 60, len: 0.7, stroke: 8 }, // hour hand
+    ].map(({ frac, len, stroke }, i) => {
+      const angle = frac * 30 - 90 // Start from 12 o'clock position
+      const radian = (angle * Math.PI) / 180
+
+      const [x1, y1] = getPlusMinusPoint(
+        [centerX, centerY],
+        clockRadius * len,
+        radian,
+      )
+
+      return (
+        <g key={`hand-${i}`}>
+          <line
+            className="stroke-base-content"
+            strokeWidth={stroke}
+            x1={centerX}
+            x2={x1}
+            y1={centerY}
+            y2={y1}
+          />
+        </g>
+      )
+    })
+  }
+
   return (
     <div className="flex justify-center">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <svg height={size} viewBox={`0 0 ${size} ${size}`} width={size}>
         {/* Clock face background */}
         <circle
+          className="fill-base-100 stroke-base-content"
           cx={centerX}
           cy={centerY}
           r={clockRadius}
-          className="fill-base-100 stroke-base-content"
           strokeWidth="3"
         />
 
@@ -272,16 +318,33 @@ export default function ClockChart({
         {/* Hour markers and numbers */}
         {hourMarkers}
 
+        {/* Clock hands for time */}
+        {showClockHands && clockHands(hours, minutes)}
+
         {/* Center dot */}
         {showCenterDot && (
           <circle
+            className="fill-base-content"
             cx={centerX}
             cy={centerY}
-            r="6"
-            className="fill-base-content"
+            r="3"
           />
         )}
       </svg>
     </div>
   )
+}
+
+function getPlusMinusPoint(
+  center: [number, number],
+  radius: number,
+  radian: number,
+  offset: number = 0,
+): [number, number, number, number] {
+  const [centerX, centerY] = center
+  const minusX = centerX + radius * Math.cos(radian - offset)
+  const plusX = centerX + radius * Math.cos(radian + offset)
+  const minusY = centerY + radius * Math.sin(radian - offset)
+  const plusY = centerY + radius * Math.sin(radian + offset)
+  return [minusX, minusY, plusX, plusY]
 }
