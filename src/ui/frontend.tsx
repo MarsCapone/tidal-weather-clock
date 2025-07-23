@@ -24,14 +24,12 @@ import SettingsLayout from '@/ui/layouts/SettingsLayout'
 import InternalSettings from '@/ui/pages/InternalSettings'
 import Settings from '@/ui/pages/Settings'
 import ActivitySettings from '@/ui/pages/ActivitySettings'
-
-const PERMITTED_INTERVAL = {
-  end: addDays(startOfToday(), 7),
-  start: startOfToday(),
-}
+import { ErrorBoundary } from 'react-error-boundary'
+import ErrorFallback, { ErrorElement } from '@/ui/components/ErrorFallback'
 
 const router = createBrowserRouter([
   {
+    errorElement: <ErrorElement />,
     children: [
       {
         Component: Home,
@@ -78,6 +76,7 @@ const router = createBrowserRouter([
         path: 'plus/:days',
       },
       {
+        errorElement: <ErrorElement />,
         children: [
           {
             Component: Settings,
@@ -118,6 +117,11 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ErrorBoundary
+      FallbackComponent={ErrorFallback}
+      onReset={(details) => console.log(details)}
+    >
+      <RouterProvider router={router} />
+    </ErrorBoundary>
   </StrictMode>,
 )
