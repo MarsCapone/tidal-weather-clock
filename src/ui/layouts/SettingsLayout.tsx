@@ -9,7 +9,6 @@ export default function SettingsLayout() {
 
   return (
     <div className="p-10">
-      {undefined()}
       <div className="mb-4">
         {showBreadcrumbs && (
           <div className="breadcrumbs text-sm mb-4">

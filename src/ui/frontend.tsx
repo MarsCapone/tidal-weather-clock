@@ -25,7 +25,7 @@ import InternalSettings from '@/ui/pages/InternalSettings'
 import Settings from '@/ui/pages/Settings'
 import ActivitySettings from '@/ui/pages/ActivitySettings'
 import { ErrorBoundary } from 'react-error-boundary'
-import ErrorFallback, { ErrorElement } from '@/ui/components/ErrorFallback'
+import ErrorElement from '@/ui/components/ErrorElement'
 
 const router = createBrowserRouter([
   {
@@ -117,11 +117,6 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ErrorBoundary
-      FallbackComponent={ErrorFallback}
-      onReset={(details) => console.log(details)}
-    >
-      <RouterProvider router={router} />
-    </ErrorBoundary>
+    <RouterProvider router={router} />
   </StrictMode>,
 )
