@@ -1,3 +1,12 @@
+import CONSTANTS from '@/constants'
+import { DataContext } from '@/types/context'
+import { IDataContextFetcher, ILogger } from '@/types/interfaces'
+import {
+  StormglassSunResponse,
+  StormglassTideResponse,
+  stormglassWeatherParams,
+  StormglassWeatherResponse,
+} from '@/types/stormglass'
 import { getFractionalTime } from '@/utils/dates'
 import {
   eachDayOfInterval,
@@ -7,18 +16,9 @@ import {
   parseISO,
   startOfDay,
 } from 'date-fns'
-import stormglassSunExample from '../../../../../public/stormGlassAstronomyExample.json'
-import stormglassTideExample from '../../../../../public/stormGlassTideExample.json'
-import stormglassWeatherExample from '../../../../../public/stormGlassWeatherExample.json'
-import CONSTANTS from '../../../../constants'
-import { DataContext } from '../../../../types/context'
-import { IDataContextFetcher, ILogger } from '../../../../types/interfaces'
-import {
-  StormglassSunResponse,
-  StormglassTideResponse,
-  stormglassWeatherParams,
-  StormglassWeatherResponse,
-} from '../../../../types/stormglass'
+import stormglassSunExample from './stormGlassAstronomyExample.json'
+import stormglassTideExample from './stormGlassTideExample.json'
+import stormglassWeatherExample from './stormGlassWeatherExample.json'
 
 const stormglassBaseUrl = 'https://api.stormglass.io'
 

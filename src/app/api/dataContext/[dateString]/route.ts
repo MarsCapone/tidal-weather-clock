@@ -1,4 +1,7 @@
-import { DebugMemoryCache } from '@/app/api/dataContext/[dateString]/cache'
+import {
+  DebugMemoryCache,
+  FileStorageCache,
+} from '@/app/api/dataContext/[dateString]/cache'
 import { StormglassDataFetcher } from '@/app/api/dataContext/[dateString]/dataContextFetcher'
 import logger from '@/app/api/pinoLogger'
 import { DataContext } from '@/types/context'
@@ -14,7 +17,7 @@ export async function GET(
   return Response.json(result)
 }
 
-const cache = new DebugMemoryCache<DataContext[]>()
+const cache = new FileStorageCache<DataContext[]>('cachedData')
 const dataFetcher = new StormglassDataFetcher(
   logger,
   process.env.STORMGLASS_API_KEY!,

@@ -40,6 +40,7 @@ export class LocalStorageCache<T> implements ICache<T> {
         cachedContent,
         key,
       })
+      localStorage.removeItem(key)
       return null
     }
 
