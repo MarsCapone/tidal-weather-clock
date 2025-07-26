@@ -21,14 +21,9 @@ import React, { useEffect, useState } from 'react'
 import { useSwipeable } from 'react-swipeable'
 
 const clientCache = new LocalStorageCache<DataContext>()
-const dialogId = 'activity-explanation-dialog'
 
-export function MainContent({ date, nextPath, prevPath }: DateInfo) {
-  const ff = useFeatureFlags()
-  const [dataContext, setDataContext] = useState<DataContext | null>(null)
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
   const router = useRouter()
-  // const navigate = useNavigate()
   const handlers = useSwipeable({
     onSwiped: ({ dir }) => {
       // swipe left means you want to see what's on the right, i.e. next
@@ -40,6 +35,21 @@ export function MainContent({ date, nextPath, prevPath }: DateInfo) {
       }
     },
   })
+  return (
+    <div
+      {...handlers}
+      className="mx-auto flex min-w-full flex-col justify-center gap-10 p-8 text-center md:min-w-0"
+    >
+      <DatePagination date={date} nextPath={nextPath} prevPath={prevPath} />
+      <MainContentWithoutDate date={date} />
+    </div>
+  )
+}
+
+function MainContentWithoutDate({ date }: { date: Date }) {
+  const ff = useFeatureFlags()
+  const [dataContext, setDataContext] = useState<DataContext | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const [selectionIndex, setSelectionIndex] = useState(0)
 
   useEffect(() => {
@@ -62,21 +72,21 @@ export function MainContent({ date, nextPath, prevPath }: DateInfo) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center">
+      <>
         <h1 className="text-2xl">Loading data...</h1>
         <span className="loading loading-dots loading-lg"></span>
-      </div>
+      </>
     )
   }
 
   if (dataContext === null || dataContext === undefined) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 p-8">
+      <>
         <h1 className="text-3xl">No data context available</h1>
         <button className="btn btn-warning rounded-md">
           <Link href="/">Back to Today</Link>
         </button>
-      </div>
+      </>
     )
   }
 
@@ -85,11 +95,7 @@ export function MainContent({ date, nextPath, prevPath }: DateInfo) {
   ).getRecommendedActivities(EXAMPLE_DATA.Activities)
 
   return (
-    <div
-      {...handlers}
-      className="mx-auto flex min-w-full flex-col gap-10 p-8 text-center md:min-w-0"
-    >
-      <DatePagination date={date} nextPath={nextPath} prevPath={prevPath} />
+    <>
       <div>
         {ff.showSuggestedActivity && (
           <SuggestedActivity
@@ -128,6 +134,6 @@ export function MainContent({ date, nextPath, prevPath }: DateInfo) {
           <ActivityScoreList scores={suggestions} />
         </div>
       </div>
-    </div>
+    </>
   )
 }

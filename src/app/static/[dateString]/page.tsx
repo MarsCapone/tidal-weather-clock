@@ -1,4 +1,4 @@
-import { MainContent } from '@/components/MainContent'
+import MainContent from '@/components/MainContent'
 import { addDays, formatISO, FormatISOOptions, parseISO } from 'date-fns'
 
 export default async function Page({

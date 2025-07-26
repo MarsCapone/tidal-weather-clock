@@ -32,7 +32,7 @@ async function getDataContextsForDateString(
   ])
 
   const cachedData = cache.getCacheValue('all-contexts', {
-    expiryHours: 4,
+    expiryHours: 24,
   })
   if (!cachedData) {
     logger.info('fetching data', {
@@ -41,7 +41,9 @@ async function getDataContextsForDateString(
     })
     const data = await dataFetcher.getDataContexts(queryDay)
 
-    cache.setCacheValue('all-contexts', data)
+    if (data.length > 0) {
+      cache.setCacheValue('all-contexts', data)
+    }
     return data
   }
   return []

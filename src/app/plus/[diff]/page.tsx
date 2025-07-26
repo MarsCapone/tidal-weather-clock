@@ -1,4 +1,4 @@
-import { MainContent } from '@/components/MainContent'
+import MainContent from '@/components/MainContent'
 import CONSTANTS from '@/constants'
 import { addDays, startOfToday } from 'date-fns'
 

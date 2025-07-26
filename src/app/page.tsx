@@ -1,6 +1,6 @@
 'use client'
 
-import { MainContent } from '@/components/MainContent'
+import MainContent from '@/components/MainContent'
 import useDateString from '@/hooks/useDateString'
 import { differenceInMilliseconds, startOfToday } from 'date-fns'
 import React from 'react'
