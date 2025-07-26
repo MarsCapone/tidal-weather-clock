@@ -60,8 +60,8 @@ export type Activity = {
 export type ActivityScore<DebugType = never> = {
   activity: Activity
   constraintScores: { [constraintType: string]: number }
+  debug?: DebugType
   feasible: boolean
   score: number
   timestamp: string
-  debug?: DebugType
 }

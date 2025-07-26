@@ -1,3 +1,5 @@
+import { Activity } from '@/types/activity'
+
 const CONSTANTS = {
   DEFAULT_CACHE_EXPIRY_HOURS: 24,
   LOCATION_COORDS: [52.9636, 0.7442] as [number, number],
@@ -8,59 +10,66 @@ const CONSTANTS = {
 
 export default CONSTANTS
 
-const daylightConstraint = {
-  isDaylight: true,
-  type: 'sun',
-} as const
-
-export const Activities = [
-  {
-    constraints: [
-      {
-        comp: 'gt',
-        type: 'time',
-        value: '09:00',
-      },
-      {
-        comp: 'lt',
-        type: 'time',
-        value: '16:45',
-      },
-      daylightConstraint,
-      {
-        comp: 'lt',
-        type: 'wind-speed',
-        value: 15,
-      },
-      {
-        comp: 'gt',
-        tideType: 'high',
-        type: 'hightide-height',
-        value: 1.8,
-      },
-      {
-        deltaHours: 2,
-        tideType: 'high',
-        type: 'tide-state',
-      },
-      {
-        direction: 'NE',
-        type: 'wind-direction',
-      },
-    ],
-    displayName: 'Paddle boarding',
-    label: 'paddle-board',
-  },
-  {
-    constraints: [
-      daylightConstraint,
-      {
-        deltaHours: 1,
-        tideType: 'low',
-        type: 'tide-state',
-      },
-    ],
-    displayName: 'Swim in Bank Hole',
-    label: 'bank-hole',
-  },
-]
+type ExampleData = {
+  Activities: Activity[]
+}
+export const EXAMPLE_DATA: ExampleData = {
+  Activities: [
+    {
+      constraints: [
+        { type: 'wind' },
+        { maxCloudCover: 80, type: 'weather' },
+        { requiresDaylight: true, type: 'sun' },
+        { earliestHour: 8, latestHour: 18, type: 'time' },
+      ],
+      description: 'Recreational sailing',
+      duration: 3,
+      id: 'sailing',
+      name: 'Sailing',
+      priority: 7,
+    },
+    {
+      constraints: [
+        { preferredStates: ['rising', 'high'], type: 'tide' },
+        {
+          directionTolerance: 45,
+          maxSpeed: 12,
+          preferredDirections: [270, 225],
+          type: 'wind',
+        },
+        { requiresDaylight: true, type: 'sun' },
+        { minTemperature: 12, type: 'weather' },
+      ],
+      description: 'Surf session',
+      duration: 2,
+      id: 'surfing',
+      name: 'Surfing',
+      priority: 8,
+    },
+    {
+      constraints: [
+        { requiresDarkness: true, type: 'sun' },
+        { maxCloudCover: 30, type: 'weather' },
+        { maxSpeed: 8, type: 'wind' },
+        { earliestHour: 21, type: 'time' },
+      ],
+      description: 'Astronomical observation',
+      duration: 2,
+      id: 'stargazing',
+      name: 'Stargazing',
+      priority: 5,
+    },
+    {
+      constraints: [
+        { preferredStates: ['rising', 'falling'], type: 'tide' },
+        { maxSpeed: 10, type: 'wind' },
+        { preferredHours: [6, 7, 18, 19, 20], type: 'time' },
+      ],
+      description: 'Shore fishing',
+      duration: 4,
+      id: 'fishing',
+      name: 'Fishing',
+      priority: 6,
+    },
+  ],
+}

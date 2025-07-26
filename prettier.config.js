@@ -1,4 +1,4 @@
-export default {
+const config = {
   plugins: [
     '@prettier/plugin-oxc',
     '@ianvs/prettier-plugin-sort-imports',
@@ -8,3 +8,5 @@ export default {
   semi: false,
   singleQuote: true,
 }
+
+export default config
