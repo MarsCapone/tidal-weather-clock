@@ -94,7 +94,6 @@ export function MainContent({ date, nextPath, prevPath }: DateInfo) {
         {ff.showSuggestedActivity && (
           <SuggestedActivity
             className={'md:hidden'}
-            dialogId={dialogId}
             index={selectionIndex}
             setIndex={setSelectionIndex}
             suggestions={suggestions}
@@ -117,7 +116,6 @@ export function MainContent({ date, nextPath, prevPath }: DateInfo) {
             {ff.showSuggestedActivity && (
               <SuggestedActivity
                 className="mb-4 hidden md:flex"
-                dialogId={dialogId}
                 index={selectionIndex}
                 setIndex={setSelectionIndex}
                 suggestions={suggestions}

@@ -78,7 +78,7 @@ export default async function tryDataFetchersWithCache(
         contextCount: dataContext.length,
         fetcher: fetcher.constructor.name,
         interval: {
-          end: dataContext.at(-1).referenceDate,
+          end: dataContext.at(-1)!.referenceDate,
           start: dataContext[0].referenceDate,
         },
       })

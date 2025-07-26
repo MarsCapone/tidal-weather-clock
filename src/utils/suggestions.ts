@@ -101,7 +101,7 @@ export function groupScores(
     .reverse()
     .map((group: DefaultActivityScore[]) => {
       const interval = {
-        end: parseISO(group.at(-1).timestamp),
+        end: parseISO(group.at(-1)!.timestamp),
         start: parseISO(group[0].timestamp),
       }
       return {
@@ -142,7 +142,7 @@ export function groupScores(
       return {
         ...group[0],
         interval: {
-          end: group.at(-1).interval.end,
+          end: group.at(-1)!.interval.end,
           start: group[0].interval.start,
         },
         intervals: group.map((score) => ({
