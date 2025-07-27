@@ -40,3 +40,7 @@ export interface IActivityRecommender<DebugType = never> {
   // Returns all activity-time combinations ranked by score
   getRecommendedActivities(activities: Activity[]): ActivityScore<DebugType>[]
 }
+
+export interface IActivityFetcher {
+  getActivities(userId: string | undefined): Promise<Activity[]>
+}
