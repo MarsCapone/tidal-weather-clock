@@ -93,6 +93,12 @@ function MainContentWithoutDate({ date }: { date: Date }) {
     dataContext,
   ).getRecommendedActivities(activities || [])
 
+  const suggestedActivity = suggestions[selectionIndex]
+  const nextSuggestion = () =>
+    setSelectionIndex(Math.min(suggestions.length - 1, selectionIndex + 1))
+  const prevSuggestion = () =>
+    setSelectionIndex(Math.max(0, selectionIndex - 1))
+
   return (
     <>
       <div>
@@ -113,6 +119,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
             />
             <TideTimesChart
               key={date.toDateString()}
+              suggestedActivity={suggestedActivity}
               sunData={dataContext.sunData}
               tideData={dataContext.tideData}
             />
