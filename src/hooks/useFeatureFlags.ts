@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react'
 
 const defaultFeatureFlags = {
   alwaysShowActivityNextButton: false,
-  showActivityTable: false,
-  showSuggestedActivity: false,
-  useDemoActivities: true,
+  showActivityTable: true,
+  showSuggestedActivity: true,
 }
 
 type FeatureFlagName = keyof typeof defaultFeatureFlags
