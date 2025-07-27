@@ -27,8 +27,8 @@ export async function GET(request: NextRequest): Promise<Response> {
     GROUP BY a.id, a.name, a.priority, a.description`) as Activity[]
 
   logger.info('fetched activities from db', {
-    userId,
     activityCount: activityResponses.length,
+    userId,
   })
 
   return Response.json(activityResponses)

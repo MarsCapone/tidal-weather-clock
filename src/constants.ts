@@ -14,8 +14,8 @@ const CONSTANTS = {
 export default CONSTANTS
 
 export const APP_CONFIG = {
-  dataFetchers: [new ServerDataFetcher(logger)],
   activityFetcher: new ServerActivityFetcher(),
+  dataFetchers: [new ServerDataFetcher(logger)],
 }
 
 type ExampleData = {

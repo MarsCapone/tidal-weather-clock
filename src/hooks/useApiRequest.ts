@@ -21,7 +21,9 @@ export default function useApiRequest<ReturnType>(
   const [val, setVal] = useState<ReturnType | null>(initial)
   useEffect(() => {
     const { method, url } = REQUESTS[requestType]
-    if (method !== 'get') throw new Error('Method not implemented')
+    if (method !== 'get') {
+      throw new Error('Method not implemented')
+    }
     fetch(url).then((res) =>
       res.json().then((body) => {
         setVal(body)
@@ -38,7 +40,7 @@ export function useActivities(activityFetcher: IActivityFetcher) {
     activityFetcher.getActivities(undefined).then((body) => {
       setVal(body)
     })
-  }, [])
+  }, [activityFetcher])
 
   return val
 }
