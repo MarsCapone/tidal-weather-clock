@@ -11,7 +11,7 @@ export class ServerDataFetcher implements IDataContextFetcher {
   isCacheable(): boolean {
     return true
   }
-  async getDataContexts(date: Date): Promise<DataContext[]> {
+  async getDataContext(date: Date): Promise<DataContext | null> {
     this.logger.debug('fetching data context from server', { date })
     const response = await fetch(`/api/dataContext/${formatISO(date)}`)
     const content = await response.json()
@@ -26,7 +26,15 @@ export class ServerDataFetcher implements IDataContextFetcher {
       statusCode: response.status,
       statusText: response.statusText,
     })
-    return []
+    return null
+  }
+
+  async getDataContexts(date: Date): Promise<DataContext[]> {
+    const context = await this.getDataContext(date)
+    if (!context) {
+      return []
+    }
+    return [context]
   }
 }
 
@@ -53,34 +61,35 @@ export default async function tryDataFetchersWithCache(
 
   const cacheKey = getCacheKeyFn(cacheKeyFn)(lat, lng, date)
   const cachedResponse = cache.getCacheValue(cacheKey, {
-    expiryHours: 24,
+    // data is stored on the server too, so this just prevents repeated calls
+    // to the server
+    expiryHours: 2,
   })
   logger.debug('fetched cached data context', {
+    cache: cache.constructor.name,
     key: cacheKey,
     value: cachedResponse,
   })
 
   if (cachedResponse) {
     logger.warn('returned data from cache', {
+      cache: cache.constructor.name,
       cacheKey,
     })
     return cachedResponse
   }
 
-  let dataContext: DataContext[] | null = null
+  let dataContext: DataContext | null = null
   let shouldCache: boolean = false
 
   for (const fetcher of fetchers) {
     logger.debug('trying fetcher', { date, fetcher: fetcher.constructor.name })
-    dataContext = await fetcher.getDataContexts(date)
-    if (dataContext.length > 0) {
+    dataContext = await fetcher.getDataContext(date)
+
+    if (dataContext !== null) {
       logger.debug('found valid data with fetcher', {
-        contextCount: dataContext.length,
+        date: dataContext.referenceDate,
         fetcher: fetcher.constructor.name,
-        interval: {
-          end: dataContext.at(-1)!.referenceDate,
-          start: dataContext[0].referenceDate,
-        },
       })
       shouldCache = fetcher.isCacheable()
       break
@@ -97,15 +106,16 @@ export default async function tryDataFetchersWithCache(
   }
 
   if (shouldCache) {
-    dataContext.forEach((dc) => {
-      const key = getCacheKeyFn(cacheKeyFn)(
-        lat,
-        lng,
-        parseISO(dc.referenceDate),
-      )
-      logger.debug('caching data context', { cacheKey: key })
-      cache.setCacheValue(key, dc)
+    const key = getCacheKeyFn(cacheKeyFn)(
+      lat,
+      lng,
+      parseISO(dataContext.referenceDate),
+    )
+    logger.debug('caching data context', {
+      cache: cache.constructor.name,
+      cacheKey: key,
     })
+    cache.setCacheValue(key, dataContext)
   }
-  return dataContext[0]
+  return dataContext
 }

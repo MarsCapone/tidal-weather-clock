@@ -6,8 +6,8 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev --turbopack",
-    "format": "prettier --experimental-cli --write .",
-    "lint": "eslint --cache .",
+    "format": "prettier --experimental-cli --write . && next lint --fix",
+    "lint": "next lint",
     "lint:format": "prettier --experimental-cli --cache --check .",
     "pre-commit": "prettier --experimental-cli --write --ignore-unknown",
     "start": "next start"

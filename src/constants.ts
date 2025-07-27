@@ -1,7 +1,4 @@
 import { Activity } from '@/types/activity'
-import { ServerActivityFetcher } from '@/utils/activityFetcher'
-import { ServerDataFetcher } from '@/utils/fetchData'
-import logger from '@/utils/logger'
 
 const CONSTANTS = {
   DEFAULT_CACHE_EXPIRY_HOURS: 24,
@@ -12,11 +9,6 @@ const CONSTANTS = {
 }
 
 export default CONSTANTS
-
-export const APP_CONFIG = {
-  activityFetcher: new ServerActivityFetcher(),
-  dataFetchers: [new ServerDataFetcher(logger)],
-}
 
 type ExampleData = {
   Activities: Activity[]

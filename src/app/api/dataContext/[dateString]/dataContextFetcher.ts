@@ -12,13 +12,11 @@ import {
   eachDayOfInterval,
   endOfDay,
   formatISO,
+  isEqual,
   isWithinInterval,
   parseISO,
   startOfDay,
 } from 'date-fns'
-import stormglassSunExample from './stormGlassAstronomyExample.json'
-import stormglassTideExample from './stormGlassTideExample.json'
-import stormglassWeatherExample from './stormGlassWeatherExample.json'
 
 const stormglassBaseUrl = 'https://api.stormglass.io'
 
@@ -63,15 +61,20 @@ export class DemoStormglassDataFetcher implements IDataContextFetcher {
   }
 
   async fetchWeatherResponse(): Promise<StormglassWeatherResponse | null> {
-    return stormglassWeatherExample
+    return null
   }
 
   async fetchTideResponse(): Promise<StormglassTideResponse | null> {
-    return stormglassTideExample as StormglassTideResponse
+    return null
   }
 
   async fetchSunResponse(): Promise<StormglassSunResponse | null> {
-    return stormglassSunExample
+    return null
+  }
+
+  async getDataContext(date: Date): Promise<DataContext | null> {
+    const dcs = await this.getDataContexts(date)
+    return dcs.find((dc) => isEqual(parseISO(dc.referenceDate), date)) || null
   }
 
   async getDataContexts(date: Date): Promise<DataContext[]> {
@@ -115,11 +118,11 @@ export class DemoStormglassDataFetcher implements IDataContextFetcher {
     })
 
     return eachDayOfInterval(interval).map((d) =>
-      this.getDataContext(d, [rawWeather!, rawTide!, rawSun!]),
+      this.getDataContextInternal(d, [rawWeather!, rawTide!, rawSun!]),
     )
   }
 
-  getDataContext(
+  getDataContextInternal(
     date: Date,
     rawResponses: [
       StormglassWeatherResponse,
