@@ -66,15 +66,15 @@ export default async function tryDataFetchersWithCache(
     expiryHours: 2,
   })
   logger.debug('fetched cached data context', {
+    cache: cache.constructor.name,
     key: cacheKey,
     value: cachedResponse,
-    cache: cache.constructor.name,
   })
 
   if (cachedResponse) {
     logger.warn('returned data from cache', {
-      cacheKey,
       cache: cache.constructor.name,
+      cacheKey,
     })
     return cachedResponse
   }
@@ -88,8 +88,8 @@ export default async function tryDataFetchersWithCache(
 
     if (dataContext !== null) {
       logger.debug('found valid data with fetcher', {
-        fetcher: fetcher.constructor.name,
         date: dataContext.referenceDate,
+        fetcher: fetcher.constructor.name,
       })
       shouldCache = fetcher.isCacheable()
       break
@@ -112,8 +112,8 @@ export default async function tryDataFetchersWithCache(
       parseISO(dataContext.referenceDate),
     )
     logger.debug('caching data context', {
-      cacheKey: key,
       cache: cache.constructor.name,
+      cacheKey: key,
     })
     cache.setCacheValue(key, dataContext)
   }

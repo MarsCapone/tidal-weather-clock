@@ -53,9 +53,10 @@ export async function getDataContextForDate(
 
   const { data: dataContext, last_updated: lastUpdated } = dc
 
-  console.log({
-    dataContext,
+  logger.debug('fetched data context', {
+    date,
     lastUpdated,
+    location,
   })
 
   return {

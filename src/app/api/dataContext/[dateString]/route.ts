@@ -1,4 +1,3 @@
-import { FileStorageCache } from '@/app/api/dataContext/[dateString]/cache'
 import { StormglassDataFetcher } from '@/app/api/dataContext/[dateString]/dataContextFetcher'
 import logger from '@/app/api/pinoLogger'
 import CONSTANTS from '@/constants'
@@ -8,7 +7,6 @@ import {
   differenceInHours,
   isAfter,
   isBefore,
-  min,
   parseISO,
   startOfDay,
   startOfToday,
@@ -26,7 +24,6 @@ export async function GET(
   return Response.json(result)
 }
 
-const cache = new FileStorageCache<DataContext[]>('cachedData')
 const dataFetcher = new StormglassDataFetcher(
   logger,
   process.env.STORMGLASS_API_KEY!,
@@ -91,36 +88,4 @@ async function getDataContextForDateString(
 
   // finally return whatever was requested
   return (await db.getDataContextForDate(date, location))?.dataContext || null
-}
-
-async function getDataContextsForDateString(
-  dateString: string,
-): Promise<DataContext[]> {
-  // query the earliest of either the provided date or today
-  const queryDay = min([
-    startOfDay(parseISO(dateString)),
-    startOfDay(new Date()),
-  ])
-
-  const cachedData = cache.getCacheValue('all-contexts', {
-    expiryHours: 24,
-  })
-  if (!cachedData) {
-    logger.info('fetching data', {
-      dateString,
-      fetcher: dataFetcher.constructor.name,
-    })
-    const data = await dataFetcher.getDataContexts(queryDay)
-
-    if (data.length > 0) {
-      cache.setCacheValue('all-contexts', data)
-    }
-
-    return data
-  }
-
-  for (const dc of cachedData) {
-    await db.addDataContext(location, dc)
-  }
-  return cachedData
 }
