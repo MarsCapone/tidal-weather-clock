@@ -1,19 +1,20 @@
 import ClockChart, { TimePointer, TimeRange } from '@/components/ClockChart'
-import { ActivityScore } from '@/types/activity'
 import { SunData, TideInfo } from '@/types/context'
 import { getFractionalTime } from '@/utils/dates'
+import { EnrichedActivityScore } from '@/utils/suggestions'
 import { parseISO } from 'date-fns'
 import React from 'react'
 
 export type TideTimesChartProps = {
   sunData: SunData
   tideData: TideInfo[]
-  suggestedActivity: ActivityScore<unknown>
+  suggestedActivity: EnrichedActivityScore | null
 }
 
 export default function TideTimesChart({
   sunData,
   tideData,
+  suggestedActivity,
 }: TideTimesChartProps) {
   const [highTideBounds, lowTideBounds] = [2, 1]
 

@@ -13,7 +13,7 @@ import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import { DataContext } from '@/types/context'
 import tryDataFetchersWithCache from '@/utils/fetchData'
 import logger from '@/utils/logger'
-import { ActivityRecommender } from '@/utils/suggestions'
+import { ActivityRecommender, groupScores } from '@/utils/suggestions'
 import { formatISO, startOfDay } from 'date-fns'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -92,10 +92,18 @@ function MainContentWithoutDate({ date }: { date: Date }) {
   const suggestions = new ActivityRecommender(
     dataContext,
   ).getRecommendedActivities(activities || [])
+  const filteredSuggestions = groupScores(
+    suggestions.filter((r) => r.feasible),
+    'timeAndActivity',
+  )
 
-  const suggestedActivity = suggestions[selectionIndex]
+  const suggestedActivity =
+    filteredSuggestions.length > 0 ? filteredSuggestions[selectionIndex] : null
+
   const nextSuggestion = () =>
-    setSelectionIndex(Math.min(suggestions.length - 1, selectionIndex + 1))
+    setSelectionIndex(
+      Math.min(filteredSuggestions.length - 1, selectionIndex + 1),
+    )
   const prevSuggestion = () =>
     setSelectionIndex(Math.max(0, selectionIndex - 1))
 
@@ -105,9 +113,13 @@ function MainContentWithoutDate({ date }: { date: Date }) {
         {ff.showSuggestedActivity && (
           <SuggestedActivity
             className={'md:hidden'}
-            index={selectionIndex}
-            setIndex={setSelectionIndex}
-            suggestions={suggestions}
+            activityScore={suggestedActivity}
+            nextSuggestion={
+              selectionIndex <= filteredSuggestions.length - 1
+                ? nextSuggestion
+                : undefined
+            }
+            prevSuggestion={selectionIndex > 0 ? prevSuggestion : undefined}
           />
         )}
         <div className="flex flex-col items-start justify-center gap-6 md:flex-row">
@@ -128,9 +140,13 @@ function MainContentWithoutDate({ date }: { date: Date }) {
             {ff.showSuggestedActivity && (
               <SuggestedActivity
                 className="mb-4 hidden md:flex"
-                index={selectionIndex}
-                setIndex={setSelectionIndex}
-                suggestions={suggestions}
+                activityScore={suggestedActivity}
+                nextSuggestion={
+                  selectionIndex <= filteredSuggestions.length - 1
+                    ? nextSuggestion
+                    : undefined
+                }
+                prevSuggestion={selectionIndex > 0 ? prevSuggestion : undefined}
               />
             )}
             <WeatherStatus dataContext={dataContext} />
