@@ -6,7 +6,7 @@ import DayTimeline from '@/components/DayTimeline'
 import SuggestedActivity from '@/components/SuggestedActivity'
 import TideTimesChart from '@/components/TideTimesChart'
 import WeatherStatus from '@/components/WeatherStatus'
-import { APP_CONFIG } from '@/constants'
+import { APP_CONFIG } from '@/config'
 import { useActivities } from '@/hooks/useApiRequest'
 import { DateInfo } from '@/hooks/useDateString'
 import { useFeatureFlags } from '@/hooks/useFeatureFlags'
@@ -20,8 +20,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { useSwipeable } from 'react-swipeable'
-
-const clientCache = new LocalStorageCache<DataContext>()
 
 export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
   const router = useRouter()
@@ -59,7 +57,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
       logger,
       startOfDay(date),
       APP_CONFIG.dataFetchers,
-      clientCache,
+      APP_CONFIG.clientCache,
       (lat, lng, date) =>
         `[${lat},${lng}]-${formatISO(date, { representation: 'date' })}`,
     ).then((dc) => {

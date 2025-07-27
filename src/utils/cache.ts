@@ -55,3 +55,11 @@ export class LocalStorageCache<T> implements ICache<T> {
     return cachedContent.value as T
   }
 }
+
+export class NullCache<T> implements ICache<T> {
+  getCacheValue(key: string, options?: GetCacheOptions): T | null {
+    return null
+  }
+
+  setCacheValue(key: string, value: T): void {}
+}
