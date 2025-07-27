@@ -134,12 +134,20 @@ export class DemoStormglassDataFetcher implements IDataContextFetcher {
       filterToDate(date, rawSun?.data),
     ]
 
+    const formatDay = formatISO(startOfDay(date))
+
     const result: DataContext = {
-      referenceDate: formatISO(startOfDay(parseISO(sunResponse[0].sunrise))),
-      sunData: {
-        sunRise: sunResponse[0].sunrise,
-        sunSet: sunResponse[0].sunset,
-      },
+      referenceDate: formatDay,
+      sunData:
+        sunResponse.length > 0
+          ? {
+              sunRise: sunResponse[0].sunrise,
+              sunSet: sunResponse[0].sunset,
+            }
+          : {
+              sunRise: formatDay,
+              sunSet: formatDay,
+            },
       tideData: [],
       weatherData: {
         points: [],
