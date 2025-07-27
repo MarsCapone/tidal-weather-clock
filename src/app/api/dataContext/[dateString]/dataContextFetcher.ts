@@ -17,9 +17,6 @@ import {
   parseISO,
   startOfDay,
 } from 'date-fns'
-import stormglassSunExample from './stormGlassAstronomyExample.json'
-import stormglassTideExample from './stormGlassTideExample.json'
-import stormglassWeatherExample from './stormGlassWeatherExample.json'
 
 const stormglassBaseUrl = 'https://api.stormglass.io'
 
@@ -64,15 +61,15 @@ export class DemoStormglassDataFetcher implements IDataContextFetcher {
   }
 
   async fetchWeatherResponse(): Promise<StormglassWeatherResponse | null> {
-    return stormglassWeatherExample
+    return null
   }
 
   async fetchTideResponse(): Promise<StormglassTideResponse | null> {
-    return stormglassTideExample as StormglassTideResponse
+    return null
   }
 
   async fetchSunResponse(): Promise<StormglassSunResponse | null> {
-    return stormglassSunExample
+    return null
   }
 
   async getDataContext(date: Date): Promise<DataContext | null> {
