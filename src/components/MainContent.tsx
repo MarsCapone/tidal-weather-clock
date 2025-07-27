@@ -6,12 +6,13 @@ import DayTimeline from '@/components/DayTimeline'
 import SuggestedActivity from '@/components/SuggestedActivity'
 import TideTimesChart from '@/components/TideTimesChart'
 import WeatherStatus from '@/components/WeatherStatus'
-import { EXAMPLE_DATA } from '@/constants'
+import { APP_CONFIG } from '@/constants'
+import { useActivities } from '@/hooks/useApiRequest'
 import { DateInfo } from '@/hooks/useDateString'
 import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import { DataContext } from '@/types/context'
 import { LocalStorageCache } from '@/utils/cache'
-import tryDataFetchersWithCache, { ServerDataFetcher } from '@/utils/fetchData'
+import tryDataFetchersWithCache from '@/utils/fetchData'
 import logger from '@/utils/logger'
 import { ActivityRecommender } from '@/utils/suggestions'
 import { formatISO, startOfDay } from 'date-fns'
@@ -47,6 +48,7 @@ export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
 }
 
 function MainContentWithoutDate({ date }: { date: Date }) {
+  const activities = useActivities(APP_CONFIG.activityFetcher)
   const ff = useFeatureFlags()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -56,7 +58,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
     tryDataFetchersWithCache(
       logger,
       startOfDay(date),
-      [new ServerDataFetcher(logger)],
+      APP_CONFIG.dataFetchers,
       clientCache,
       (lat, lng, date) =>
         `[${lat},${lng}]-${formatISO(date, { representation: 'date' })}`,
@@ -92,7 +94,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
 
   const suggestions = new ActivityRecommender(
     dataContext,
-  ).getRecommendedActivities(EXAMPLE_DATA.Activities)
+  ).getRecommendedActivities(activities || [])
 
   return (
     <>

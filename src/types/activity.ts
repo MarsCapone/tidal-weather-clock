@@ -51,7 +51,6 @@ export type Constraint =
 export type Activity = {
   constraints: Constraint[]
   description: string
-  duration: number // hours
   id: string
   name: string
   priority: number // 1-10, higher is more important

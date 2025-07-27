@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'node:fs'
 import logger from '@/app/api/pinoLogger'
 import { GetCacheOptions, ICache } from '@/types/interfaces'
 import { differenceInDays } from 'date-fns'

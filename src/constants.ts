@@ -1,4 +1,7 @@
 import { Activity } from '@/types/activity'
+import { ServerActivityFetcher } from '@/utils/activityFetcher'
+import { ServerDataFetcher } from '@/utils/fetchData'
+import logger from '@/utils/logger'
 
 const CONSTANTS = {
   DEFAULT_CACHE_EXPIRY_HOURS: 24,
@@ -9,6 +12,11 @@ const CONSTANTS = {
 }
 
 export default CONSTANTS
+
+export const APP_CONFIG = {
+  activityFetcher: new ServerActivityFetcher(),
+  dataFetchers: [new ServerDataFetcher(logger)],
+}
 
 type ExampleData = {
   Activities: Activity[]
@@ -23,7 +31,6 @@ export const EXAMPLE_DATA: ExampleData = {
         { earliestHour: 8, latestHour: 18, type: 'time' },
       ],
       description: 'Recreational sailing',
-      duration: 3,
       id: 'sailing',
       name: 'Sailing',
       priority: 7,
@@ -41,7 +48,6 @@ export const EXAMPLE_DATA: ExampleData = {
         { minTemperature: 12, type: 'weather' },
       ],
       description: 'Surf session',
-      duration: 2,
       id: 'surfing',
       name: 'Surfing',
       priority: 8,
@@ -54,7 +60,6 @@ export const EXAMPLE_DATA: ExampleData = {
         { earliestHour: 21, type: 'time' },
       ],
       description: 'Astronomical observation',
-      duration: 2,
       id: 'stargazing',
       name: 'Stargazing',
       priority: 5,
@@ -66,7 +71,6 @@ export const EXAMPLE_DATA: ExampleData = {
         { preferredHours: [6, 7, 18, 19, 20], type: 'time' },
       ],
       description: 'Shore fishing',
-      duration: 4,
       id: 'fishing',
       name: 'Fishing',
       priority: 6,
