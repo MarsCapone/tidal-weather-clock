@@ -80,15 +80,28 @@ export default function TideTimesChart({
 
   const intervals = getActivityGroupInfo(suggestedActivity)
 
-  const timeRanges: TimeRange[] = intervals.map((agi) => {
-    return {
-      color: 'success',
-      id: `${suggestedActivity.activity.id}-${formatInterval(agi.interval)}`,
-      label: formatInterval(agi.interval),
-      startHour: getFractionalTime(agi.interval.start),
-      endHour: getFractionalTime(agi.interval.end) + 1,
-    }
-  })
+  const scoreToColor = (index: number): TimeRange['color'] => {
+    // score is between 0 and 1.
+    if (intervals.length === 1 || index === 0) return 'success'
+
+    if (intervals.length >= 2 && index === 1) return 'success80'
+
+    if (intervals.length >= 3 && index === 2) return 'success60'
+
+    return 'success40'
+  }
+
+  const timeRanges: TimeRange[] = intervals
+    .sort((a, b) => b.score - a.score)
+    .map((agi, index) => {
+      return {
+        color: scoreToColor(index),
+        id: `${suggestedActivity.activity.id}-${formatInterval(agi.interval)}`,
+        label: formatInterval(agi.interval),
+        startHour: getFractionalTime(agi.interval.start),
+        endHour: getFractionalTime(agi.interval.end) + 1,
+      }
+    })
 
   return <ClockChart {...chartOptions} timeRanges={timeRanges} />
 }
