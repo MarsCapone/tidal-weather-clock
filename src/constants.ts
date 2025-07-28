@@ -1,10 +1,21 @@
 import { Activity } from '@/types/activity'
 
-const CONSTANTS = {
-  DEFAULT_CACHE_EXPIRY_HOURS: 24,
+type Constants = {
+  LOCATION_COORDS: [number, number]
+  LOCATION_NAME: string
+  MAX_PERMITTED_DAYS: number
+  PATH_TITLES: Record<string, string>
+  TITLE: string
+}
+
+const CONSTANTS: Constants = {
   LOCATION_COORDS: [52.9636, 0.7442] as [number, number],
   LOCATION_NAME: 'Burnham Overy Staithe',
   MAX_PERMITTED_DAYS: 10,
+  PATH_TITLES: {
+    '/settings': 'Settings',
+    '/settings/activities': 'Activity Settings',
+  },
   TITLE: 'Tidal Weather Clock',
 }
 
