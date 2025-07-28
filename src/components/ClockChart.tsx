@@ -272,6 +272,24 @@ export default function ClockChart({
       }
       return [range]
     })
+    .flatMap((range) => {
+      if (range.startHour < 24 && range.endHour >= 24) {
+        return [
+          {
+            ...range,
+            endHour: 23.999_99, // we can't actually use 12, so we use a value just below it
+            startHour: range.startHour,
+          },
+          {
+            ...range,
+            endHour: range.endHour - 24,
+            id: `${range.id}-pm`,
+            startHour: 0,
+          },
+        ]
+      }
+      return [range]
+    })
     .map((range) => {
       const startAngle = (range.startHour % 12) * 30 - 90
       const endAngle = (range.endHour % 12) * 30 - 90
