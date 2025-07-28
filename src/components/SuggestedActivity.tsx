@@ -63,7 +63,7 @@ export default function SuggestedActivity({
         </div>
         <div className="card-actions">
           <div className="w-full">
-            <div className="flex flex-row justify-between gap-x-2">
+            <div className="flex flex-row justify-between gap-2 md:flex-col lg:flex-row">
               {prevButton}
               <ExplainButton selection={activityScore} />
               {nextButton}
@@ -168,7 +168,7 @@ function NavButton({
 }: NavButtonProps) {
   return (
     <button
-      className={`btn btn-secondary join-item w-1/4 rounded-sm ${disabled ? 'disabled btn-disabled' : ''} ${className || ''}`}
+      className={`btn btn-secondary join-item rounded-sm lg:w-1/4 ${disabled ? 'disabled btn-disabled' : ''} ${className || ''}`}
       onClick={() => {
         if (!disabled && onClick) {
           onClick()
