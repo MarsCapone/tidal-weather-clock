@@ -112,8 +112,8 @@ function MainContentWithoutDate({ date }: { date: Date }) {
       <div>
         {ff.showSuggestedActivity && (
           <SuggestedActivity
-            className={'md:hidden'}
             activityScore={suggestedActivity}
+            className={'md:hidden'}
             nextSuggestion={
               selectionIndex <= filteredSuggestions.length - 1
                 ? nextSuggestion
@@ -139,8 +139,8 @@ function MainContentWithoutDate({ date }: { date: Date }) {
           <div className="w-full md:w-1/3">
             {ff.showSuggestedActivity && (
               <SuggestedActivity
-                className="mb-4 hidden md:flex"
                 activityScore={suggestedActivity}
+                className="mb-4 hidden md:flex"
                 nextSuggestion={
                   selectionIndex <= filteredSuggestions.length - 1
                     ? nextSuggestion

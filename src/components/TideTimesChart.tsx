@@ -5,25 +5,21 @@ import ClockChart, {
 } from '@/components/ClockChart'
 import { getActivityGroupInfo } from '@/components/SuggestedActivity'
 import { SunData, TideInfo } from '@/types/context'
-import {
-  formatInterval,
-  getFractionalTime,
-  withFractionalTime,
-} from '@/utils/dates'
+import { formatInterval, getFractionalTime } from '@/utils/dates'
 import { EnrichedActivityScore } from '@/utils/suggestions'
 import { parseISO } from 'date-fns'
 import React from 'react'
 
 export type TideTimesChartProps = {
+  suggestedActivity: EnrichedActivityScore | null
   sunData: SunData
   tideData: TideInfo[]
-  suggestedActivity: EnrichedActivityScore | null
 }
 
 export default function TideTimesChart({
+  suggestedActivity,
   sunData,
   tideData,
-  suggestedActivity,
 }: TideTimesChartProps) {
   const highTides = tideData.filter((t) => t.type === 'high')
   const lowTides = tideData.filter((t) => t.type === 'low')
@@ -33,24 +29,24 @@ export default function TideTimesChart({
 
   const timePointers: TimePointer[] = [
     {
+      isOutside: true,
       label: 'Sunrise',
       timestamp: sunData.sunRise ? parseISO(sunData.sunRise) : null,
-      isOutside: true,
     },
     {
+      isOutside: true,
       label: 'Sunset',
       timestamp: sunData.sunSet ? parseISO(sunData.sunSet) : null,
-      isOutside: true,
     },
     {
-      label: 'HW',
       hour: highTideTime,
       isOutside: false,
+      label: 'HW',
     },
     {
-      label: 'LW',
       hour: lowTideTime,
       isOutside: false,
+      label: 'LW',
     },
   ].map((s) => ({
     color: 'warning',
@@ -82,11 +78,17 @@ export default function TideTimesChart({
 
   const scoreToColor = (index: number): TimeRange['color'] => {
     // score is between 0 and 1.
-    if (intervals.length === 1 || index === 0) return 'success'
+    if (intervals.length === 1 || index === 0) {
+      return 'success'
+    }
 
-    if (intervals.length >= 2 && index === 1) return 'success80'
+    if (intervals.length >= 2 && index === 1) {
+      return 'success80'
+    }
 
-    if (intervals.length >= 3 && index === 2) return 'success60'
+    if (intervals.length >= 3 && index === 2) {
+      return 'success60'
+    }
 
     return 'success40'
   }
@@ -96,10 +98,10 @@ export default function TideTimesChart({
     .map((agi, index) => {
       return {
         color: scoreToColor(index),
+        endHour: getFractionalTime(agi.interval.end) + 1,
         id: `${suggestedActivity.activity.id}-${formatInterval(agi.interval)}`,
         label: formatInterval(agi.interval),
         startHour: getFractionalTime(agi.interval.start),
-        endHour: getFractionalTime(agi.interval.end) + 1,
       }
     })
 

@@ -1,18 +1,13 @@
 import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import { formatInterval } from '@/utils/dates'
-import {
-  ActivityGroupInfo,
-  DefaultActivityScore,
-  EnrichedActivityScore,
-  groupScores,
-} from '@/utils/suggestions'
+import { ActivityGroupInfo, EnrichedActivityScore } from '@/utils/suggestions'
 import { compareAsc } from 'date-fns'
 import React from 'react'
 import GenericObject from './GenericObject'
 
 export type SuggestedActivityProps = {
-  className?: string
   activityScore: EnrichedActivityScore | null
+  className?: string
   nextSuggestion?: () => void
   prevSuggestion?: () => void
 }
@@ -20,8 +15,8 @@ export type SuggestedActivityProps = {
 const INTERVAL_LIMIT = 3
 
 export default function SuggestedActivity({
-  className,
   activityScore,
+  className,
   nextSuggestion,
   prevSuggestion,
 }: SuggestedActivityProps) {
@@ -182,8 +177,8 @@ function NavButton({
     <button
       className={`btn btn-secondary join-item w-1/4 rounded-sm ${disabled ? 'disabled btn-disabled' : ''} ${className || ''}`}
       onClick={() => {
-        if (!disabled) {
-          onClick && onClick()
+        if (!disabled && onClick) {
+          onClick()
         }
       }}
     >

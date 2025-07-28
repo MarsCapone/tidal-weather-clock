@@ -43,47 +43,11 @@ const colorClasses = {
     text: 'text-warning',
   },
   // shades
-  success90: {
-    bg: 'bg-success/90',
-    fill: 'fill-success/90',
-    stroke: 'stroke-success/90',
-    text: 'text-success/90',
-  },
-  success80: {
-    bg: 'bg-success/80',
-    fill: 'fill-success/80',
-    stroke: 'stroke-success/80',
-    text: 'text-success/80',
-  },
-  success70: {
-    bg: 'bg-success/70',
-    fill: 'fill-success/70',
-    stroke: 'stroke-success/70',
-    text: 'text-success/70',
-  },
-  success60: {
-    bg: 'bg-success/60',
-    fill: 'fill-success/60',
-    stroke: 'stroke-success/60',
-    text: 'text-success/60',
-  },
-  success50: {
-    bg: 'bg-success/50',
-    fill: 'fill-success/50',
-    stroke: 'stroke-success/50',
-    text: 'text-success/50',
-  },
-  success40: {
-    bg: 'bg-success/40',
-    fill: 'fill-success/40',
-    stroke: 'stroke-success/40',
-    text: 'text-success/40',
-  },
-  success30: {
-    bg: 'bg-success/30',
-    fill: 'fill-success/30',
-    stroke: 'stroke-success/30',
-    text: 'text-success/30',
+  success10: {
+    bg: 'bg-success/10',
+    fill: 'fill-success/10',
+    stroke: 'stroke-success/10',
+    text: 'text-success/10',
   },
   success20: {
     bg: 'bg-success/20',
@@ -91,11 +55,47 @@ const colorClasses = {
     stroke: 'stroke-success/20',
     text: 'text-success/20',
   },
-  success10: {
-    bg: 'bg-success/10',
-    fill: 'fill-success/10',
-    stroke: 'stroke-success/10',
-    text: 'text-success/10',
+  success30: {
+    bg: 'bg-success/30',
+    fill: 'fill-success/30',
+    stroke: 'stroke-success/30',
+    text: 'text-success/30',
+  },
+  success40: {
+    bg: 'bg-success/40',
+    fill: 'fill-success/40',
+    stroke: 'stroke-success/40',
+    text: 'text-success/40',
+  },
+  success50: {
+    bg: 'bg-success/50',
+    fill: 'fill-success/50',
+    stroke: 'stroke-success/50',
+    text: 'text-success/50',
+  },
+  success60: {
+    bg: 'bg-success/60',
+    fill: 'fill-success/60',
+    stroke: 'stroke-success/60',
+    text: 'text-success/60',
+  },
+  success70: {
+    bg: 'bg-success/70',
+    fill: 'fill-success/70',
+    stroke: 'stroke-success/70',
+    text: 'text-success/70',
+  },
+  success80: {
+    bg: 'bg-success/80',
+    fill: 'fill-success/80',
+    stroke: 'stroke-success/80',
+    text: 'text-success/80',
+  },
+  success90: {
+    bg: 'bg-success/90',
+    fill: 'fill-success/90',
+    stroke: 'stroke-success/90',
+    text: 'text-success/90',
   },
 }
 
