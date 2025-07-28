@@ -17,15 +17,15 @@ type TimelineItem = {
   timestamp: Date | null
 }
 
-export type DayTimelineProps = {
-  vertical?: boolean
-} & Omit<DataContext, 'weatherData' | 'windData'>
+export type DayTimelineProps = {} & Omit<
+  DataContext,
+  'weatherData' | 'windData'
+>
 
 export default function DayTimeline({
   referenceDate,
   sunData,
   tideData,
-  vertical = false,
 }: DayTimelineProps) {
   const tides = tideData.map((t) => ({
     ...t,
@@ -81,13 +81,13 @@ export default function DayTimeline({
 
   return (
     <ul
-      className={`timeline timeline-vertical sm:timeline-horizontal my-2 justify-center ${vertical ? 'timeline-vertical' : 'timeline-horizontal'}`}
+      className={`timeline timeline-vertical md:timeline-horizontal my-2 justify-center`}
     >
       {timelineItems.map(({ additionalClasses, Icon, label, timestamp }, i) => (
         <li key={`timeline-item-${i}`}>
           <hr className={`${additionalClasses.line || 'bg-primary'}`} />
           <div
-            className={`timeline-start w-24 text-xl xl:w-32 xl:text-2xl ${additionalClasses.label || ''} ${additionalClasses.all || ''}`}
+            className={`timeline-start w-24 text-xl md:w-16 lg:w-24 xl:w-32 xl:text-2xl ${additionalClasses.label || ''} ${additionalClasses.all || ''}`}
           >
             {label}
           </div>
