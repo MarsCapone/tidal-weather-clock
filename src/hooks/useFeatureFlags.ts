@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 const defaultFeatureFlags = {
   showActivityTable: true,
+  showSettingsTitle: true,
   showSuggestedActivity: true,
 }
 

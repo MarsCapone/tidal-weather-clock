@@ -1,5 +1,6 @@
 'use client'
 
+import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import useTitle, { getTitle } from '@/hooks/useTitle'
 import { CogIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
@@ -7,14 +8,17 @@ import { usePathname } from 'next/navigation'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const title = useTitle()
+  const ff = useFeatureFlags()
 
   return (
     <div>
       <Breadcrumbs />
       <div className="p-10">
-        <div className="mb-4">
-          {title && <h1 className="text-3xl">{title}</h1>}
-        </div>
+        {ff.showSettingsTitle && (
+          <div className="mb-4">
+            {title && <h1 className="text-3xl">{title}</h1>}
+          </div>
+        )}
         {children}
       </div>
     </div>
