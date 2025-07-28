@@ -23,10 +23,10 @@ export async function addDataContext(
       ${dataContext},
       ${new Date()}
     )
-    ON CONFLICT 
+    ON CONFLICT ON CONSTRAINT unique_date_location
     DO UPDATE SET 
-      data = ${dataContext},
-      date = ${new Date()}
+      data = EXCLUDED.data,
+      date = EXCLUDED.date
     RETURNING id;
   `
   logger.info('saved datacontext to db', {
