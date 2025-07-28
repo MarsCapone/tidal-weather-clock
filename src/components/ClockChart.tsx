@@ -17,6 +17,7 @@ export type TimePointer = {
 }
 
 const colorClasses = {
+  // core
   error: {
     bg: 'bg-error',
     fill: 'fill-error',
@@ -40,6 +41,61 @@ const colorClasses = {
     fill: 'fill-warning',
     stroke: 'stroke-warning',
     text: 'text-warning',
+  },
+  // shades
+  success10: {
+    bg: 'bg-success/10',
+    fill: 'fill-success/10',
+    stroke: 'stroke-success/10',
+    text: 'text-success/10',
+  },
+  success20: {
+    bg: 'bg-success/20',
+    fill: 'fill-success/20',
+    stroke: 'stroke-success/20',
+    text: 'text-success/20',
+  },
+  success30: {
+    bg: 'bg-success/30',
+    fill: 'fill-success/30',
+    stroke: 'stroke-success/30',
+    text: 'text-success/30',
+  },
+  success40: {
+    bg: 'bg-success/40',
+    fill: 'fill-success/40',
+    stroke: 'stroke-success/40',
+    text: 'text-success/40',
+  },
+  success50: {
+    bg: 'bg-success/50',
+    fill: 'fill-success/50',
+    stroke: 'stroke-success/50',
+    text: 'text-success/50',
+  },
+  success60: {
+    bg: 'bg-success/60',
+    fill: 'fill-success/60',
+    stroke: 'stroke-success/60',
+    text: 'text-success/60',
+  },
+  success70: {
+    bg: 'bg-success/70',
+    fill: 'fill-success/70',
+    stroke: 'stroke-success/70',
+    text: 'text-success/70',
+  },
+  success80: {
+    bg: 'bg-success/80',
+    fill: 'fill-success/80',
+    stroke: 'stroke-success/80',
+    text: 'text-success/80',
+  },
+  success90: {
+    bg: 'bg-success/90',
+    fill: 'fill-success/90',
+    stroke: 'stroke-success/90',
+    text: 'text-success/90',
   },
 }
 
@@ -132,9 +188,15 @@ export default function ClockChart({
     const angle = (totalMinutes / 720) * 360 - 90 // Convert to degrees from 12 o'clock
     const radian = (angle * Math.PI) / 180
 
+    const [outsideTip, insideTip] = [2, 50]
+
     // Swap the tip and base positions
-    const tipRadius = pointer.isOutside ? clockRadius + 2 : clockRadius - 22
-    const baseRadius = pointer.isOutside ? clockRadius + 10 : clockRadius - 30
+    const tipRadius = pointer.isOutside
+      ? clockRadius + outsideTip
+      : clockRadius - insideTip
+    const baseRadius = pointer.isOutside
+      ? clockRadius + (outsideTip + 8)
+      : clockRadius - (insideTip + 8)
 
     const [tipX, tipY] = getPlusMinusPoint(
       [centerX, centerY],
@@ -150,7 +212,9 @@ export default function ClockChart({
 
     const pathData = `M ${tipX} ${tipY} L ${base1X} ${base1Y} L ${base2X} ${base2Y} Z`
 
-    const labelRadius = pointer.isOutside ? clockRadius + 15 : clockRadius - 32
+    const labelRadius = pointer.isOutside
+      ? clockRadius + (outsideTip + 15)
+      : clockRadius - (insideTip + 15)
     const [labelX, labelY] = getPlusMinusPoint(
       [centerX, centerY],
       labelRadius,
@@ -190,7 +254,7 @@ export default function ClockChart({
     .flatMap((range) => {
       // ensure the startHour and endHour are within 0-12 range
       // Normalize hours to 0-12 range
-      if (range.startHour < 12 && range.endHour > 12) {
+      if (range.startHour < 12 && range.endHour >= 12) {
         // If the range crosses noon, adjust the hours
         return [
           {

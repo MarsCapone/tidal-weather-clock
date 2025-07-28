@@ -38,7 +38,7 @@ type TimeSlot = {
   wind: WindInfo
 }
 
-type ActivityGroupInfo = {
+export type ActivityGroupInfo = {
   constraintScores: ActivityScore['constraintScores']
   interval: Interval<Date, Date>
   score: ActivityScore['score']

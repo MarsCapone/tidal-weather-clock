@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 
 const defaultFeatureFlags = {
-  alwaysShowActivityNextButton: false,
   showActivityTable: true,
   showSuggestedActivity: true,
 }

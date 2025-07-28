@@ -13,7 +13,7 @@ import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import { DataContext } from '@/types/context'
 import tryDataFetchersWithCache from '@/utils/fetchData'
 import logger from '@/utils/logger'
-import { ActivityRecommender } from '@/utils/suggestions'
+import { ActivityRecommender, groupScores } from '@/utils/suggestions'
 import { formatISO, startOfDay } from 'date-fns'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -92,16 +92,34 @@ function MainContentWithoutDate({ date }: { date: Date }) {
   const suggestions = new ActivityRecommender(
     dataContext,
   ).getRecommendedActivities(activities || [])
+  const filteredSuggestions = groupScores(
+    suggestions.filter((r) => r.feasible),
+    'timeAndActivity',
+  )
+
+  const suggestedActivity =
+    filteredSuggestions.length > 0 ? filteredSuggestions[selectionIndex] : null
+
+  const nextSuggestion = () =>
+    setSelectionIndex(
+      Math.min(filteredSuggestions.length - 1, selectionIndex + 1),
+    )
+  const prevSuggestion = () =>
+    setSelectionIndex(Math.max(0, selectionIndex - 1))
 
   return (
     <>
       <div>
         {ff.showSuggestedActivity && (
           <SuggestedActivity
+            activityScore={suggestedActivity}
             className={'md:hidden'}
-            index={selectionIndex}
-            setIndex={setSelectionIndex}
-            suggestions={suggestions}
+            nextSuggestion={
+              selectionIndex <= filteredSuggestions.length - 1
+                ? nextSuggestion
+                : undefined
+            }
+            prevSuggestion={selectionIndex > 0 ? prevSuggestion : undefined}
           />
         )}
         <div className="flex flex-col items-start justify-center gap-6 md:flex-row">
@@ -113,6 +131,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
             />
             <TideTimesChart
               key={date.toDateString()}
+              suggestedActivity={suggestedActivity}
               sunData={dataContext.sunData}
               tideData={dataContext.tideData}
             />
@@ -120,10 +139,14 @@ function MainContentWithoutDate({ date }: { date: Date }) {
           <div className="w-full md:w-1/3">
             {ff.showSuggestedActivity && (
               <SuggestedActivity
+                activityScore={suggestedActivity}
                 className="mb-4 hidden md:flex"
-                index={selectionIndex}
-                setIndex={setSelectionIndex}
-                suggestions={suggestions}
+                nextSuggestion={
+                  selectionIndex <= filteredSuggestions.length - 1
+                    ? nextSuggestion
+                    : undefined
+                }
+                prevSuggestion={selectionIndex > 0 ? prevSuggestion : undefined}
               />
             )}
             <WeatherStatus dataContext={dataContext} />
