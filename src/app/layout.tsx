@@ -17,7 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
           <div className="flex-none">
-            <ul className="menu menu-horizontal items-center px-1">
+            <ul className="menu menu-horizontal items-center gap-x-2 px-1">
               <li>
                 <Link className="btn btn-ghost rounded-sm" href="/about">
                   About
@@ -34,7 +34,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </ul>
           </div>
         </div>
-        <div className="mx-auto flex min-w-full flex-col justify-center gap-10 p-8 text-center md:min-w-0">
+        <div className="mx-auto flex min-w-full flex-col justify-center gap-10 p-10 text-center md:min-w-0">
           {children}
         </div>
       </div>

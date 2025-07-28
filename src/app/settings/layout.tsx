@@ -1,41 +1,63 @@
 'use client'
 
+import { useFeatureFlags } from '@/hooks/useFeatureFlags'
+import useTitle, { getTitle } from '@/hooks/useTitle'
+import { CogIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import { useMatches } from 'react-router'
+import { usePathname } from 'next/navigation'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const matches = useMatches()
-
-  const showBreadcrumbs = !matches.some((m) => m.id === 'SettingsHome')
-  const pageData = matches.at(-1)?.data as { title: string } | undefined
-  const title = pageData ? pageData.title : ''
+  const title = useTitle()
+  const ff = useFeatureFlags()
 
   return (
-    <div className="p-10">
-      <div className="mb-4">
-        {showBreadcrumbs && (
-          <div className="breadcrumbs mb-4 text-sm">
-            <ul>
-              {matches.map((page, i) => {
-                if (i === matches.length - 1) {
-                  return (
-                    <li className="font-bold" key={i}>
-                      {page.id}
-                    </li>
-                  )
-                }
-                return (
-                  <li key={i}>
-                    <Link href={page.pathname}>{page.id}</Link>
-                  </li>
-                )
-              })}
-            </ul>
+    <div>
+      <Breadcrumbs />
+      <div className="p-10">
+        {ff.showSettingsTitle && (
+          <div className="mb-4">
+            {title && <h1 className="text-3xl">{title}</h1>}
           </div>
         )}
-        {title && <h1 className="text-3xl">{title}</h1>}
+        {children}
       </div>
-      {children}
+    </div>
+  )
+}
+
+function Breadcrumbs() {
+  const paths = usePathname()
+  const pathNames = paths.split('/').filter(Boolean).slice(1)
+
+  const showBreadcrumbs = pathNames.at(-1) !== 'settings'
+  if (!showBreadcrumbs) {
+    return null
+  }
+
+  return (
+    <div className="breadcrumbs text-sm">
+      <ul>
+        <li className="link link-hover">
+          <Link href="/">
+            <CogIcon className="h-4 w-4" />
+            Settings
+          </Link>
+        </li>
+        {pathNames.map((path, i) => {
+          const href = '/settings/' + pathNames.slice(0, i + 1).join('/')
+          const title = getTitle(href, pathNames[i])
+
+          if (href === paths) {
+            return <li key={`path-${i}`}>{title}</li>
+          }
+
+          return (
+            <li className={'link link-hover'} key={`path-${i}`}>
+              <Link href={href}>{title}</Link>
+            </li>
+          )
+        })}
+      </ul>
     </div>
   )
 }

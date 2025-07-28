@@ -27,51 +27,40 @@ export default function SuggestedActivity({
     return null
   }
 
-  const prevButton = (
-    <NavButton
-      direction="prev"
-      disabled={prevSuggestion === undefined}
-      onClick={prevSuggestion}
-    />
-  )
-  const nextButton = (
-    <NavButton
-      direction="next"
-      disabled={nextSuggestion === undefined}
-      onClick={nextSuggestion}
-    />
-  )
-
   const intervals = getActivityGroupInfo(activityScore)
 
-  const intervalView = intervals.map((agi, i) => (
-    <div
-      className="flex flex-col justify-center md:flex-row md:gap-x-2 lg:flex-col"
-      key={`interval-${i}`}
-    >
-      <div>{formatInterval(agi.interval, 1)}</div>
-      <div>{renderScore(agi.score)}</div>
-    </div>
-  ))
-
   return (
-    <>
-      <SuggestedActivityContent className={className}>
-        <p className="text-2xl font-extrabold">{activityScore.activity.name}</p>
-        <div className="text-base-content/50 flex flex-row justify-around gap-4 font-mono text-sm md:flex-col lg:flex-row">
-          {intervalView}
-        </div>
-        <div className="card-actions">
-          <div className="w-full">
-            <div className="flex flex-row justify-between gap-2 md:flex-col lg:flex-row">
-              {prevButton}
-              <ExplainButton selection={activityScore} />
-              {nextButton}
-            </div>
+    <SuggestedActivityContent className={className}>
+      <p className="text-2xl font-extrabold">{activityScore.activity.name}</p>
+      <div className="text-base-content/50 flex flex-row justify-around gap-4 font-mono text-sm md:flex-col lg:flex-row">
+        {intervals.map((agi, i) => (
+          <div
+            className="flex flex-col justify-center md:flex-row md:gap-x-2 lg:flex-col"
+            key={`interval-${i}`}
+          >
+            <div>{formatInterval(agi.interval, 1)}</div>
+            <div>{renderScore(agi.score)}</div>
+          </div>
+        ))}
+      </div>
+      <div className="card-actions">
+        <div className="w-full">
+          <div className="flex flex-row justify-between gap-2 md:flex-col lg:flex-row">
+            <NavButton
+              direction="prev"
+              disabled={prevSuggestion === undefined}
+              onClick={prevSuggestion}
+            />
+            <ExplainButton selection={activityScore} />
+            <NavButton
+              direction="next"
+              disabled={nextSuggestion === undefined}
+              onClick={nextSuggestion}
+            />
           </div>
         </div>
-      </SuggestedActivityContent>
-    </>
+      </div>
+    </SuggestedActivityContent>
   )
 }
 
