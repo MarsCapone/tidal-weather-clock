@@ -5,6 +5,7 @@ import { DataContext } from '@/types/context'
 import {
   addDays,
   differenceInHours,
+  formatISO,
   isAfter,
   isBefore,
   parseISO,
@@ -12,7 +13,7 @@ import {
   startOfToday,
 } from 'date-fns'
 import { NextRequest } from 'next/server'
-import db from './db'
+import db, { addDataContext } from './db'
 
 export async function GET(
   request: NextRequest,
