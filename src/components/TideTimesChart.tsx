@@ -1,47 +1,35 @@
-import ClockChart, { TimePointer, TimeRange } from '@/components/ClockChart'
+import ClockChart, {
+  ClockChartProps,
+  TimePointer,
+  TimeRange,
+} from '@/components/ClockChart'
+import { getActivityGroupInfo } from '@/components/SuggestedActivity'
 import { SunData, TideInfo } from '@/types/context'
-import { getFractionalTime, withFractionalTime } from '@/utils/dates'
+import {
+  formatInterval,
+  getFractionalTime,
+  withFractionalTime,
+} from '@/utils/dates'
 import { EnrichedActivityScore } from '@/utils/suggestions'
 import { parseISO } from 'date-fns'
 import React from 'react'
 
 export type TideTimesChartProps = {
-  referenceDate: string
   sunData: SunData
   tideData: TideInfo[]
   suggestedActivity: EnrichedActivityScore | null
 }
 
 export default function TideTimesChart({
-  referenceDate,
   sunData,
   tideData,
   suggestedActivity,
 }: TideTimesChartProps) {
-  const [highTideBounds, lowTideBounds] = [2, 1]
-
   const highTides = tideData.filter((t) => t.type === 'high')
   const lowTides = tideData.filter((t) => t.type === 'low')
 
   const highTideTime = highTides.length > 0 ? highTides[0].time : 12
   const lowTideTime = lowTides.length > 0 ? lowTides[0].time : 12
-
-  const timeRanges: TimeRange[] = [
-    // {
-    //   color: 'success',
-    //   endHour: highTideTime + highTideBounds,
-    //   id: 'high-tide',
-    //   label: 'High Tide',
-    //   startHour: highTideTime - highTideBounds,
-    // },
-    // {
-    //   color: 'error',
-    //   endHour: lowTideTime + lowTideBounds,
-    //   id: 'low-tide',
-    //   label: 'Low Tide',
-    //   startHour: lowTideTime - lowTideBounds,
-    // },
-  ]
 
   const timePointers: TimePointer[] = [
     {
@@ -72,19 +60,35 @@ export default function TideTimesChart({
     label: s.label,
   }))
 
-  return (
-    <ClockChart
-      clockRadius={180}
-      options={{
-        range: {
-          offset: -37,
-          width: 69,
-        },
-      }}
-      showCenterDot={true}
-      size={500}
-      timePointers={timePointers}
-      timeRanges={timeRanges}
-    />
-  )
+  const chartOptions: ClockChartProps = {
+    clockRadius: 180,
+    options: {
+      range: {
+        offset: -37,
+        width: 69,
+      },
+    },
+    showCenterDot: true,
+    size: 500,
+    timePointers,
+    timeRanges: [],
+  }
+
+  if (suggestedActivity === null) {
+    return <ClockChart {...chartOptions} />
+  }
+
+  const intervals = getActivityGroupInfo(suggestedActivity)
+
+  const timeRanges: TimeRange[] = intervals.map((agi) => {
+    return {
+      color: 'success',
+      id: `${suggestedActivity.activity.id}-${formatInterval(agi.interval)}`,
+      label: formatInterval(agi.interval),
+      startHour: getFractionalTime(agi.interval.start),
+      endHour: getFractionalTime(agi.interval.end) + 1,
+    }
+  })
+
+  return <ClockChart {...chartOptions} timeRanges={timeRanges} />
 }
