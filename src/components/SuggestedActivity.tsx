@@ -1,6 +1,7 @@
 import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import { formatInterval } from '@/utils/dates'
 import {
+  ActivityGroupInfo,
   DefaultActivityScore,
   EnrichedActivityScore,
   groupScores,
@@ -46,16 +47,7 @@ export default function SuggestedActivity({
     />
   )
 
-  const intervals =
-    'intervals' in activityScore
-      ? activityScore.intervals!.slice(0, INTERVAL_LIMIT)
-      : [
-          {
-            constraintScores: activityScore.constraintScores,
-            interval: activityScore.interval,
-            score: activityScore.score,
-          },
-        ]
+  const intervals = getActivityGroupInfo(activityScore)
 
   const intervalView = intervals.map((agi, i) => (
     <div
@@ -93,6 +85,20 @@ export default function SuggestedActivity({
       </SuggestedActivityContent>
     </>
   )
+}
+
+export function getActivityGroupInfo(
+  activityScore: EnrichedActivityScore,
+): ActivityGroupInfo[] {
+  return 'intervals' in activityScore
+    ? activityScore.intervals!.slice(0, INTERVAL_LIMIT)
+    : [
+        {
+          constraintScores: activityScore.constraintScores,
+          interval: activityScore.interval,
+          score: activityScore.score,
+        },
+      ]
 }
 
 const renderScore = (score: number) => {

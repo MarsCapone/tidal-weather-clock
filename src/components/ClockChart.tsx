@@ -132,9 +132,15 @@ export default function ClockChart({
     const angle = (totalMinutes / 720) * 360 - 90 // Convert to degrees from 12 o'clock
     const radian = (angle * Math.PI) / 180
 
+    const [outsideTip, insideTip] = [2, 50]
+
     // Swap the tip and base positions
-    const tipRadius = pointer.isOutside ? clockRadius + 2 : clockRadius - 22
-    const baseRadius = pointer.isOutside ? clockRadius + 10 : clockRadius - 30
+    const tipRadius = pointer.isOutside
+      ? clockRadius + outsideTip
+      : clockRadius - insideTip
+    const baseRadius = pointer.isOutside
+      ? clockRadius + (outsideTip + 8)
+      : clockRadius - (insideTip + 8)
 
     const [tipX, tipY] = getPlusMinusPoint(
       [centerX, centerY],
@@ -150,7 +156,9 @@ export default function ClockChart({
 
     const pathData = `M ${tipX} ${tipY} L ${base1X} ${base1Y} L ${base2X} ${base2Y} Z`
 
-    const labelRadius = pointer.isOutside ? clockRadius + 15 : clockRadius - 32
+    const labelRadius = pointer.isOutside
+      ? clockRadius + (outsideTip + 15)
+      : clockRadius - (insideTip + 15)
     const [labelX, labelY] = getPlusMinusPoint(
       [centerX, centerY],
       labelRadius,
