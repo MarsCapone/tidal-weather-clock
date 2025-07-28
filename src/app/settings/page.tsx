@@ -1,5 +1,6 @@
 'use client'
 
+import ActivitySettings from '@/app/settings/components/ActivitySettings'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -7,7 +8,7 @@ export default function Page() {
   const [hash, setHash] = useState('#activities')
 
   const links = [
-    { Component: LongComponent, id: 'activities', label: 'Activities' },
+    { Component: ActivitySettings, id: 'activities', label: 'Activities' },
     { id: 'more settings', label: 'More settings' },
   ]
 
