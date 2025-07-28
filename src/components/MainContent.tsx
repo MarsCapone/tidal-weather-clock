@@ -34,10 +34,7 @@ export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
     },
   })
   return (
-    <div
-      {...handlers}
-      className="mx-auto flex min-w-full flex-col justify-center gap-10 p-8 text-center md:min-w-0"
-    >
+    <div {...handlers}>
       <DatePagination date={date} nextPath={nextPath} prevPath={prevPath} />
       <MainContentWithoutDate date={date} />
     </div>
