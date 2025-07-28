@@ -41,8 +41,12 @@ export default function WeatherStatus({
 function WeatherStatusRow({ Icon, label, values }: DataTableRow) {
   return (
     <li className="list-row items-center">
-      <div>{Icon && <Icon height={36} width={36} />}</div>
-      <div>
+      <div className="list-col-grow flex flex-row items-center justify-start gap-x-2 md:flex-col lg:flex-row">
+        {Icon && (
+          <div>
+            <Icon height={36} width={36} />
+          </div>
+        )}
         <div>{label}</div>
       </div>
       <div>
