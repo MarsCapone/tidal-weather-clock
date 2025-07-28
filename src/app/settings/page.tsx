@@ -1,13 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { Component, useEffect, useState } from 'react'
+import { useState } from 'react'
 
 export default function Page() {
   const [hash, setHash] = useState('#activities')
 
   const links = [
-    { id: 'activities', label: 'Activities', Component: LongComponent },
+    { Component: LongComponent, id: 'activities', label: 'Activities' },
     { id: 'more settings', label: 'More settings' },
   ]
 
@@ -21,13 +21,13 @@ export default function Page() {
 
             return (
               <li
-                key={`link-${link.id}`}
                 className={link.Component === undefined ? 'menu-disabled' : ''}
+                key={`link-${link.id}`}
               >
                 <Link
+                  className={hash === linkHash ? 'menu-active' : ''}
                   href={linkHash}
                   onClick={() => setHash(linkHash)}
-                  className={hash === linkHash ? 'menu-active' : ''}
                 >
                   {link.label}
                 </Link>
@@ -37,10 +37,10 @@ export default function Page() {
         </ul>
       </div>
       <div className="w-1/2">
-        {links.map(({ id, Component }) => {
+        {links.map(({ Component, id }) => {
           if (Component) {
             return (
-              <div key={`content-${id}`} id={id}>
+              <div id={id} key={`content-${id}`}>
                 <Component />
               </div>
             )
