@@ -23,7 +23,21 @@ import { useSwipeable } from 'react-swipeable'
 export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
   const router = useRouter()
   const handlers = useSwipeable({
-    onSwiped: ({ dir }) => {
+    onSwiped: ({ event, dir }) => {
+      if (event.target !== null && event.target !== undefined) {
+        const modals = document.getElementsByClassName('modal')
+        for (let i = 0; i < modals.length; i++) {
+          if (modals[i].contains(event.target as Node)) {
+            logger.debug('not changing page because dialog is open', {
+              dialog: modals[i],
+              target: event.target,
+            })
+            // a dialog is open, so don't do the usual action
+            return
+          }
+        }
+      }
+
       // swipe left means you want to see what's on the right, i.e. next
       if (nextPath && dir === 'Left') {
         router.push(nextPath)
