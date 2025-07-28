@@ -13,18 +13,18 @@ export default function Page() {
           <p>
             Activities can be configured with various constraints. Then tide,
             sun, wind, and weather information is pulled from the{' '}
-            <a href="https://stormglass.io/" className="link">
+            <a className="link" href="https://stormglass.io/">
               Stormglass API
             </a>
             .
           </p>
           <p>
             Each day all constraints are evaluated against the latest data, and
-            the "best" suggestion is given.
+            the &quot;best&quot; suggestion is given.
           </p>
           <p className="text-xs">
             Created by{' '}
-            <a href="https://github.com/MarsCapone" className="link">
+            <a className="link" href="https://github.com/MarsCapone">
               Samson Ventura-Danziger
             </a>
           </p>
