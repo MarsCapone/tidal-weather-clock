@@ -63,14 +63,7 @@ export default function SuggestedActivity({
         </div>
         <div className="card-actions">
           <div className="w-full">
-            <div className="flex flex-col items-center gap-y-2 lg:hidden">
-              <ExplainButton selection={activityScore} />
-              <div className="join">
-                {prevButton}
-                {nextButton}
-              </div>
-            </div>
-            <div className="hidden flex-row justify-between gap-x-2 lg:flex">
+            <div className="flex flex-row justify-between gap-x-2">
               {prevButton}
               <ExplainButton selection={activityScore} />
               {nextButton}
