@@ -254,7 +254,7 @@ export default function ClockChart({
     .flatMap((range) => {
       // ensure the startHour and endHour are within 0-12 range
       // Normalize hours to 0-12 range
-      if (range.startHour < 12 && range.endHour > 12) {
+      if (range.startHour < 12 && range.endHour >= 12) {
         // If the range crosses noon, adjust the hours
         return [
           {
