@@ -23,7 +23,7 @@ import { useSwipeable } from 'react-swipeable'
 export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
   const router = useRouter()
   const handlers = useSwipeable({
-    onSwiped: ({ event, dir }) => {
+    onSwiped: ({ dir, event }) => {
       if (event.target !== null && event.target !== undefined) {
         const modals = document.getElementsByClassName('modal')
         for (let i = 0; i < modals.length; i++) {
