@@ -16,19 +16,19 @@ export default function DatePagination({
   return (
     <div>
       <div className="join">
-        <div className={`join-item btn ${!prevPath ? 'btn-disabled' : ''}`}>
-          <Link href={prevPath || '/public'}>
+        <Link href={prevPath || '/public'}>
+          <div className={`join-item btn ${!prevPath ? 'btn-disabled' : ''}`}>
             <ChevronLeftIcon height={20} width={20} />
-          </Link>
-        </div>
+          </div>
+        </Link>
         <div className="join-item btn btn-disabled bg-primary text-base-content">
           {format(date, 'PPPP')}
         </div>
-        <div className={`join-item btn ${!nextPath ? 'btn-disabled' : ''}`}>
-          <Link href={nextPath || '/public'}>
+        <Link href={nextPath || '/public'}>
+          <div className={`join-item btn ${!nextPath ? 'btn-disabled' : ''}`}>
             <ChevronRightIcon height={20} width={20} />
-          </Link>
-        </div>
+          </div>
+        </Link>
       </div>
     </div>
   )
