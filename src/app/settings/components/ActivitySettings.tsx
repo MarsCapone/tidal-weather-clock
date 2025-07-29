@@ -57,25 +57,34 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
               readOnly={!editable}
             />
           </div>
-          <button className="btn btn-ghost rounded-field aspect-square p-1">
-            <PlusIcon className="h-4 w-4" />
-          </button>
-          <button
-            className={`btn ${editable ? 'btn-accent' : 'btn-ghost'} rounded-field aspect-square p-1`}
-            onClick={onEdit}
+          <div className="tooltip tooltip-bottom" data-tip="Add constraint">
+            <button className="btn btn-ghost rounded-field aspect-square p-1">
+              <PlusIcon className="h-4 w-4" />
+            </button>
+          </div>
+          <div
+            className="tooltip tooltip-bottom"
+            data-tip={editable ? 'Save' : 'Edit'}
           >
-            {editable ? (
-              <SaveIcon className="h-4 w-4" />
-            ) : (
-              <PencilIcon className="h-4 w-4" />
-            )}
-          </button>
-          <button
-            className="btn btn-ghost rounded-field aspect-square p-1"
-            onClick={onDelete}
-          >
-            <TrashIcon className="h-4 w-4" />
-          </button>
+            <button
+              className={`btn ${editable ? 'btn-accent' : 'btn-ghost'} rounded-field aspect-square p-1`}
+              onClick={onEdit}
+            >
+              {editable ? (
+                <SaveIcon className="h-4 w-4" />
+              ) : (
+                <PencilIcon className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+          <div className="tooltip tooltip-bottom" data-tip="Delete activity">
+            <button
+              className="btn btn-ghost rounded-field aspect-square p-1"
+              onClick={onDelete}
+            >
+              <TrashIcon className="h-4 w-4" />
+            </button>
+          </div>
         </div>
         <div>
           <input
