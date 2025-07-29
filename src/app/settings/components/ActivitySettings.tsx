@@ -4,6 +4,7 @@ import { APP_CONFIG } from '@/config'
 import { useActivities } from '@/hooks/useApiRequest'
 import { Activity, Constraint } from '@/types/activity'
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/solid'
+import { SaveIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export default function ActivitySettings() {
@@ -39,18 +40,32 @@ type ActivityCardProps = {
 }
 
 function ActivityCard({ activity, onDelete }: ActivityCardProps) {
-  const onEdit = () => {}
+  const [editable, setEditable] = useState(false)
+  const onEdit = () => {
+    setEditable(!editable)
+  }
 
   return (
     <div className="card card-lg my-2 shadow-sm">
       <div className="card-body">
         <div className="card-title flex flex-row justify-between">
-          <div className="flex-1">{activity.name}</div>
+          <div className="flex-1">
+            <input
+              type="text"
+              className={`input input-lg ${editable ? '' : 'input-ghost'} focus:border-none`}
+              defaultValue={activity.name}
+              readOnly={!editable}
+            />
+          </div>
           <button
-            className="btn btn-ghost rounded-field aspect-square p-1"
+            className={`btn ${editable ? 'btn-accent' : 'btn-ghost'} rounded-field aspect-square p-1`}
             onClick={onEdit}
           >
-            <PencilIcon className="h-4 w-4" />
+            {editable ? (
+              <SaveIcon className="h-4 w-4" />
+            ) : (
+              <PencilIcon className="h-4 w-4" />
+            )}
           </button>
           <button
             className="btn btn-ghost rounded-field aspect-square p-1"
@@ -59,7 +74,14 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
             <TrashIcon className="h-4 w-4" />
           </button>
         </div>
-        <div>{activity.description}</div>
+        <div>
+          <input
+            type="text"
+            className={`input input-md w-full ${editable ? '' : 'input-ghost'}`}
+            defaultValue={activity.description}
+            readOnly={!editable}
+          />
+        </div>
         <div
           tabIndex={0}
           className="collapse-arrow bg-base-100 border-base-content/20 collapse border"
