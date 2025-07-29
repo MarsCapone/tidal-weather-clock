@@ -27,10 +27,27 @@ function ActivityCard({ activity }: ActivityCardProps) {
       <div className="card-body">
         <div className="card-title">{activity.name}</div>
         <div>{activity.description}</div>
-        <div>
-          {activity.constraints.map((constraint) => (
-            <ActivityConstraint constraint={constraint} />
-          ))}
+        <div
+          tabIndex={0}
+          className="collapse-arrow bg-base-100 border-base-content/20 collapse border"
+        >
+          <div className="collapse-title font-semibold">
+            Show constraints{' '}
+            <div className="badge badge-sm badge-secondary">
+              {activity.constraints.length}
+            </div>
+          </div>
+          <div className="collapse-content">
+            <div className="text-xs">
+              Each of these constraints will be scored from 0 to 1 based on the
+              available daily data.
+            </div>
+            <div>
+              {activity.constraints.map((constraint) => (
+                <ActivityConstraint constraint={constraint} />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -42,5 +59,5 @@ type ActivityConstraintProps = {
 }
 
 function ActivityConstraint({ constraint }: ActivityConstraintProps) {
-  return <div>{JSON.stringify(constraint, null, 2)}</div>
+  return <div className="text-sm">{JSON.stringify(constraint, null, 2)}</div>
 }
