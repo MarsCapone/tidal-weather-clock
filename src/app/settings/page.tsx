@@ -13,9 +13,9 @@ export default function Page() {
   ]
 
   return (
-    <div className="flex flex-row justify-center text-start">
-      <div className="w-1/4">
-        <div className="sticky top-10 flex w-56 flex-col gap-4">
+    <div className="flex flex-row justify-center gap-8 text-start">
+      <div className="hidden w-1/4 lg:block">
+        <div className="sticky top-10 flex w-full flex-col gap-4">
           <ul className="menu bg-base-200 rounded-box w-full">
             <li className="menu-title">Settings</li>
             {links.map((link) => {
@@ -41,7 +41,7 @@ export default function Page() {
           </ul>
         </div>
       </div>
-      <div className="w-1/2">
+      <div className="w-full lg:w-1/2">
         {links.map(({ Component, id }) => {
           if (Component) {
             return (

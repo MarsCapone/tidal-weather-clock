@@ -3,6 +3,7 @@
 import { APP_CONFIG } from '@/config'
 import { useActivities } from '@/hooks/useApiRequest'
 import { Activity, Constraint } from '@/types/activity'
+import { PencilIcon, TrashIcon } from '@heroicons/react/24/solid'
 
 export default function ActivitySettings() {
   const activities = useActivities(APP_CONFIG.activityFetcher)
@@ -25,7 +26,11 @@ function ActivityCard({ activity }: ActivityCardProps) {
   return (
     <div className="card card-lg my-2 shadow-sm">
       <div className="card-body">
-        <div className="card-title">{activity.name}</div>
+        <div className="card-title flex flex-row justify-between">
+          <div className="flex-1">{activity.name}</div>
+          <PencilIcon className="h-4 w-4" />
+          <TrashIcon className="h-4 w-4" />
+        </div>
         <div>{activity.description}</div>
         <div
           tabIndex={0}
