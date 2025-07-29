@@ -11,16 +11,16 @@ const classNamesToString = (v: string | string[] | undefined) => {
 }
 
 type FieldsetProps = {
-  label: string
   fieldsetClasses?: string | string[]
+  label: string
   optional?: boolean
 }
 
 export function Fieldset({
-  label,
-  fieldsetClasses,
-  optional,
   children,
+  fieldsetClasses,
+  label,
+  optional,
 }: FieldsetProps & { children: React.ReactNode }) {
   return (
     <fieldset className={`fieldset ${classNamesToString(fieldsetClasses)}`}>
@@ -32,33 +32,32 @@ export function Fieldset({
 }
 
 type InputProps = FieldsetProps & {
-  type?: HTMLInputElement['type']
   defaultValue?: HTMLInputElement['defaultValue']
   inputClasses?: string | string[]
   readonly?: boolean
+  type?: HTMLInputElement['type']
 }
 
 export function Input({
-  optional,
-  type,
-  label,
   defaultValue,
-  inputClasses,
   fieldsetClasses,
+  inputClasses,
+  label,
+  optional,
   readonly,
+  type,
 }: InputProps) {
   return (
     <Fieldset
-      label={label}
       fieldsetClasses={fieldsetClasses}
+      label={label}
       optional={optional}
-      readonly={readonly}
     >
       <input
-        type={type || 'text'}
         className={`input ${classNamesToString(inputClasses)}`}
         defaultValue={defaultValue}
         readOnly={readonly}
+        type={type || 'text'}
       />
     </Fieldset>
   )
@@ -69,30 +68,29 @@ type PrefixSuffixInputProps = InputProps & {
   suffix?: string | React.ReactNode
 }
 export function PrefixSuffixInput({
-  optional,
-  type,
-  label,
   defaultValue,
-  inputClasses,
   fieldsetClasses,
-  readonly,
+  inputClasses,
+  label,
+  optional,
   prefix,
+  readonly,
   suffix,
+  type,
 }: PrefixSuffixInputProps) {
   return (
     <Fieldset
-      label={label}
       fieldsetClasses={fieldsetClasses}
+      label={label}
       optional={optional}
-      readonly={readonly}
     >
       <label className={`input ${classNamesToString(inputClasses)}`}>
         {prefix}
         <input
-          type={type || 'text'}
           className={`grow`}
           defaultValue={defaultValue}
           readOnly={readonly}
+          type={type || 'text'}
         />
         {suffix}
       </label>

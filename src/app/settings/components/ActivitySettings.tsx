@@ -16,15 +16,9 @@ import {
   WeatherConstraint,
   WindConstraint,
 } from '@/types/activity'
-import { fractionalTimeToString, withFractionalTime } from '@/utils/dates'
+import { fractionalTimeToString } from '@/utils/dates'
 import { capitalize } from '@/utils/string'
-import {
-  ClockIcon,
-  PencilIcon,
-  PlusIcon,
-  SaveIcon,
-  TrashIcon,
-} from 'lucide-react'
+import { PencilIcon, PlusIcon, SaveIcon, TrashIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export default function ActivitySettings() {
@@ -41,11 +35,11 @@ export default function ActivitySettings() {
   const addActivity = () => {
     setActivities([
       {
+        constraints: [],
+        description: '',
         id: `abc-${activities.length + 1}`,
         name: 'random name',
-        description: '',
         priority: 5,
-        constraints: [],
       },
       ...activities,
     ])
@@ -61,8 +55,8 @@ export default function ActivitySettings() {
       </div>
       {activities.map((activity) => (
         <ActivityCard
-          key={activity.id}
           activity={activity}
+          key={activity.id}
           onDelete={() => {
             onDeleteActivity(activity.id)
           }}
@@ -89,10 +83,10 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
         <div className="card-title flex flex-row justify-between">
           <div className="flex-1">
             <input
-              type="text"
               className={`input input-lg ${editable ? '' : 'input-ghost'}`}
               defaultValue={activity.name}
               readOnly={!editable}
+              type="text"
             />
           </div>
           <div className="tooltip tooltip-bottom" data-tip="Add constraint">
@@ -126,18 +120,19 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
         </div>
         <div>
           <input
-            type="text"
             className={`input input-md w-full ${editable ? '' : 'input-ghost'}`}
             defaultValue={activity.description}
             readOnly={!editable}
+            type="text"
           />
         </div>
         <div className="flex flex-col gap-2">
           {activity.constraints.map((constraint, i) => (
             <ActivityConstraint
-              key={`${i}:${constraint.type}`}
+              constraintId={`${i}:${constraint.type}`}
               constraint={constraint}
               editable={editable}
+              key={`${i}:${constraint.type}`}
             />
           ))}
         </div>
@@ -146,15 +141,20 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
   )
 }
 
-type ActivityConstraintProps<T> = {
-  editable: boolean
+type ConstraintControlsProps<T> = {
   constraint: T
+  editable: boolean
+}
+
+type ActivityConstraintProps = ConstraintControlsProps<Constraint> & {
+  constraintId: string
 }
 
 function ActivityConstraint({
   constraint,
+  constraintId,
   editable,
-}: ActivityConstraintProps<Constraint>) {
+}: ActivityConstraintProps) {
   let controls
 
   switch (constraint.type) {
@@ -192,15 +192,20 @@ function ActivityConstraint({
 
   return (
     <div>
-      <div className={'text-sm font-bold'}>
-        {capitalize(constraint.type)} Constraint
+      <div className="flex flex-row justify-between">
+        <div className={'text-sm font-bold'}>
+          {capitalize(constraint.type)} Constraint
+        </div>
+        <div className="badge badge-info ml-4 font-mono text-xs font-thin">
+          {constraintId}
+        </div>
       </div>
       {controls}
     </div>
   )
 }
 
-type TimeConstraintControlsProps = ActivityConstraintProps<TimeConstraint>
+type TimeConstraintControlsProps = ConstraintControlsProps<TimeConstraint>
 
 function TimeConstraintControls({
   constraint,
@@ -209,72 +214,72 @@ function TimeConstraintControls({
   return (
     <div className="flex flex-row gap-2">
       <PrefixSuffixInput
-        optional={true}
-        type="time"
-        label="Earliest time"
         defaultValue={fractionalTimeToString(constraint.earliestHour)}
+        label="Earliest time"
+        optional={true}
         readonly={!editable}
+        type="time"
       />
       <PrefixSuffixInput
-        optional={true}
-        type="time"
-        label="Latest time"
         defaultValue={fractionalTimeToString(constraint.latestHour)}
+        label="Latest time"
+        optional={true}
         readonly={!editable}
+        type="time"
       />
       <Input
-        optional={true}
-        type="text"
-        label="Preferred hours"
         defaultValue={constraint.preferredHours?.join(', ')}
         fieldsetClasses={'w-1/3'}
+        label="Preferred hours"
+        optional={true}
         readonly={!editable}
+        type="text"
       />
     </div>
   )
 }
 
-type SunConstraintControlsProps = ActivityConstraintProps<SunConstraint>
+type SunConstraintControlsProps = ConstraintControlsProps<SunConstraint>
 
 function SunConstraintControls({
-  editable,
   constraint,
+  editable,
 }: SunConstraintControlsProps) {
   return (
     <div className="flex flex-row justify-start gap-2">
       <Input
-        label={'Maximum hours before sunset'}
-        type="number"
         defaultValue={constraint.maxHoursBeforeSunset?.toString() || '0'}
+        fieldsetClasses={'w-1/4'}
+        label={'Maximum hours before sunset'}
         optional={true}
         readonly={!editable}
-        fieldsetClasses={'w-1/4'}
+        type="number"
       />
       <Input
-        label={'Minimum hours after sunrise'}
-        type="number"
         defaultValue={constraint.minHoursAfterSunrise?.toString() || '0'}
+        fieldsetClasses={'w-1/4'}
+        label={'Minimum hours after sunrise'}
         optional={true}
         readonly={!editable}
-        fieldsetClasses={'w-1/4'}
+        type="number"
       />
       <label className="label mt-2">
         <input
-          type="checkbox"
-          defaultChecked={constraint.requiresDaylight || false}
           className="checkbox checkbox-xl rounded-field"
-          readOnly={!editable}
+          defaultChecked={constraint.requiresDaylight || false}
           disabled={!editable}
+          readOnly={!editable}
+          type="checkbox"
         />
         Requires daylight
       </label>
       <label className="label mt-2">
         <input
-          type="checkbox"
-          defaultChecked={constraint.requiresDarkness || false}
           className="checkbox checkbox-xl rounded-field"
-          readOnly={!editable}
+          defaultChecked={constraint.requiresDarkness || false}
           disabled={!editable}
+          readOnly={!editable}
+          type="checkbox"
         />
         Requires darkness
       </label>
@@ -282,7 +287,7 @@ function SunConstraintControls({
   )
 }
 
-type TideConstraintControlsProps = ActivityConstraintProps<TideConstraint>
+type TideConstraintControlsProps = ConstraintControlsProps<TideConstraint>
 
 function TideConstraintControls({
   constraint,
@@ -292,98 +297,98 @@ function TideConstraintControls({
     <div>
       <div className="flex flex-row justify-start gap-2">
         <PrefixSuffixInput
-          optional={true}
-          type="number"
+          defaultValue={constraint.minHeight?.toString()}
           label="Min height"
-          defaultValue={constraint.minHeight}
+          optional={true}
           readonly={!editable}
           suffix={'m'}
+          type="number"
         />
         <PrefixSuffixInput
-          optional={true}
-          type="number"
+          defaultValue={constraint.maxHeight?.toString()}
           label="Max height"
-          defaultValue={constraint.maxHeight}
+          optional={true}
           readonly={!editable}
           suffix={'m'}
+          type="number"
         />
         <Input
-          optional={true}
-          type="text"
-          label="Preferred States"
           defaultValue={constraint.preferredStates?.join(', ')}
+          label="Preferred States"
+          optional={true}
           readonly={!editable}
+          type="text"
         />
       </div>
       <div className="text-xs font-bold">Time from tide event</div>
       <div className="flex flex-row justify-start gap-2">
         <Fieldset label={'Event type'}>
-          <select defaultValue="Event" className="select" disabled={!editable}>
-            <option selected={constraint.timeFromTideEvent?.event === 'high'}>
-              High
-            </option>
-            <option selected={constraint.timeFromTideEvent?.event === 'low'}>
-              Low
-            </option>
+          <select
+            className="select"
+            defaultValue={constraint.timeFromTideEvent?.event}
+            disabled={!editable}
+          >
+            <option>High</option>
+            <option>Low</option>
           </select>
         </Fieldset>
         <Input
-          optional={true}
-          type="text"
-          label="Event"
           defaultValue={constraint.timeFromTideEvent?.event}
+          label="Event"
+          optional={true}
           readonly={!editable}
+          type="text"
         />
         <PrefixSuffixInput
-          optional={true}
-          type="number"
+          defaultValue={constraint.timeFromTideEvent?.maxHoursAfter?.toString()}
           label="Maximum hours after"
-          defaultValue={constraint.timeFromTideEvent?.maxHoursAfter}
+          optional={true}
           readonly={!editable}
           suffix={'hours'}
+          type="number"
         />
         <PrefixSuffixInput
-          optional={true}
-          type="number"
+          defaultValue={constraint.timeFromTideEvent?.maxHoursBefore?.toString()}
           label="Maximum hours before"
-          defaultValue={constraint.timeFromTideEvent?.maxHoursBefore}
+          optional={true}
           readonly={!editable}
           suffix={'hours'}
+          type="number"
         />
       </div>
     </div>
   )
 }
 
-type WeatherConstraintControlsProps = ActivityConstraintProps<WeatherConstraint>
+type WeatherConstraintControlsProps = ConstraintControlsProps<WeatherConstraint>
 
 function WeatherConstraintControls({
   constraint,
   editable,
 }: WeatherConstraintControlsProps) {
   const fields = [
-    { label: 'Max cloud cover', field: constraint.maxCloudCover, suffix: '%' },
-    { label: 'Maximum temperature', field: constraint.maxTemperature },
-    { label: 'Minimum temperature', field: constraint.minTemperature },
+    { field: constraint.maxCloudCover, label: 'Max cloud cover', suffix: '%' },
+    { field: constraint.maxTemperature, label: 'Maximum temperature' },
+    { field: constraint.minTemperature, label: 'Minimum temperature' },
   ]
   return (
     <div className="flex flex-row justify-start gap-2">
-      {fields.map(({ label, field, suffix }) => (
+      {fields.map(({ field, label, suffix }) => (
         <PrefixSuffixInput
+          defaultValue={field?.toString() || '0'}
           key={label}
           label={label}
-          type="number"
-          defaultValue={field?.toString() || '0'}
           optional={true}
           readonly={!editable}
           suffix={suffix}
+          type="number"
         />
       ))}
     </div>
   )
 }
 
-type WindConstraintControlsProps = ActivityConstraintProps<WindConstraint>
+type WindConstraintControlsProps = ConstraintControlsProps<WindConstraint>
 
 function WindConstraintControls({
   constraint,
@@ -391,25 +396,25 @@ function WindConstraintControls({
 }: WindConstraintControlsProps) {
   const fields = [
     {
-      label: 'Direction tolerance',
       field: constraint.directionTolerance,
+      label: 'Direction tolerance',
       suffix: 'degrees',
     },
-    { label: 'Max gust speed', field: constraint.maxGustSpeed, suffix: 'm/s' },
-    { label: 'Max speed', field: constraint.maxSpeed, suffix: 'm/s' },
-    { label: 'Min speed', field: constraint.minSpeed, suffix: 'm/s' },
+    { field: constraint.maxGustSpeed, label: 'Max gust speed', suffix: 'm/s' },
+    { field: constraint.maxSpeed, label: 'Max speed', suffix: 'm/s' },
+    { field: constraint.minSpeed, label: 'Min speed', suffix: 'm/s' },
   ]
   return (
     <div className="flex flex-row justify-start gap-2">
-      {fields.map(({ label, field, suffix }) => (
+      {fields.map(({ field, label, suffix }) => (
         <PrefixSuffixInput
+          defaultValue={field?.toString() || '0'}
           key={label}
           label={label}
-          type="number"
-          defaultValue={field?.toString() || '0'}
           optional={true}
           readonly={!editable}
           suffix={suffix}
+          type="number"
         />
       ))}
     </div>
