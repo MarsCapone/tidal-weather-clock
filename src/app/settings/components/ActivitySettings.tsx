@@ -73,8 +73,13 @@ type ActivityCardProps = {
 
 function ActivityCard({ activity, onDelete }: ActivityCardProps) {
   const [editable, setEditable] = useState(false)
+  const [constraints, setConstraints] = useState(activity.constraints)
   const onEdit = () => {
     setEditable(!editable)
+  }
+
+  const onAdd = () => {
+    setConstraints([...constraints, { type: 'tide' }])
   }
 
   return (
@@ -90,7 +95,10 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
             />
           </div>
           <div className="tooltip tooltip-bottom" data-tip="Add constraint">
-            <button className="btn btn-ghost rounded-field aspect-square p-1">
+            <button
+              className="btn btn-ghost hover:btn-primary rounded-field aspect-square p-1"
+              onClick={onAdd}
+            >
               <PlusIcon className="h-4 w-4" />
             </button>
           </div>
@@ -111,7 +119,7 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
           </div>
           <div className="tooltip tooltip-bottom" data-tip="Delete activity">
             <button
-              className="btn btn-ghost rounded-field aspect-square p-1"
+              className="btn btn-ghost hover:btn-error rounded-field aspect-square p-1"
               onClick={onDelete}
             >
               <TrashIcon className="h-4 w-4" />
@@ -127,12 +135,15 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
           />
         </div>
         <div className="flex flex-col gap-2">
-          {activity.constraints.map((constraint, i) => (
+          {constraints.map((constraint, i) => (
             <ActivityConstraint
               constraint={constraint}
               constraintId={`${i}:${constraint.type}`}
               editable={editable}
               key={`${i}:${constraint.type}`}
+              onDelete={() => {
+                setConstraints(activity.constraints.filter((c, j) => i !== j))
+              }}
             />
           ))}
         </div>
@@ -148,12 +159,14 @@ type ConstraintControlsProps<T> = {
 
 type ActivityConstraintProps = ConstraintControlsProps<Constraint> & {
   constraintId: string
+  onDelete: () => void
 }
 
 function ActivityConstraint({
   constraint,
   constraintId,
   editable,
+  onDelete,
 }: ActivityConstraintProps) {
   let controls
 
@@ -192,13 +205,19 @@ function ActivityConstraint({
 
   return (
     <div>
-      <div className="flex flex-row justify-between">
-        <div className={'text-sm font-bold'}>
+      <div className="flex flex-row justify-between gap-2">
+        <div className={'flex-1 text-sm font-bold'}>
           {capitalize(constraint.type)} Constraint
         </div>
         <div className="badge badge-info ml-4 font-mono text-xs font-thin">
           {constraintId}
         </div>
+        <button
+          className="btn btn-xs hover:btn-error rounded-box"
+          onClick={onDelete}
+        >
+          <TrashIcon className="h-4 w-4" />
+        </button>
       </div>
       {controls}
     </div>
