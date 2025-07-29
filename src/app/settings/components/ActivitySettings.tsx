@@ -129,8 +129,8 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
         <div className="flex flex-col gap-2">
           {activity.constraints.map((constraint, i) => (
             <ActivityConstraint
-              constraintId={`${i}:${constraint.type}`}
               constraint={constraint}
+              constraintId={`${i}:${constraint.type}`}
               editable={editable}
               key={`${i}:${constraint.type}`}
             />
