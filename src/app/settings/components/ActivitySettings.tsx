@@ -3,7 +3,12 @@
 import { LabelledInput } from '@/components/forms/FormComponents'
 import { APP_CONFIG } from '@/config'
 import { useActivities } from '@/hooks/useApiRequest'
-import { Activity, Constraint, TimeConstraint } from '@/types/activity'
+import {
+  Activity,
+  Constraint,
+  SunConstraint,
+  TimeConstraint,
+} from '@/types/activity'
 import { fractionalTimeToString, withFractionalTime } from '@/utils/dates'
 import { capitalize } from '@/utils/string'
 import { PencilIcon, PlusIcon, SaveIcon, TrashIcon } from 'lucide-react'
@@ -110,18 +115,26 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
   )
 }
 
-type ActivityConstraintProps = {
+type ActivityConstraintProps<T> = {
   editable: boolean
-  constraint: Constraint
+  constraint: T
 }
 
-function ActivityConstraint({ constraint, editable }: ActivityConstraintProps) {
+function ActivityConstraint({
+  constraint,
+  editable,
+}: ActivityConstraintProps<Constraint>) {
   let controls
 
   switch (constraint.type) {
     case 'time':
       controls = (
         <TimeConstraintControls constraint={constraint} editable={editable} />
+      )
+      break
+    case 'sun':
+      controls = (
+        <SunConstraintControls constraint={constraint} editable={editable} />
       )
       break
     default:
@@ -138,15 +151,12 @@ function ActivityConstraint({ constraint, editable }: ActivityConstraintProps) {
   )
 }
 
-type TimeConstraintViewProps = {
-  editable: boolean
-  constraint: TimeConstraint
-}
+type TimeConstraintControlsProps = ActivityConstraintProps<TimeConstraint>
 
 function TimeConstraintControls({
   constraint,
   editable,
-}: TimeConstraintViewProps) {
+}: TimeConstraintControlsProps) {
   return (
     <div className="flex flex-row gap-2">
       <LabelledInput
@@ -163,7 +173,6 @@ function TimeConstraintControls({
         type="time"
         label="Latest time"
         defaultValue={fractionalTimeToString(constraint.latestHour)}
-        inputClasses={editable ? '' : 'input-ghost'}
         fieldsetClasses={'w-1/3'}
         readonly={!editable}
       />
@@ -172,10 +181,57 @@ function TimeConstraintControls({
         type="text"
         label="Preferred hours"
         defaultValue={constraint.preferredHours?.join(', ')}
-        inputClasses={editable ? '' : 'input-ghost'}
         fieldsetClasses={'w-1/3'}
         readonly={!editable}
       />
+    </div>
+  )
+}
+
+type SunConstraintControlsProps = ActivityConstraintProps<SunConstraint>
+
+function SunConstraintControls({
+  editable,
+  constraint,
+}: SunConstraintControlsProps) {
+  return (
+    <div className="flex flex-row justify-between gap-2">
+      <LabelledInput
+        label={'Maximum hours before sunset'}
+        type="number"
+        defaultValue={constraint.maxHoursBeforeSunset?.toString() || '0'}
+        optional={true}
+        readonly={!editable}
+        fieldsetClasses={'w-1/4'}
+      />
+      <LabelledInput
+        label={'Minimum hours after sunrise'}
+        type="number"
+        defaultValue={constraint.minHoursAfterSunrise?.toString() || '0'}
+        optional={true}
+        readonly={!editable}
+        fieldsetClasses={'w-1/4'}
+      />
+      <label className="label mt-2">
+        <input
+          type="checkbox"
+          defaultChecked={constraint.requiresDaylight || false}
+          className="checkbox checkbox-xl rounded-field"
+          readOnly={!editable}
+          disabled={!editable}
+        />
+        Requires daylight
+      </label>
+      <label className="label mt-2">
+        <input
+          type="checkbox"
+          defaultChecked={constraint.requiresDarkness || false}
+          className="checkbox checkbox-xl rounded-field"
+          readOnly={!editable}
+          disabled={!editable}
+        />
+        Requires darkness
+      </label>
     </div>
   )
 }

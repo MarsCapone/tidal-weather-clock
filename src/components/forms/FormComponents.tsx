@@ -32,7 +32,7 @@ export function LabelledInput({
       <legend className="fieldset-legend">{label}</legend>
       <input
         type={type || 'text'}
-        className={`input ${classNamesToString(inputClasses)}`}
+        className={`input ${readonly ? 'input-ghost' : ''} ${classNamesToString(inputClasses)}`}
         defaultValue={defaultValue}
         readOnly={readonly}
       />
