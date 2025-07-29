@@ -25,9 +25,27 @@ export default function ActivitySettings() {
     setActivities(activities.filter((item) => item.id !== id))
   }
 
+  const addActivity = () => {
+    setActivities([
+      {
+        id: `abc-${activities.length + 1}`,
+        name: 'random name',
+        description: '',
+        priority: 5,
+        constraints: [],
+      },
+      ...activities,
+    ])
+  }
+
   return (
     <div>
-      <h1 className="text-2xl font-bold">Activity Settings</h1>
+      <div className="mb-4 flex flex-row items-center justify-between">
+        <h1 className="px-4 text-2xl font-bold">Activity Settings</h1>
+        <button className="btn btn-primary rounded-field" onClick={addActivity}>
+          Add Activity <PlusIcon className="h-4 w-4" />
+        </button>
+      </div>
       {activities.map((activity) => (
         <ActivityCard
           key={activity.id}
