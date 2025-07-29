@@ -1,4 +1,4 @@
-import { MoonIcon, SunIcon } from '@heroicons/react/24/solid'
+import { MoonIcon, SunIcon } from 'lucide-react'
 import React from 'react'
 
 export default function ColorschemeToggle() {

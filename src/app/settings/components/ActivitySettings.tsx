@@ -3,8 +3,7 @@
 import { APP_CONFIG } from '@/config'
 import { useActivities } from '@/hooks/useApiRequest'
 import { Activity, Constraint } from '@/types/activity'
-import { PencilIcon, TrashIcon } from '@heroicons/react/24/solid'
-import { PlusIcon, SaveIcon } from 'lucide-react'
+import { PencilIcon, PlusIcon, SaveIcon, TrashIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export default function ActivitySettings() {

@@ -1,5 +1,5 @@
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
 import { format } from 'date-fns'
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
 
 export type DatePaginationProps = {

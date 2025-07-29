@@ -13,7 +13,6 @@
     "start": "next start"
   },
   "dependencies": {
-    "@heroicons/react": "^2.2.0",
     "@neondatabase/serverless": "^1.0.1",
     "array-equal": "^2.0.0",
     "bun-plugin-tailwind": "^0.0.14",
