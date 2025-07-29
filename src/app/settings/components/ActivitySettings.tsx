@@ -11,7 +11,7 @@ export default function ActivitySettings() {
     <div>
       <h1 className="text-2xl font-bold">Activity Settings</h1>
       {activities.map((activity) => (
-        <ActivityCard activity={activity} />
+        <ActivityCard key={activity.id} activity={activity} />
       ))}
     </div>
   )
