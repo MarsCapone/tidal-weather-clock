@@ -4,7 +4,7 @@ import { APP_CONFIG } from '@/config'
 import { useActivities } from '@/hooks/useApiRequest'
 import { Activity, Constraint } from '@/types/activity'
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/solid'
-import { SaveIcon } from 'lucide-react'
+import { PlusIcon, SaveIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export default function ActivitySettings() {
@@ -57,6 +57,9 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
               readOnly={!editable}
             />
           </div>
+          <button className="btn btn-ghost rounded-field aspect-square p-1">
+            <PlusIcon className="h-4 w-4" />
+          </button>
           <button
             className={`btn ${editable ? 'btn-accent' : 'btn-ghost'} rounded-field aspect-square p-1`}
             onClick={onEdit}
@@ -82,30 +85,13 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
             readOnly={!editable}
           />
         </div>
-        <div
-          tabIndex={0}
-          className="collapse-arrow bg-base-100 border-base-content/20 collapse border"
-        >
-          <div className="collapse-title font-semibold">
-            Show constraints{' '}
-            <div className="badge badge-sm badge-secondary">
-              {activity.constraints.length}
-            </div>
-          </div>
-          <div className="collapse-content">
-            <div className="text-xs">
-              Each of these constraints will be scored from 0 to 1 based on the
-              available daily data.
-            </div>
-            <div>
-              {activity.constraints.map((constraint, i) => (
-                <ActivityConstraint
-                  key={`${i}:${constraint.type}`}
-                  constraint={constraint}
-                />
-              ))}
-            </div>
-          </div>
+        <div>
+          {activity.constraints.map((constraint, i) => (
+            <ActivityConstraint
+              key={`${i}:${constraint.type}`}
+              constraint={constraint}
+            />
+          ))}
         </div>
       </div>
     </div>
