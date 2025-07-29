@@ -1,29 +1,42 @@
-export type InputWithDescriptionProps<T> = {
-  description: string
-  placeholder?: T
-  setValue?: (value: string) => void
-  title: string
-  value?: T
+export type LabelledInputProps = {
+  optional?: boolean
+  type?: HTMLInputElement['type']
+  label: string
+  defaultValue?: HTMLInputElement['defaultValue']
+  inputClasses?: string | string[]
+  fieldsetClasses?: string | string[]
+  readonly?: boolean
 }
 
-export function InputWithDescription<T>({
-  description,
-  placeholder,
-  setValue,
-  title,
-  value,
-}: InputWithDescriptionProps<T>) {
+export function LabelledInput({
+  optional,
+  type,
+  label,
+  defaultValue,
+  inputClasses,
+  fieldsetClasses,
+  readonly,
+}: LabelledInputProps) {
+  const classNamesToString = (v: string | string[] | undefined) => {
+    if (v === undefined) {
+      return ''
+    }
+    if (typeof v === 'string') {
+      return v
+    }
+    return v.join(' ')
+  }
+
   return (
-    <fieldset className="fieldset">
-      <legend className="fieldset-legend">{title}</legend>
+    <fieldset className={`fieldset ${classNamesToString(fieldsetClasses)}`}>
+      <legend className="fieldset-legend">{label}</legend>
       <input
-        className="input"
-        onChange={(e) => (setValue ? setValue(e.target.value) : null)}
-        placeholder={String(placeholder)}
-        type="text"
-        value={String(value)}
+        type={type || 'text'}
+        className={`input ${classNamesToString(inputClasses)}`}
+        defaultValue={defaultValue}
+        readOnly={readonly}
       />
-      <label className="label">{description}</label>
+      {optional && !readonly && <p className="label">Optional</p>}
     </fieldset>
   )
 }

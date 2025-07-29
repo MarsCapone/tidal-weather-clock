@@ -1,8 +1,11 @@
 'use client'
 
+import { LabelledInput } from '@/components/forms/FormComponents'
 import { APP_CONFIG } from '@/config'
 import { useActivities } from '@/hooks/useApiRequest'
-import { Activity, Constraint } from '@/types/activity'
+import { Activity, Constraint, TimeConstraint } from '@/types/activity'
+import { fractionalTimeToString, withFractionalTime } from '@/utils/dates'
+import { capitalize } from '@/utils/string'
 import { PencilIcon, PlusIcon, SaveIcon, TrashIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -51,7 +54,7 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
           <div className="flex-1">
             <input
               type="text"
-              className={`input input-lg ${editable ? '' : 'input-ghost'} focus:border-none`}
+              className={`input input-lg ${editable ? '' : 'input-ghost'}`}
               defaultValue={activity.name}
               readOnly={!editable}
             />
@@ -93,11 +96,12 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
             readOnly={!editable}
           />
         </div>
-        <div>
+        <div className="flex flex-col gap-2">
           {activity.constraints.map((constraint, i) => (
             <ActivityConstraint
               key={`${i}:${constraint.type}`}
               constraint={constraint}
+              editable={editable}
             />
           ))}
         </div>
@@ -107,9 +111,71 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
 }
 
 type ActivityConstraintProps = {
+  editable: boolean
   constraint: Constraint
 }
 
-function ActivityConstraint({ constraint }: ActivityConstraintProps) {
-  return <div className="text-sm">{JSON.stringify(constraint, null, 2)}</div>
+function ActivityConstraint({ constraint, editable }: ActivityConstraintProps) {
+  let controls
+
+  switch (constraint.type) {
+    case 'time':
+      controls = (
+        <TimeConstraintControls constraint={constraint} editable={editable} />
+      )
+      break
+    default:
+      controls = null
+  }
+
+  return (
+    <div>
+      <div className={'text-sm font-bold'}>
+        {capitalize(constraint.type)} Constraint
+      </div>
+      {controls}
+    </div>
+  )
+}
+
+type TimeConstraintViewProps = {
+  editable: boolean
+  constraint: TimeConstraint
+}
+
+function TimeConstraintControls({
+  constraint,
+  editable,
+}: TimeConstraintViewProps) {
+  return (
+    <div className="flex flex-row gap-2">
+      <LabelledInput
+        optional={true}
+        type="time"
+        label="Earliest time"
+        defaultValue={fractionalTimeToString(constraint.earliestHour)}
+        inputClasses={editable ? '' : 'input-ghost'}
+        fieldsetClasses={'w-1/3'}
+        readonly={!editable}
+      />
+      <LabelledInput
+        optional={true}
+        type="time"
+        label="Latest time"
+        defaultValue={fractionalTimeToString(constraint.latestHour)}
+        inputClasses={editable ? '' : 'input-ghost'}
+        fieldsetClasses={'w-1/3'}
+        readonly={!editable}
+      />
+      <LabelledInput
+        optional={true}
+        type="text"
+        label="Preferred hours"
+        defaultValue={constraint.preferredHours?.join(', ')}
+        inputClasses={editable ? '' : 'input-ghost'}
+        fieldsetClasses={'w-1/3'}
+        readonly={!editable}
+      />
+    </div>
+  )
 }

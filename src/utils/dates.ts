@@ -39,3 +39,15 @@ export function getFractionalTime(d: Date | string): number {
   const fractionalMinutes = d.getMinutes() / 60
   return hours + fractionalMinutes
 }
+
+export function fractionalTimeToString(
+  time: number | undefined,
+): string | undefined {
+  if (time === undefined) {
+    return undefined
+  }
+  const hours = Math.floor(time)
+  const minutes = (time - hours) * 60
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+}
