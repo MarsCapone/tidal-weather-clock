@@ -322,7 +322,7 @@ function TideConstraintControls({
       </div>
       <div className="text-xs font-bold">Time from tide event</div>
       <div className="flex flex-row justify-start gap-2">
-        <Fieldset label={'Event type'}>
+        <Fieldset fieldsetClasses="min-w-20" label={'Event type'}>
           <select
             className="select"
             defaultValue={constraint.timeFromTideEvent?.event}
