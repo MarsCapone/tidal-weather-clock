@@ -1,4 +1,4 @@
-import { StormglassDataFetcher } from '@/app/api/dataContext/[dateString]/dataContextFetcher'
+import { StormglassDataFetcher } from '@/app/api/dataContext/[dateString]/stormglass'
 import logger from '@/app/api/pinoLogger'
 import CONSTANTS from '@/constants'
 import { DataContext } from '@/types/context'
