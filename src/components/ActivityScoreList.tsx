@@ -9,7 +9,7 @@ import {
   PencilIcon,
   TrashIcon,
   XCircleIcon,
-} from '@heroicons/react/24/solid'
+} from 'lucide-react'
 import { useState } from 'react'
 import { ExplainButton } from './SuggestedActivity'
 

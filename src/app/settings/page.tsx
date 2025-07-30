@@ -1,5 +1,6 @@
 'use client'
 
+import ActivitySettings from '@/app/settings/components/ActivitySettings'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -7,36 +8,40 @@ export default function Page() {
   const [hash, setHash] = useState('#activities')
 
   const links = [
-    { Component: LongComponent, id: 'activities', label: 'Activities' },
+    { Component: ActivitySettings, id: 'activities', label: 'Activities' },
     { id: 'more settings', label: 'More settings' },
   ]
 
   return (
-    <div className="flex flex-row justify-center text-start">
-      <div className="w-1/4">
-        <ul className="menu bg-base-200 rounded-box sticky top-10 w-56">
-          <li className="menu-title">Settings</li>
-          {links.map((link) => {
-            const linkHash = `#${link.id}`
+    <div className="flex flex-row justify-center gap-8 text-start">
+      <div className="hidden w-1/6 lg:block">
+        <div className="sticky top-10 flex w-full flex-col gap-4">
+          <ul className="menu bg-base-200 rounded-box w-full">
+            <li className="menu-title">Settings</li>
+            {links.map((link) => {
+              const linkHash = `#${link.id}`
 
-            return (
-              <li
-                className={link.Component === undefined ? 'menu-disabled' : ''}
-                key={`link-${link.id}`}
-              >
-                <Link
-                  className={hash === linkHash ? 'menu-active' : ''}
-                  href={linkHash}
-                  onClick={() => setHash(linkHash)}
+              return (
+                <li
+                  className={
+                    link.Component === undefined ? 'menu-disabled' : ''
+                  }
+                  key={`link-${link.id}`}
                 >
-                  {link.label}
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
+                  <Link
+                    className={hash === linkHash ? 'menu-active' : ''}
+                    href={linkHash}
+                    onClick={() => setHash(linkHash)}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
       </div>
-      <div className="w-1/2">
+      <div className="w-full lg:w-1/2">
         {links.map(({ Component, id }) => {
           if (Component) {
             return (
@@ -48,16 +53,6 @@ export default function Page() {
           return null
         })}
       </div>
-    </div>
-  )
-}
-
-function LongComponent() {
-  return (
-    <div>
-      {[...Array(256).keys()].map((_, i) => (
-        <p key={i}>{i}</p>
-      ))}
     </div>
   )
 }
