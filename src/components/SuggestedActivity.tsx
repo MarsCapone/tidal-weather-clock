@@ -1,5 +1,5 @@
 import { useFeatureFlags } from '@/hooks/useFeatureFlags'
-import { Constraint, WindConstraint } from '@/types/activity'
+import { Constraint } from '@/types/activity'
 import { WindInfo } from '@/types/context'
 import { formatInterval } from '@/utils/dates'
 import { ActivityGroupInfo, EnrichedActivityScore } from '@/utils/suggestions'

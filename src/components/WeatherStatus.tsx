@@ -10,7 +10,7 @@ import { WindIcon } from '@/components/icons/WindIcon'
 import { DataContext } from '@/types/context'
 import { formatTime, withFractionalTime } from '@/utils/dates'
 import { calcMean } from '@/utils/math'
-import { mpsToKnots, mpsToMph } from '@/utils/units'
+import { mpsToMph } from '@/utils/units'
 import { parseISO } from 'date-fns'
 
 export default function WeatherStatus({
