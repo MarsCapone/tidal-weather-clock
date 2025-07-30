@@ -1,6 +1,6 @@
 export type WindConstraint = {
   directionTolerance?: number // tolerance in degrees for preferred directions
-  maxGustSpeed?: number
+  maxGustSpeed?: number // these will be meters per second
   maxSpeed?: number
   minSpeed?: number
   preferredDirections?: number[] // array of preferred wind directions in degrees

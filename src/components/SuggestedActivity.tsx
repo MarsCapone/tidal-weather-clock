@@ -1,6 +1,8 @@
 import { useFeatureFlags } from '@/hooks/useFeatureFlags'
+import { Constraint, WindConstraint } from '@/types/activity'
 import { formatInterval } from '@/utils/dates'
 import { ActivityGroupInfo, EnrichedActivityScore } from '@/utils/suggestions'
+import { mpsToMph } from '@/utils/units'
 import { compareAsc } from 'date-fns'
 import React from 'react'
 import GenericObject from './GenericObject'
@@ -189,9 +191,22 @@ function SuggestedActivityExplanationDialog({
         ]
   ).sort((a, b) => compareAsc(a.interval.start, b.interval.start))
 
-  const constraintsMap = Object.fromEntries(
+  const constraintsMap: {
+    [p: string]: Omit<Constraint, 'type'>
+  } = Object.fromEntries(
     selection.activity.constraints.map((constraint, index) => {
-      const { type, ...constraintWithoutType } = constraint
+      const enrichedConstraint =
+        constraint.type === 'wind'
+          ? {
+              ...constraint,
+              maxGustSpeedMph:
+                constraint.maxGustSpeed && mpsToMph(constraint.maxGustSpeed),
+              maxSpeedMph: constraint.maxSpeed && mpsToMph(constraint.maxSpeed),
+              minSpeedMph: constraint.minSpeed && mpsToMph(constraint.minSpeed),
+            }
+          : constraint
+
+      const { type, ...constraintWithoutType } = enrichedConstraint
 
       return [`${index}:${type}`, constraintWithoutType]
     }),
