@@ -32,7 +32,6 @@ const _logger = pino({
   formatters: {
     bindings: (bindings) => {
       return {
-        node_version: process.version,
         source: 'server',
       }
     },
