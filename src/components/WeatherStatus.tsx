@@ -10,6 +10,7 @@ import { WindIcon } from '@/components/icons/WindIcon'
 import { DataContext } from '@/types/context'
 import { formatTime, withFractionalTime } from '@/utils/dates'
 import { calcMean } from '@/utils/math'
+import { mpsToMph } from '@/utils/units'
 import { parseISO } from 'date-fns'
 
 export default function WeatherStatus({
@@ -77,7 +78,7 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
   const highTides = tides.filter((t) => t.type === 'high')
   const lowTides = tides.filter((t) => t.type === 'low')
 
-  const windSpeeds = dataContext.windData.points.map((p) => p.speed)
+  const windSpeeds = dataContext.windData.points.map((p) => mpsToMph(p.speed))
   const cloudiness = dataContext.weatherData.points.map((p) => p.cloudCover)
   const temperature = dataContext.weatherData.points.map((p) => p.temperature)
 
@@ -87,7 +88,7 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       label: 'Wind',
       values: [
         windSpeeds.length > 0
-          ? `${calcMean(windSpeeds).toFixed(1)} kts`
+          ? `${calcMean(windSpeeds).toFixed(1)} mph`
           : undefined,
       ],
     },
@@ -144,7 +145,7 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
     {
       Icon: TideHeightIcon,
       label: 'Tide Heights',
-      values: tides.map((t) => `${t.height.toFixed(1)}m`),
+      values: tides.map((t) => `${t.height.toFixed(2)}m`),
     },
   ]
 }
