@@ -1,5 +1,6 @@
 import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import { Constraint, WindConstraint } from '@/types/activity'
+import { WindInfo } from '@/types/context'
 import { formatInterval } from '@/utils/dates'
 import { ActivityGroupInfo, EnrichedActivityScore } from '@/utils/suggestions'
 import { mpsToMph } from '@/utils/units'
@@ -212,6 +213,19 @@ function SuggestedActivityExplanationDialog({
     }),
   )
 
+  const selectionWind = selection.debug?.slot?.wind as WindInfo | undefined
+  const slotWind = {
+    ...(selectionWind || {}),
+    gustSpeedMph:
+      selectionWind?.gustSpeed && mpsToMph(selectionWind?.gustSpeed),
+    speedMph: selectionWind?.speed && mpsToMph(selectionWind?.speed),
+  }
+
+  const selectionSlot = {
+    ...(selection.debug?.slot || {}),
+    wind: slotWind,
+  }
+
   return (
     <dialog className="modal" id={dialogId}>
       <div className="modal-box max-h-5xl h-11/12 w-11/12 max-w-5xl">
@@ -266,10 +280,10 @@ function SuggestedActivityExplanationDialog({
                         />
                       </td>
                       <td className="align-text-top">
-                        {selection.debug?.slot && (
+                        {selectionSlot && (
                           <GenericObject
                             className={'w-20'}
-                            obj={selection.debug.slot}
+                            obj={selectionSlot}
                             options={{
                               jsonEditorProps: {
                                 minWidth: 300,
