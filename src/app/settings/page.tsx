@@ -1,6 +1,7 @@
 'use client'
 
 import ActivitySettings from '@/app/settings/components/ActivitySettings'
+import FeatureFlagSettings from '@/app/settings/components/FeatureFlagSettings'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -9,7 +10,11 @@ export default function Page() {
 
   const links = [
     { Component: ActivitySettings, id: 'activities', label: 'Activities' },
-    { id: 'more settings', label: 'More settings' },
+    {
+      Component: FeatureFlagSettings,
+      id: 'feature flags',
+      label: 'Feature Flags',
+    },
   ]
 
   return (
@@ -45,7 +50,7 @@ export default function Page() {
         {links.map(({ Component, id }) => {
           if (Component) {
             return (
-              <div id={id} key={`content-${id}`}>
+              <div className="mb-12" id={id} key={`content-${id}`}>
                 <Component />
               </div>
             )

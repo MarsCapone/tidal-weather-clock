@@ -1,5 +1,6 @@
 'use client'
 
+import { SettingTitle } from '@/app/settings/components/common'
 import {
   Fieldset,
   Input,
@@ -48,7 +49,7 @@ export default function ActivitySettings() {
   return (
     <div>
       <div className="mb-4 flex flex-row items-center justify-between">
-        <h1 className="px-4 text-2xl font-bold">Activity Settings</h1>
+        <SettingTitle title={'Activity Settings'} />
         <button className="btn btn-primary rounded-field" onClick={addActivity}>
           Add Activity <PlusIcon className="h-4 w-4" />
         </button>
