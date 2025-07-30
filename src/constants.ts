@@ -17,4 +17,10 @@ const CONSTANTS: Constants = {
   TITLE: 'Tidal Weather Clock',
 }
 
+export const DEFAULT_FEATURE_FLAGS = {
+  showActivityTable: true,
+  showSettingsTitle: true,
+  showSuggestedActivity: true,
+}
+
 export default CONSTANTS
