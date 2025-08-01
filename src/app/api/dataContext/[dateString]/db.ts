@@ -26,7 +26,8 @@ export async function addDataContext(
     ON CONFLICT ON CONSTRAINT unique_date_location
     DO UPDATE SET 
       data = EXCLUDED.data,
-      date = EXCLUDED.date
+      date = EXCLUDED.date,
+      last_updated = EXCLUDED.last_updated
     RETURNING id;
   `
   logger.info('saved datacontext to db', {
