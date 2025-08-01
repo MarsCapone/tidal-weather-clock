@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
+import React from 'react'
 
 export type DatePaginationProps = {
   date: Date
@@ -13,22 +14,30 @@ export default function DatePagination({
   nextPath,
   prevPath,
 }: DatePaginationProps) {
+  const LinkWrapper = ({
+    children,
+    path,
+  }: {
+    children: React.ReactNode
+    path: string | null
+  }) => (path ? <Link href={path}>{children}</Link> : <div>{children}</div>)
+
   return (
     <div>
       <div className="join">
-        <Link href={prevPath || '/public'}>
+        <LinkWrapper path={prevPath}>
           <div className={`join-item btn ${!prevPath ? 'btn-disabled' : ''}`}>
             <ChevronLeftIcon height={20} width={20} />
           </div>
-        </Link>
+        </LinkWrapper>
         <div className="join-item btn btn-disabled bg-primary text-base-content">
           {format(date, 'PPPP')}
         </div>
-        <Link href={nextPath || '/public'}>
+        <LinkWrapper path={nextPath}>
           <div className={`join-item btn ${!nextPath ? 'btn-disabled' : ''}`}>
             <ChevronRightIcon height={20} width={20} />
           </div>
-        </Link>
+        </LinkWrapper>
       </div>
     </div>
   )
