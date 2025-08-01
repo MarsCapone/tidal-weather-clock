@@ -3,7 +3,6 @@ import { Constraint } from '@/types/activity'
 import { WindInfo } from '@/types/context'
 import { formatInterval } from '@/utils/dates'
 import { ActivityGroupInfo, EnrichedActivityScore } from '@/utils/suggestions'
-import { mpsToMph } from '@/utils/units'
 import { compareAsc } from 'date-fns'
 import React from 'react'
 import GenericObject from './GenericObject'
@@ -196,18 +195,7 @@ function SuggestedActivityExplanationDialog({
     [p: string]: Omit<Constraint, 'type'>
   } = Object.fromEntries(
     selection.activity.constraints.map((constraint, index) => {
-      const enrichedConstraint =
-        constraint.type === 'wind'
-          ? {
-              ...constraint,
-              maxGustSpeedMph:
-                constraint.maxGustSpeed && mpsToMph(constraint.maxGustSpeed),
-              maxSpeedMph: constraint.maxSpeed && mpsToMph(constraint.maxSpeed),
-              minSpeedMph: constraint.minSpeed && mpsToMph(constraint.minSpeed),
-            }
-          : constraint
-
-      const { type, ...constraintWithoutType } = enrichedConstraint
+      const { type, ...constraintWithoutType } = constraint
 
       return [`${index}:${type}`, constraintWithoutType]
     }),
@@ -216,9 +204,6 @@ function SuggestedActivityExplanationDialog({
   const selectionWind = selection.debug?.slot?.wind as WindInfo | undefined
   const slotWind = {
     ...(selectionWind || {}),
-    gustSpeedMph:
-      selectionWind?.gustSpeed && mpsToMph(selectionWind?.gustSpeed),
-    speedMph: selectionWind?.speed && mpsToMph(selectionWind?.speed),
   }
 
   const selectionSlot = {

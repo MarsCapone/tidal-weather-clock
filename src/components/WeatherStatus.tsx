@@ -10,7 +10,7 @@ import { WindIcon } from '@/components/icons/WindIcon'
 import { DataContext } from '@/types/context'
 import { formatTime, withFractionalTime } from '@/utils/dates'
 import { calcMean } from '@/utils/math'
-import { mpsToMph } from '@/utils/units'
+import { mpsToKnots } from '@/utils/units'
 import { parseISO } from 'date-fns'
 
 export default function WeatherStatus({
@@ -78,7 +78,7 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
   const highTides = tides.filter((t) => t.type === 'high')
   const lowTides = tides.filter((t) => t.type === 'low')
 
-  const windSpeeds = dataContext.windData.points.map((p) => mpsToMph(p.speed))
+  const windSpeeds = dataContext.windData.points.map((p) => mpsToKnots(p.speed))
   const cloudiness = dataContext.weatherData.points.map((p) => p.cloudCover)
   const temperature = dataContext.weatherData.points.map((p) => p.temperature)
 
