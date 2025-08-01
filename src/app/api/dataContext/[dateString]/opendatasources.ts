@@ -301,6 +301,9 @@ export class OpenMeteoAndEasyTideDataFetcher implements IDataContextFetcher {
           speed: point.windSpeed,
           timestamp: point.timestamp,
         })),
+        dominantDirection: dailyPoint?.windDirectionDominant,
+        dominantSpeed: dailyPoint?.windSpeedMax,
+        dominantGustSpeed: dailyPoint?.windGustsMax,
       },
     }
   }
