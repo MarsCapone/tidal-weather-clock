@@ -2,6 +2,7 @@ import { OpenMeteoAndEasyTideDataFetcher } from '@/app/api/dataContext/[dateStri
 import logger from '@/app/api/pinoLogger'
 import CONSTANTS from '@/constants'
 import { DataContext } from '@/types/context'
+import { tz } from '@date-fns/tz'
 import {
   addDays,
   differenceInHours,
@@ -19,6 +20,7 @@ export async function GET(
   { params }: { params: Promise<{ dateString: string }> },
 ) {
   const { dateString } = await params
+
   const date = startOfDay(parseISO(dateString))
   const result = await getDataContextForDateString(date)
   return Response.json(result)

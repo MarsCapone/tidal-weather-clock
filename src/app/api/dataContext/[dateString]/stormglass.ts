@@ -1,3 +1,4 @@
+import { uploadDebugData } from '@/app/api/dataContext/[dateString]/debug'
 import CONSTANTS from '@/constants'
 import { DataContext } from '@/types/context'
 import { IDataContextFetcher, ILogger } from '@/types/interfaces'
@@ -7,7 +8,7 @@ import {
   stormglassWeatherParams,
   StormglassWeatherResponse,
 } from '@/types/stormglass'
-import { getFractionalTime } from '@/utils/dates'
+import { dateOptions, getFractionalTime } from '@/utils/dates'
 import { put } from '@vercel/blob'
 import {
   eachDayOfInterval,
@@ -85,16 +86,15 @@ export class DemoStormglassDataFetcher implements IDataContextFetcher {
       await this.fetchSunResponse(),
     ]
 
-    const { url } = await put(
-      `stormglassRawData/${formatISO(new Date())}.json`,
-      JSON.stringify({
-        sun: rawSun,
-        tide: rawTide,
-        weather: rawWeather,
-      }),
-      { access: 'public' },
+    await uploadDebugData(
+      'dataContextSource',
+      `stormglass-${formatISO(new Date(), dateOptions)}`,
+      {
+        rawSun,
+        rawTide,
+        rawWeather,
+      },
     )
-    this.logger.info('uploaded raw Stormglass debug data', { url })
 
     // we have to have pulled all data
     if (

@@ -1,7 +1,8 @@
+import { uploadDebugData } from '@/app/api/dataContext/[dateString]/debug'
 import CONSTANTS from '@/constants'
 import { DataContext } from '@/types/context'
 import { IDataContextFetcher, ILogger } from '@/types/interfaces'
-import { getFractionalTime } from '@/utils/dates'
+import { dateOptions, getFractionalTime } from '@/utils/dates'
 import { tz, TZDate } from '@date-fns/tz'
 import { put } from '@vercel/blob'
 import {
@@ -12,10 +13,6 @@ import {
   parseISO,
   startOfToday,
 } from 'date-fns'
-
-const dateOptions = {
-  in: tz('+00:00'),
-}
 
 type EasyTideData = {
   footerNote?: string
@@ -240,16 +237,15 @@ export class OpenMeteoAndEasyTideDataFetcher implements IDataContextFetcher {
       },
     )
 
-    const { url } = await put(
-      `openMeteoAndEasyTideRawData/${formatISO(new Date())}.json`,
-      JSON.stringify({
+    await uploadDebugData(
+      'dataContextSource',
+      `openmeteo+easytide-${formatISO(new Date(), dateOptions)}`,
+      {
         dailyPoints,
         hourlyPoints,
         rawData: { easyTideData, openMeteoData },
-      }),
-      { access: 'public' },
+      },
     )
-    this.logger.debug('uploaded raw OpenMeteo and EasyTide debug data', { url })
 
     return dates.map((d) =>
       this.makeDataContext(d, easyTideData, hourlyPoints, dailyPoints),
