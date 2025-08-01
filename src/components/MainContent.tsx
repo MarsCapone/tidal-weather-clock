@@ -126,7 +126,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
             activityScore={suggestedActivity}
             className={'md:hidden'}
             nextSuggestion={
-              selectionIndex <= filteredSuggestions.length - 1
+              selectionIndex < filteredSuggestions.length - 1
                 ? nextSuggestion
                 : undefined
             }
@@ -153,7 +153,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
                 activityScore={suggestedActivity}
                 className="mb-4 hidden md:flex"
                 nextSuggestion={
-                  selectionIndex <= filteredSuggestions.length - 1
+                  selectionIndex < filteredSuggestions.length - 1
                     ? nextSuggestion
                     : undefined
                 }
