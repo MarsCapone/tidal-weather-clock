@@ -93,34 +93,6 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
   const cloudiness = dataContext.weatherData.points.map((p) => p.cloudCover)
   const temperature = dataContext.weatherData.points.map((p) => p.temperature)
 
-  const directionToIcon = (direction: number) => {
-    if (direction >= 337.5 || direction < 22.5) {
-      return ArrowUpIcon
-    }
-    if (direction >= 22.5 && direction < 67.5) {
-      return ArrowUpLeftIcon
-    }
-    if (direction >= 67.5 && direction < 112.5) {
-      return ArrowLeftIcon
-    }
-    if (direction >= 112.5 && direction < 157.5) {
-      return ArrowDownLeftIcon
-    }
-    if (direction >= 157.5 && direction < 202.5) {
-      return ArrowDownIcon
-    }
-    if (direction >= 202.5 && direction < 247.5) {
-      return ArrowDownRightIcon
-    }
-    if (direction >= 247.5 && direction < 292.5) {
-      return ArrowRightIcon
-    }
-    if (direction >= 292.5 && direction < 337.5) {
-      return ArrowUpRightIcon
-    }
-    return 'div'
-  }
-
   const WindDirectionIcon = dataContext.windData.dominantDirection
     ? directionToIcon(dataContext.windData.dominantDirection)
     : null
@@ -195,4 +167,31 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       values: tides.map((t) => `${t.height.toFixed(2)}m`),
     },
   ]
+}
+const directionToIcon = (direction: number) => {
+  if (direction >= 337.5 || direction < 22.5) {
+    return ArrowUpIcon
+  }
+  if (direction >= 22.5 && direction < 67.5) {
+    return ArrowUpLeftIcon
+  }
+  if (direction >= 67.5 && direction < 112.5) {
+    return ArrowLeftIcon
+  }
+  if (direction >= 112.5 && direction < 157.5) {
+    return ArrowDownLeftIcon
+  }
+  if (direction >= 157.5 && direction < 202.5) {
+    return ArrowDownIcon
+  }
+  if (direction >= 202.5 && direction < 247.5) {
+    return ArrowDownRightIcon
+  }
+  if (direction >= 247.5 && direction < 292.5) {
+    return ArrowRightIcon
+  }
+  if (direction >= 292.5 && direction < 337.5) {
+    return ArrowUpRightIcon
+  }
+  return 'div'
 }
