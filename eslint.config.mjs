@@ -7,6 +7,7 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off',
       'perfectionist/sort-object-types': 'off',
       'perfectionist/sort-objects': 'off',
+      'perfectionist/sort-jsx-props': 'off',
     },
   },
 ]

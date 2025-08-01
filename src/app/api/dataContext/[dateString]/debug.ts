@@ -16,7 +16,7 @@ export async function uploadDebugData(
     ...dateOptions,
     representation: 'date',
   })
-  const fileName = `${category}/${dateFolder}/${name}`
+  const fileName = `${category}/${dateFolder}/${name}${name.endsWith('.json') ? '' : '.json'}`
 
   const { url } = await put(fileName, JSON.stringify(data), {
     access: 'public',

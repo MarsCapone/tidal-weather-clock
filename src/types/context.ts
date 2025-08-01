@@ -36,7 +36,11 @@ type TimeBasedDataPoints<T extends Timestamp> = {
 }
 
 export type WeatherDataPoints = TimeBasedDataPoints<WeatherInfo>
-export type WindDataPoints = TimeBasedDataPoints<WindInfo>
+export type WindDataPoints = TimeBasedDataPoints<WindInfo> & {
+  dominantDirection?: number
+  dominantSpeed?: number
+  dominantGustSpeed?: number
+}
 
 export type DataContext = {
   referenceDate: string
