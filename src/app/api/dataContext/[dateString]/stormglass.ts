@@ -8,6 +8,7 @@ import {
   StormglassWeatherResponse,
 } from '@/types/stormglass'
 import { getFractionalTime } from '@/utils/dates'
+import { put } from '@vercel/blob'
 import {
   eachDayOfInterval,
   endOfDay,
@@ -83,6 +84,17 @@ export class DemoStormglassDataFetcher implements IDataContextFetcher {
       await this.fetchTideResponse(),
       await this.fetchSunResponse(),
     ]
+
+    const { url } = await put(
+      `stormglassRawData/${formatISO(new Date())}.json`,
+      JSON.stringify({
+        sun: rawSun,
+        tide: rawTide,
+        weather: rawWeather,
+      }),
+      { access: 'public' },
+    )
+    this.logger.info('uploaded raw Stormglass debug data', { url })
 
     // we have to have pulled all data
     if (

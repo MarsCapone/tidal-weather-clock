@@ -24,8 +24,18 @@ export default function TideTimesChart({
   const highTides = tideData.filter((t) => t.type === 'high')
   const lowTides = tideData.filter((t) => t.type === 'low')
 
-  const highTideTime = highTides.length > 0 ? highTides[0].time : 12
-  const lowTideTime = lowTides.length > 0 ? lowTides[0].time : 12
+  let lowTideEstimate = false
+  if (lowTides.length === 0 && highTides.length > 0) {
+    lowTideEstimate = true
+    // If there are no low tides, we create a fake one 6 hours after the first high tide, or 6 hours before (if it
+    // would be after midnight)
+    lowTides.push({
+      height: 0,
+      time:
+        highTides[0].time >= 18 ? highTides[0].time - 6 : highTides[0].time + 6,
+      type: 'low',
+    })
+  }
 
   const timePointers: TimePointer[] = [
     {
@@ -38,19 +48,20 @@ export default function TideTimesChart({
       label: 'Sunset',
       timestamp: sunData.sunSet ? parseISO(sunData.sunSet) : null,
     },
-    {
-      hour: highTideTime,
-      isOutside: false,
-      label: 'HW',
-    },
-    {
-      hour: lowTideTime,
-      isOutside: false,
-      label: 'LW',
-    },
+    ...highTides.map((t, i) => ({
+      hour: t.time,
+      isOutside: true,
+      label: `HW (${t.time >= 12 ? 'pm' : 'am'})`,
+    })),
+    ...lowTides.map((t, i) => ({
+      hour: t.time,
+      isOutside: true,
+      label:
+        `LW (${t.time >= 12 ? 'pm' : 'am'}) ${lowTideEstimate ? '[est.]' : ''}`.trim(),
+    })),
   ].map((s) => ({
     color: 'warning',
-    hour: s.hour || getFractionalTime(s.timestamp!),
+    hour: 'hour' in s ? s.hour : getFractionalTime(s.timestamp!),
     id: s.label.toLowerCase(),
     isOutside: s.isOutside,
     label: s.label,

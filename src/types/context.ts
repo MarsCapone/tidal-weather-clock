@@ -8,7 +8,7 @@ export type TideInfo = {
   height: number
   time: number
   type: TideType
-}
+} & Partial<Timestamp>
 
 export type SunData = {
   sunRise: string
@@ -17,8 +17,12 @@ export type SunData = {
 
 export type WeatherInfo = {
   cloudCover: number
-  summary?: string
+  precipitation?: number
+  precipitationProbability?: number
+  rain?: number
+  sunshineDuration?: number
   temperature: number
+  uvIndex?: number
 } & Timestamp
 
 export type WindInfo = {

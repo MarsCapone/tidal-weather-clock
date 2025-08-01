@@ -1,4 +1,4 @@
-import { StormglassDataFetcher } from '@/app/api/dataContext/[dateString]/dataContextFetcher'
+import { OpenMeteoAndEasyTideDataFetcher } from '@/app/api/dataContext/[dateString]/opendatasources'
 import logger from '@/app/api/pinoLogger'
 import CONSTANTS from '@/constants'
 import { DataContext } from '@/types/context'
@@ -24,10 +24,7 @@ export async function GET(
   return Response.json(result)
 }
 
-const dataFetcher = new StormglassDataFetcher(
-  logger,
-  process.env.STORMGLASS_API_KEY!,
-)
+const dataFetcher = new OpenMeteoAndEasyTideDataFetcher(logger)
 const location = CONSTANTS.LOCATION_COORDS
 const EXPIRY_HOURS = 24
 
