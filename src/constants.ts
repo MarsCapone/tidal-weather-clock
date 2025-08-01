@@ -5,6 +5,7 @@ type Constants = {
   MAX_PERMITTED_DAYS: number
   PATH_TITLES: Record<string, string>
   TITLE: string
+  MAX_BLOB_STORAGE_DAYS: number
 }
 
 const CONSTANTS: Constants = {
@@ -17,6 +18,7 @@ const CONSTANTS: Constants = {
     '/settings/activities': 'Activity Settings',
   },
   TITLE: 'Tidal Weather Clock',
+  MAX_BLOB_STORAGE_DAYS: 28,
 }
 
 export const DEFAULT_FEATURE_FLAGS = {
