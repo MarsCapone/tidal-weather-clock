@@ -1,3 +1,4 @@
+import { tz } from '@date-fns/tz'
 import {
   addHours,
   addMinutes,
@@ -6,6 +7,10 @@ import {
   parseISO,
   startOfDay,
 } from 'date-fns'
+
+export const dateOptions = {
+  in: tz('+00:00'),
+}
 
 export function formatTime(date: Date): string {
   return format(date, 'HH:mm')

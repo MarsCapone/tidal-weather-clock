@@ -19,6 +19,7 @@ export async function GET(
   { params }: { params: Promise<{ dateString: string }> },
 ) {
   const { dateString } = await params
+
   const date = startOfDay(parseISO(dateString))
   const result = await getDataContextForDateString(date)
   return Response.json(result)
