@@ -94,7 +94,7 @@ export class DemoStormglassDataFetcher implements IDataContextFetcher {
       }),
       { access: 'public' },
     )
-    this.logger.info('uploaded raw stormglass data', { url })
+    this.logger.info('uploaded raw Stormglass debug data', { url })
 
     // we have to have pulled all data
     if (
