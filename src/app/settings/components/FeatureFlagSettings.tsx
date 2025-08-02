@@ -1,10 +1,10 @@
 import { SettingTitle } from '@/app/settings/components/common'
-import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import { sentenceCase } from 'change-case'
+import { useFlags } from 'launchdarkly-react-client-sdk'
 import { PencilIcon } from 'lucide-react'
 
 export default function FeatureFlagSettings() {
-  const ff = useFeatureFlags()
+  const ff = useFlags()
 
   return (
     <div>
@@ -25,7 +25,7 @@ export default function FeatureFlagSettings() {
             <div className="label" key={key}>
               <input
                 checked={value}
-                className="checkbox checkbox-xl checkbox-secondary rounded-field"
+                className="checkbox checkbox-lg checkbox-secondary rounded-field"
                 disabled
                 readOnly
                 type="checkbox"

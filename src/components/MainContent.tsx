@@ -9,12 +9,12 @@ import WeatherStatus from '@/components/WeatherStatus'
 import { APP_CONFIG } from '@/config'
 import { useActivities } from '@/hooks/useApiRequest'
 import { DateInfo } from '@/hooks/useDateString'
-import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import { DataContext } from '@/types/context'
 import tryDataFetchersWithCache from '@/utils/fetchData'
 import logger from '@/utils/logger'
 import { ActivityRecommender, groupScores } from '@/utils/suggestions'
 import { formatISO, startOfDay } from 'date-fns'
+import { useFlags } from 'launchdarkly-react-client-sdk'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
@@ -57,7 +57,7 @@ export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
 
 function MainContentWithoutDate({ date }: { date: Date }) {
   const activities = useActivities(APP_CONFIG.activityFetcher)
-  const ff = useFeatureFlags()
+  const { showSuggestedActivity, showActivityTable } = useFlags()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [selectionIndex, setSelectionIndex] = useState(0)
@@ -121,7 +121,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
   return (
     <>
       <div>
-        {ff.showSuggestedActivity && (
+        {showSuggestedActivity && (
           <SuggestedActivity
             activityScore={suggestedActivity}
             className={'md:hidden'}
@@ -148,7 +148,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
             />
           </div>
           <div className="w-full md:w-1/3">
-            {ff.showSuggestedActivity && (
+            {showSuggestedActivity && (
               <SuggestedActivity
                 activityScore={suggestedActivity}
                 className="mb-4 hidden md:flex"
@@ -163,9 +163,11 @@ function MainContentWithoutDate({ date }: { date: Date }) {
             <WeatherStatus dataContext={dataContext} />
           </div>
         </div>
-        <div className="my-8">
-          <ActivityScoreList scores={suggestions} />
-        </div>
+        {showActivityTable && (
+          <div className="my-8">
+            <ActivityScoreList scores={suggestions} />
+          </div>
+        )}
       </div>
     </>
   )
