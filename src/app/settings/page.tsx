@@ -1,7 +1,6 @@
 'use client'
 
 import ActivitySettings from '@/app/settings/components/ActivitySettings'
-import FeatureFlagSettings from '@/app/settings/components/FeatureFlagSettings'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -10,11 +9,6 @@ export default function Page() {
 
   const links = [
     { Component: ActivitySettings, id: 'activities', label: 'Activities' },
-    {
-      Component: FeatureFlagSettings,
-      id: 'feature flags',
-      label: 'Feature Flags',
-    },
   ]
 
   return (

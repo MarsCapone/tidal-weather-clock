@@ -6,6 +6,7 @@ type Constants = {
   PATH_TITLES: Record<string, string>
   TITLE: string
   MAX_BLOB_STORAGE_DAYS: number
+  LD_CLIENT_ID: string
 }
 
 const CONSTANTS: Constants = {
@@ -19,12 +20,7 @@ const CONSTANTS: Constants = {
   },
   TITLE: 'Tidal Weather Clock',
   MAX_BLOB_STORAGE_DAYS: 28,
-}
-
-export const DEFAULT_FEATURE_FLAGS = {
-  showActivityTable: true,
-  showSettingsTitle: true,
-  showSuggestedActivity: true,
+  LD_CLIENT_ID: '688e958f84052b0957d24bc7',
 }
 
 export default CONSTANTS

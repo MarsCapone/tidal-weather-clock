@@ -24,6 +24,7 @@
     "date-fns": "^4.1.0",
     "express": "^5.1.0",
     "json-edit-react": "^1.28.2",
+    "launchdarkly-react-client-sdk": "^3.8.1",
     "lucide-react": "^0.533.0",
     "next": "15.4.4",
     "openmeteo": "^1.2.0",

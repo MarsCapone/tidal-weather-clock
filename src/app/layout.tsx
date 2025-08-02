@@ -4,6 +4,7 @@ import ColorschemeToggle from '@/components/Colorscheme'
 import CONSTANTS from '@/constants'
 import Link from 'next/link'
 import './globals.css'
+import { LDProvider } from 'launchdarkly-react-client-sdk'
 import React from 'react'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -53,7 +54,11 @@ function Root({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <div id="root">
-          <React.StrictMode>{children}</React.StrictMode>
+          <React.StrictMode>
+            <LDProvider clientSideID={CONSTANTS.LD_CLIENT_ID}>
+              {children}
+            </LDProvider>
+          </React.StrictMode>
         </div>
       </body>
     </html>

@@ -1,4 +1,3 @@
-import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import { Constraint } from '@/types/activity'
 import { WindInfo } from '@/types/context'
 import { formatInterval } from '@/utils/dates'
@@ -22,8 +21,6 @@ export default function SuggestedActivity({
   nextSuggestion,
   prevSuggestion,
 }: SuggestedActivityProps) {
-  const ff = useFeatureFlags()
-
   // don't show this panel at all if there is nothing to show
   if (!activityScore) {
     return null
