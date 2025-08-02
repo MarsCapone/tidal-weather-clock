@@ -7,7 +7,5 @@ export async function GET(request: NextRequest): Promise<Response> {
 
   const range = await db.getDataContextRange(CONSTANTS.LOCATION_COORDS)
 
-  return Response.json({
-    dataContextRange: range,
-  })
+  return Response.json(range)
 }
