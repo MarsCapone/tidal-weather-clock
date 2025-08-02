@@ -171,11 +171,21 @@ Overcast: 8/8 (100%) cloud cover.
 In addition to these, terms like "mostly clear" and "mostly cloudy" are also used, typically corresponding to ranges like 10-30% and 70-80% cloud cover respectively, according to Spectrum News.
  */
 function describeCloudiness(cloudCover: number | undefined): string {
-  if (cloudCover === undefined) return 'Unknown'
-  if (cloudCover < 12.5) return 'Clear'
-  if (cloudCover < 25) return 'Mostly Clear'
-  if (cloudCover < 50) return 'Scattered Clouds'
-  if (cloudCover < 87.5) return 'Mostly Cloudy'
+  if (cloudCover === undefined) {
+    return 'Unknown'
+  }
+  if (cloudCover < 12.5) {
+    return 'Clear'
+  }
+  if (cloudCover < 25) {
+    return 'Mostly Clear'
+  }
+  if (cloudCover < 50) {
+    return 'Scattered Clouds'
+  }
+  if (cloudCover < 87.5) {
+    return 'Mostly Cloudy'
+  }
   return 'Overcast'
 }
 
