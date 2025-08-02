@@ -84,7 +84,10 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
   const cloudiness = dataContext.weatherData.points.map((p) => p.cloudCover)
   const temperature = dataContext.weatherData.points.map((p) => p.temperature)
 
-  const direction = dataContext.windData.dominantDirection
+  const dominantWindDirection = dataContext.windData.dominantDirection
+
+  const cloudinessMean =
+    cloudiness.length > 0 ? calcMean(cloudiness) : undefined
 
   return [
     {
@@ -95,9 +98,9 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
           ? `${calcMean(windSpeeds).toFixed(1)} kts`
           : undefined,
         <div key={'wind'} className="flex flex-row items-center gap-x-1">
-          {direction && (
+          {dominantWindDirection && (
             <ArrowBigUpIcon
-              className={`fill-accent h-4 w-4 ${allRotations[direction]}`}
+              className={`fill-accent h-4 w-4 ${allRotations[dominantWindDirection]}`}
             />
           )}
           {dataContext.windData.dominantDirection}°
@@ -116,11 +119,7 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
     {
       Icon: SimpleCloudIcon,
       label: 'Cloudiness',
-      values: [
-        cloudiness.length > 0
-          ? `${calcMean(cloudiness).toFixed(1)}%`
-          : undefined,
-      ],
+      values: [describeCloudiness(cloudinessMean)],
     },
     {
       Icon: SunriseIcon,
@@ -161,7 +160,36 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
     },
   ]
 }
-// have to do thid because tailwind does not support dynamic classes
+
+/*
+Here's a more detailed breakdown:
+Clear: Less than 1/8 (or 12.5%) cloud cover.
+Few: 1/8 to 2/8 (12.5% to 25%) cloud cover.
+Scattered: 3/8 to 4/8 (37.5% to 50%) cloud cover.
+Broken: 5/8 to 7/8 (62.5% to 87.5%) cloud cover.
+Overcast: 8/8 (100%) cloud cover.
+In addition to these, terms like "mostly clear" and "mostly cloudy" are also used, typically corresponding to ranges like 10-30% and 70-80% cloud cover respectively, according to Spectrum News.
+ */
+function describeCloudiness(cloudCover: number | undefined): string {
+  if (cloudCover === undefined) {
+    return 'Unknown'
+  }
+  if (cloudCover < 12.5) {
+    return 'Clear'
+  }
+  if (cloudCover < 25) {
+    return 'Mostly Clear'
+  }
+  if (cloudCover < 50) {
+    return 'Scattered Clouds'
+  }
+  if (cloudCover < 87.5) {
+    return 'Mostly Cloudy'
+  }
+  return 'Overcast'
+}
+
+// have to do this because tailwind does not support dynamic classes
 const allRotations = [
   'rotate-[0deg]',
   'rotate-[1deg]',
