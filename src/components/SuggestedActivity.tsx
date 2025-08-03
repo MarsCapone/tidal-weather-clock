@@ -208,6 +208,22 @@ function SuggestedActivityExplanationDialog({
       constraints: suggestedActivity.activity.constraints,
     }
 
+    fetch('/api/explain', {
+      method: 'POST',
+      body: JSON.stringify({ scope, debugMode }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.explanation) {
+          setAiExplanation(data.explanation)
+        } else {
+          setAiExplanation('No explanation available.')
+        }
+      })
+
     // sleep for 5 seconds to simulate AI explanation loading
     const timer = setTimeout(() => {
       // Here you would typically fetch the AI explanation
