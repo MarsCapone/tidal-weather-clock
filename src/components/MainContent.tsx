@@ -1,10 +1,10 @@
 'use client'
 
 import ActivityScoreList from '@/components/ActivityScoreList'
+import ClockDisplay from '@/components/ClockDisplay'
 import DatePagination from '@/components/DatePagination'
 import DayTimeline from '@/components/DayTimeline'
 import SuggestedActivity from '@/components/SuggestedActivity'
-import TideTimesChart from '@/components/TideTimesChart'
 import WeatherStatus from '@/components/WeatherStatus'
 import { APP_CONFIG } from '@/config'
 import { useActivities } from '@/hooks/useApiRequest'
@@ -140,11 +140,9 @@ function MainContentWithoutDate({ date }: { date: Date }) {
               sunData={dataContext.sunData}
               tideData={dataContext.tideData}
             />
-            <TideTimesChart
-              key={date.toDateString()}
+            <ClockDisplay
               suggestedActivity={suggestedActivity}
-              sunData={dataContext.sunData}
-              tideData={dataContext.tideData}
+              dataContext={dataContext}
             />
           </div>
           <div className="w-full md:w-1/3">
