@@ -185,6 +185,11 @@ export function TimeToNext({
         </div>
       )}
 
+      {!nextActivityInThePast && (
+        <div className="text-md font-bold md:text-xl xl:text-3xl">
+          the selected activity is
+        </div>
+      )}
       <div className="bg-base-content text-base-100 w-fit px-1 py-0.5 text-xl font-extrabold md:text-3xl xl:text-5xl">
         {suggestedActivity.activity.name}
       </div>
