@@ -1,9 +1,12 @@
+import { isDarkMode } from '@/components/Colorscheme'
 import { Constraint } from '@/types/activity'
+import { IsDarkContext } from '@/utils/contexts'
 import { formatInterval } from '@/utils/dates'
 import { ActivityGroupInfo, EnrichedActivityScore } from '@/utils/suggestions'
+import MarkdownPreview from '@uiw/react-markdown-preview'
 import { compareAsc } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import GenericObject from './GenericObject'
 
 export type SuggestedActivityProps = {
@@ -185,6 +188,7 @@ function SuggestedActivityExplanationDialog({
 }: SuggestedActivityExplanationDialogProps) {
   const { debugMode } = useFlags()
   const [aiExplanation, setAiExplanation] = React.useState<string | null>(null)
+  const isDarkMode = useContext(IsDarkContext)
 
   useEffect(() => {
     // the relevant information to send to the AI for explanation is:
@@ -223,14 +227,7 @@ function SuggestedActivityExplanationDialog({
           setAiExplanation('No explanation available.')
         }
       })
-
-    // sleep for 5 seconds to simulate AI explanation loading
-    const timer = setTimeout(() => {
-      // Here you would typically fetch the AI explanation
-      setAiExplanation('This is a simulated AI explanation for the activity.')
-    }, 5000)
-    return () => clearTimeout(timer)
-  }, [suggestedActivity])
+  }, [suggestedActivity, debugMode])
 
   const intervals = (
     'intervals' in suggestedActivity
@@ -290,7 +287,13 @@ function SuggestedActivityExplanationDialog({
                         <span>{renderScore(interval.score)}</span>
                       </td>
                       <td className="align-text-top">
-                        {aiExplanation || 'Thinking...'}
+                        <MarkdownPreview
+                          source={aiExplanation || 'Thinking...'}
+                          className="p-8"
+                          wrapperElement={{
+                            'data-color-mode': isDarkMode ? 'dark' : 'light',
+                          }}
+                        />
                       </td>
                       {debugMode && (
                         <>
