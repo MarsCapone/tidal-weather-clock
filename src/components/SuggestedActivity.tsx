@@ -3,6 +3,7 @@ import { WindInfo } from '@/types/context'
 import { formatInterval } from '@/utils/dates'
 import { ActivityGroupInfo, EnrichedActivityScore } from '@/utils/suggestions'
 import { compareAsc } from 'date-fns'
+import { useFlags } from 'launchdarkly-react-client-sdk'
 import React from 'react'
 import GenericObject from './GenericObject'
 
@@ -21,6 +22,8 @@ export default function SuggestedActivity({
   nextSuggestion,
   prevSuggestion,
 }: SuggestedActivityProps) {
+  const { useDescriptiveIntervals } = useFlags()
+
   // don't show this panel at all if there is nothing to show
   if (!activityScore) {
     return null
@@ -34,10 +37,14 @@ export default function SuggestedActivity({
       <div className="text-base-content/50 flex flex-row justify-around gap-4 font-mono text-sm md:flex-col lg:flex-row">
         {intervals.map((agi, i) => (
           <div
-            className="flex flex-col justify-center md:flex-row md:gap-x-2 lg:flex-col"
+            className="flex flex-col justify-center md:gap-x-2"
             key={`interval-${i}`}
           >
-            <div>{formatInterval(agi.interval, 1)}</div>
+            {formatInterval(agi.interval, 1, useDescriptiveIntervals).map(
+              (part, j) => (
+                <div key={j}>{part}</div>
+              ),
+            )}
             <div>{renderScore(agi.score)}</div>
           </div>
         ))}

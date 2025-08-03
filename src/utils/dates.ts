@@ -3,7 +3,10 @@ import {
   addHours,
   addMinutes,
   format,
+  formatDuration,
+  formatRelative,
   Interval,
+  intervalToDuration,
   parseISO,
   startOfDay,
 } from 'date-fns'
@@ -19,12 +22,26 @@ export function formatTime(date: Date): string {
 export function formatInterval(
   interval: Interval<Date, Date>,
   addEndHours?: number,
-): string {
+  humanReadable = false,
+): string[] {
   let end = interval.end
   if (addEndHours) {
     end = addHours(end, addEndHours)
   }
-  return `${formatTime(interval.start)} - ${formatTime(end)}`
+
+  if (humanReadable) {
+    const startingAt = formatRelative(interval.start, new Date(), dateOptions)
+    const duration = formatDuration(
+      intervalToDuration({
+        start: interval.start,
+        end,
+      }),
+    )
+
+    return [`from ${startingAt}`, `for ${duration}`]
+  }
+
+  return [`${formatTime(interval.start)} - ${formatTime(end)}`]
 }
 
 export function withFractionalTime(date: Date | string, time: number): Date {
