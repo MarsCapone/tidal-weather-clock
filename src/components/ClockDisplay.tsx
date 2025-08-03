@@ -7,7 +7,14 @@ import { getActivityGroupInfo } from '@/components/SuggestedActivity'
 import { DataContext } from '@/types/context'
 import { dateOptions, formatInterval, getFractionalTime } from '@/utils/dates'
 import { EnrichedActivityScore } from '@/utils/suggestions'
-import { format, formatDuration, intervalToDuration, parseISO } from 'date-fns'
+import {
+  format,
+  formatDuration,
+  formatRelative,
+  intervalToDuration,
+  isBefore,
+  parseISO,
+} from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import React, { useEffect } from 'react'
 
@@ -125,7 +132,7 @@ export function AnalogActivityRanges({
         color: scoreToColor(index),
         endHour: getFractionalTime(agi.interval.end) + 1,
         id: `${suggestedActivity.activity.id}-${formatInterval(agi.interval)}`,
-        label: formatInterval(agi.interval),
+        label: formatInterval(agi.interval).join(' '),
         startHour: getFractionalTime(agi.interval.start),
       }
     })
@@ -139,7 +146,6 @@ export function TimeToNext({
 }: ClockDisplayProps & { displayTime?: boolean; type: 'descriptive' }) {
   const [diff, setDiff] = React.useState<string | number | null>(null)
   const [currentTime, setCurrentTime] = React.useState<Date | null>(null)
-
   useEffect(() => {
     const updateTime = () => {
       if (!suggestedActivity) {
@@ -158,6 +164,14 @@ export function TimeToNext({
     return () => clearInterval(interval)
   }, [suggestedActivity])
 
+  if (!suggestedActivity) {
+    return null
+  }
+
+  const timestamp = parseISO(suggestedActivity?.timestamp, dateOptions)
+
+  const nextActivityInThePast = isBefore(timestamp, currentTime || new Date())
+
   return (
     <div className="p-10">
       {displayTime && currentTime && (
@@ -169,17 +183,28 @@ export function TimeToNext({
             {format(currentTime, 'h:mm aaa')}
           </div>
           <div className="text-md font-bold md:text-xl xl:text-3xl">
-            and it&#39;s
+            and{' '}
+            {nextActivityInThePast ? 'this activity was suggested for' : "it's"}
           </div>
         </div>
       )}
 
-      <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
-        {diff}
-      </div>
-      <div className="text-md font-bold md:text-xl xl:text-3xl">
-        until the next activity
-      </div>
+      {nextActivityInThePast ? (
+        <>
+          <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
+            {formatRelative(timestamp, currentTime || new Date(), dateOptions)}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
+            {diff}
+          </div>
+          <div className="text-md font-bold md:text-xl xl:text-3xl">
+            until the next activity
+          </div>
+        </>
+      )}
     </div>
   )
 }
