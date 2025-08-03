@@ -4,23 +4,37 @@ import ClockChart, {
   TimeRange,
 } from '@/components/ClockChart'
 import { getActivityGroupInfo } from '@/components/SuggestedActivity'
-import { SunData, TideInfo } from '@/types/context'
-import { formatInterval, getFractionalTime } from '@/utils/dates'
+import { DataContext } from '@/types/context'
+import { dateOptions, formatInterval, getFractionalTime } from '@/utils/dates'
 import { EnrichedActivityScore } from '@/utils/suggestions'
-import { parseISO } from 'date-fns'
-import React from 'react'
+import { format, formatDuration, intervalToDuration, parseISO } from 'date-fns'
+import { useFlags } from 'launchdarkly-react-client-sdk'
+import React, { useEffect } from 'react'
 
-export type TideTimesChartProps = {
+export type ClockDisplayProps = {
   suggestedActivity: EnrichedActivityScore | null
-  sunData: SunData
-  tideData: TideInfo[]
+  dataContext: DataContext
 }
 
-export default function TideTimesChart({
+export default function ClockDisplay(props: ClockDisplayProps) {
+  const { clockType } = useFlags()
+
+  switch (clockType) {
+    case 'analog-activity-ranges':
+      return <AnalogActivityRanges {...props} />
+    case 'time-to-next-descriptive':
+      return <TimeToNext {...props} type={'descriptive'} displayTime={true} />
+    default:
+      return null
+  }
+}
+
+export function AnalogActivityRanges({
   suggestedActivity,
-  sunData,
-  tideData,
-}: TideTimesChartProps) {
+  dataContext,
+}: ClockDisplayProps) {
+  const { tideData, sunData } = dataContext
+
   const highTides = tideData.filter((t) => t.type === 'high')
   const lowTides = tideData.filter((t) => t.type === 'low')
 
@@ -117,4 +131,55 @@ export default function TideTimesChart({
     })
 
   return <ClockChart {...chartOptions} timeRanges={timeRanges} />
+}
+
+export function TimeToNext({
+  suggestedActivity,
+  displayTime = true,
+}: ClockDisplayProps & { displayTime?: boolean; type: 'descriptive' }) {
+  const [diff, setDiff] = React.useState<string | number | null>(null)
+  const [currentTime, setCurrentTime] = React.useState<Date | null>(null)
+
+  useEffect(() => {
+    const updateTime = () => {
+      if (!suggestedActivity) {
+        return
+      }
+      const current = new Date()
+      const duration = intervalToDuration({
+        start: current,
+        end: parseISO(suggestedActivity?.timestamp, dateOptions),
+      })
+      const formatted = formatDuration(duration)
+      setDiff(formatted)
+      setCurrentTime(current)
+    }
+    const interval = setInterval(updateTime, 1000)
+    return () => clearInterval(interval)
+  }, [suggestedActivity])
+
+  return (
+    <div className="p-10">
+      {displayTime && currentTime && (
+        <div>
+          <div className="text-md font-bold md:text-xl xl:text-3xl">
+            The time is
+          </div>
+          <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
+            {format(currentTime, 'h:mm aaa')}
+          </div>
+          <div className="text-md font-bold md:text-xl xl:text-3xl">
+            and it&#39;s
+          </div>
+        </div>
+      )}
+
+      <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
+        {diff}
+      </div>
+      <div className="text-md font-bold md:text-xl xl:text-3xl">
+        until the next activity
+      </div>
+    </div>
+  )
 }

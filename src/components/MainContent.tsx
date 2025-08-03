@@ -1,10 +1,10 @@
 'use client'
 
 import ActivityScoreList from '@/components/ActivityScoreList'
+import ClockDisplay from '@/components/ClockDisplay'
 import DatePagination from '@/components/DatePagination'
 import DayTimeline from '@/components/DayTimeline'
 import SuggestedActivity from '@/components/SuggestedActivity'
-import TideTimesChart from '@/components/TideTimesChart'
 import WeatherStatus from '@/components/WeatherStatus'
 import { APP_CONFIG } from '@/config'
 import { useActivities } from '@/hooks/useApiRequest'
@@ -15,6 +15,7 @@ import logger from '@/utils/logger'
 import { ActivityRecommender, groupScores } from '@/utils/suggestions'
 import { formatISO, startOfDay } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
+import { Clock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
@@ -57,7 +58,7 @@ export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
 
 function MainContentWithoutDate({ date }: { date: Date }) {
   const activities = useActivities(APP_CONFIG.activityFetcher)
-  const { showSuggestedActivity, showActivityTable, clockType } = useFlags()
+  const { showSuggestedActivity, showActivityTable } = useFlags()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [selectionIndex, setSelectionIndex] = useState(0)
@@ -140,14 +141,10 @@ function MainContentWithoutDate({ date }: { date: Date }) {
               sunData={dataContext.sunData}
               tideData={dataContext.tideData}
             />
-            {clockType === 'analog-activity-ranges' && (
-              <TideTimesChart
-                key={date.toDateString()}
-                suggestedActivity={suggestedActivity}
-                sunData={dataContext.sunData}
-                tideData={dataContext.tideData}
-              />
-            )}
+            <ClockDisplay
+              suggestedActivity={suggestedActivity}
+              dataContext={dataContext}
+            />
           </div>
           <div className="w-full md:w-1/3">
             {showSuggestedActivity && (
