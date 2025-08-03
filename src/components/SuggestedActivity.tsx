@@ -4,7 +4,7 @@ import { IsDarkContext } from '@/utils/contexts'
 import { formatInterval } from '@/utils/dates'
 import { ActivityGroupInfo, EnrichedActivityScore } from '@/utils/suggestions'
 import MarkdownPreview from '@uiw/react-markdown-preview'
-import { compareAsc } from 'date-fns'
+import { addHours, compareAsc, isEqual } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import React, { useContext, useEffect } from 'react'
 import GenericObject from './GenericObject'
@@ -197,18 +197,31 @@ function SuggestedActivityExplanationDialog({
     // - the constraints
     // - the context
 
+    const intervals: ActivityGroupInfo[] = (
+      suggestedActivity.intervals || [
+        {
+          constraintScores: suggestedActivity.constraintScores,
+          interval: suggestedActivity.interval,
+          score: suggestedActivity.score,
+          slot: suggestedActivity.debug?.slot,
+        },
+      ]
+    )
+      .sort((a, b) => compareAsc(a.interval.start, b.interval.start))
+      .map((agi) => {
+        const { start, end } = agi.interval
+        return {
+          ...agi,
+          interval: {
+            start,
+            end: addHours(end, 1), // end is inclusive, so we add 1 hour to make it exclusive
+          },
+        }
+      })
+
     const scope = {
       activityName: suggestedActivity.activity.name,
-      intervals:
-        suggestedActivity.intervals ||
-        [
-          {
-            constraintScores: suggestedActivity.constraintScores,
-            interval: suggestedActivity.interval,
-            score: suggestedActivity.score,
-            slot: suggestedActivity.debug?.slot,
-          },
-        ].sort((a, b) => compareAsc(a.interval.start, b.interval.start)),
+      intervals,
       constraints: suggestedActivity.activity.constraints,
     }
 
