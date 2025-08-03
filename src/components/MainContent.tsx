@@ -57,7 +57,7 @@ export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
 
 function MainContentWithoutDate({ date }: { date: Date }) {
   const activities = useActivities(APP_CONFIG.activityFetcher)
-  const { showSuggestedActivity, showActivityTable } = useFlags()
+  const { showSuggestedActivity, showActivityTable, clockType } = useFlags()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [selectionIndex, setSelectionIndex] = useState(0)
@@ -140,12 +140,14 @@ function MainContentWithoutDate({ date }: { date: Date }) {
               sunData={dataContext.sunData}
               tideData={dataContext.tideData}
             />
-            <TideTimesChart
-              key={date.toDateString()}
-              suggestedActivity={suggestedActivity}
-              sunData={dataContext.sunData}
-              tideData={dataContext.tideData}
-            />
+            {clockType === 'analog-activity-ranges' && (
+              <TideTimesChart
+                key={date.toDateString()}
+                suggestedActivity={suggestedActivity}
+                sunData={dataContext.sunData}
+                tideData={dataContext.tideData}
+              />
+            )}
           </div>
           <div className="w-full md:w-1/3">
             {showSuggestedActivity && (
