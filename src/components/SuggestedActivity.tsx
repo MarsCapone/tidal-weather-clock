@@ -187,7 +187,9 @@ function SuggestedActivityExplanationDialog({
   suggestedActivity,
 }: SuggestedActivityExplanationDialogProps) {
   const { debugMode } = useFlags()
-  const [aiExplanation, setAiExplanation] = React.useState<string | null>(null)
+  const [aiExplanations, setAiExplanations] = React.useState<string[] | null>(
+    null,
+  )
   const isDarkMode = useContext(IsDarkContext)
 
   useEffect(() => {
@@ -221,7 +223,8 @@ function SuggestedActivityExplanationDialog({
 
     const scope = {
       activityName: suggestedActivity.activity.name,
-      intervals,
+      activityPriority: suggestedActivity.activity.priority,
+      contexts: intervals,
       constraints: suggestedActivity.activity.constraints,
     }
 
@@ -235,9 +238,7 @@ function SuggestedActivityExplanationDialog({
       .then((res) => res.json())
       .then((data) => {
         if (data.explanation) {
-          setAiExplanation(data.explanation)
-        } else {
-          setAiExplanation('No explanation available.')
+          setAiExplanations(data.explanation)
         }
       })
   }, [suggestedActivity, debugMode])
@@ -301,8 +302,14 @@ function SuggestedActivityExplanationDialog({
                       </td>
                       <td className="align-text-top">
                         <MarkdownPreview
-                          source={aiExplanation || 'Thinking...'}
-                          className="p-8"
+                          source={
+                            aiExplanations
+                              ? aiExplanations[i]
+                                ? aiExplanations[i].trim()
+                                : 'No explanation available'
+                              : 'Thinking...'
+                          }
+                          className=""
                           wrapperElement={{
                             'data-color-mode': isDarkMode ? 'dark' : 'light',
                           }}
