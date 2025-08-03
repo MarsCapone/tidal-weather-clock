@@ -1,5 +1,11 @@
-import { githubLightTheme, JsonEditor, JsonEditorProps } from 'json-edit-react'
-import React from 'react'
+import { IsDarkContext } from '@/utils/contexts'
+import {
+  githubDarkTheme,
+  githubLightTheme,
+  JsonEditor,
+  JsonEditorProps,
+} from 'json-edit-react'
+import React, { useContext } from 'react'
 
 export type GenericObjectProps = {
   className?: string
@@ -16,6 +22,7 @@ export default function GenericObject({
   obj,
   options,
 }: GenericObjectProps) {
+  const isDarkTheme = useContext(IsDarkContext)
   const renderValue = (v: number | string | boolean) => {
     if (v === null) {
       return 'NULL'
@@ -63,11 +70,11 @@ export default function GenericObject({
       showArrayIndices: false,
       showCollectionCount: false,
       showStringQuotes: false,
-      theme: githubLightTheme, // isDarkTheme ? githubDarkTheme : githubLightTheme,
+      theme: isDarkTheme ? githubDarkTheme : githubLightTheme,
       viewOnly: true,
       ...(options?.jsonEditorProps || {}),
     }
-    return <JsonEditor {...jsonEditorProps} className="" />
+    return <JsonEditor {...jsonEditorProps} />
   }
 
   if (obj === null || obj === undefined) {
