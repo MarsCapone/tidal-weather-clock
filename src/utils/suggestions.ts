@@ -42,6 +42,7 @@ export type ActivityGroupInfo = {
   constraintScores: ActivityScore['constraintScores']
   interval: Interval<Date, Date>
   score: ActivityScore['score']
+  slot: TimeSlot | undefined
 }
 
 export type DefaultActivityScore = ActivityScore<{ slot: TimeSlot }>
@@ -149,6 +150,7 @@ export function groupScores(
           constraintScores: score.constraintScores,
           interval: score.interval,
           score: score.score,
+          slot: score.debug?.slot,
         })),
       }
     })

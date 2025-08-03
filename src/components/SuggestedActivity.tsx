@@ -1,10 +1,9 @@
 import { Constraint } from '@/types/activity'
-import { WindInfo } from '@/types/context'
 import { formatInterval } from '@/utils/dates'
 import { ActivityGroupInfo, EnrichedActivityScore } from '@/utils/suggestions'
 import { compareAsc } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
-import React from 'react'
+import React, { useEffect } from 'react'
 import GenericObject from './GenericObject'
 
 export type SuggestedActivityProps = {
@@ -80,6 +79,7 @@ export function getActivityGroupInfo(
           constraintScores: activityScore.constraintScores,
           interval: activityScore.interval,
           score: activityScore.score,
+          slot: activityScore.debug?.slot,
         },
       ]
 }
@@ -126,7 +126,7 @@ export function ExplainButton({ selection }: ExplainButtonProps) {
       </div>
       <SuggestedActivityExplanationDialog
         dialogId={dialogId}
-        selection={selection}
+        suggestedActivity={selection}
       />
     </>
   )
@@ -177,22 +177,54 @@ function NavButton({
 
 type SuggestedActivityExplanationDialogProps = {
   dialogId: string
-  selection: EnrichedActivityScore
+  suggestedActivity: EnrichedActivityScore
 }
 function SuggestedActivityExplanationDialog({
   dialogId,
-  selection,
+  suggestedActivity,
 }: SuggestedActivityExplanationDialogProps) {
   const { debugMode } = useFlags()
+  const [aiExplanation, setAiExplanation] = React.useState<string | null>(null)
+
+  useEffect(() => {
+    // the relevant information to send to the AI for explanation is:
+    // - the activity name
+    // - the intervals with scores
+    // - the constraints
+    // - the context
+
+    const scope = {
+      activityName: suggestedActivity.activity.name,
+      intervals:
+        suggestedActivity.intervals ||
+        [
+          {
+            constraintScores: suggestedActivity.constraintScores,
+            interval: suggestedActivity.interval,
+            score: suggestedActivity.score,
+            slot: suggestedActivity.debug?.slot,
+          },
+        ].sort((a, b) => compareAsc(a.interval.start, b.interval.start)),
+      constraints: suggestedActivity.activity.constraints,
+    }
+
+    // sleep for 5 seconds to simulate AI explanation loading
+    const timer = setTimeout(() => {
+      // Here you would typically fetch the AI explanation
+      setAiExplanation('This is a simulated AI explanation for the activity.')
+    }, 5000)
+    return () => clearTimeout(timer)
+  }, [suggestedActivity])
 
   const intervals = (
-    'intervals' in selection
-      ? selection.intervals!
+    'intervals' in suggestedActivity
+      ? suggestedActivity.intervals!
       : [
           {
-            constraintScores: selection.constraintScores,
-            interval: selection.interval,
-            score: selection.score,
+            constraintScores: suggestedActivity.constraintScores,
+            interval: suggestedActivity.interval,
+            score: suggestedActivity.score,
+            slot: suggestedActivity.debug?.slot,
           },
         ]
   ).sort((a, b) => compareAsc(a.interval.start, b.interval.start))
@@ -200,27 +232,19 @@ function SuggestedActivityExplanationDialog({
   const constraintsMap: {
     [p: string]: Omit<Constraint, 'type'>
   } = Object.fromEntries(
-    selection.activity.constraints.map((constraint, index) => {
+    suggestedActivity.activity.constraints.map((constraint, index) => {
       const { type, ...constraintWithoutType } = constraint
 
       return [`${index}:${type}`, constraintWithoutType]
     }),
   )
 
-  const selectionWind = selection.debug?.slot?.wind as WindInfo | undefined
-  const slotWind = {
-    ...(selectionWind || {}),
-  }
-
-  const selectionSlot = {
-    ...(selection.debug?.slot || {}),
-    wind: slotWind,
-  }
-
   return (
     <dialog className="modal" id={dialogId}>
       <div className="modal-box max-h-5xl h-11/12 w-11/12 max-w-5xl">
-        <p className="text-2xl font-extrabold">{selection.activity.name}</p>
+        <p className="text-2xl font-extrabold">
+          {suggestedActivity.activity.name}
+        </p>
         <div className="">
           <div className="overflow-x-auto">
             <table className="table-primary table-md table-pin-rows table">
@@ -249,7 +273,9 @@ function SuggestedActivityExplanationDialog({
                         <span>{interval.score.toFixed(3)}</span>
                         <span>{renderScore(interval.score)}</span>
                       </td>
-                      <td className="align-text-top">AI description here</td>
+                      <td className="align-text-top">
+                        {aiExplanation || 'Thinking...'}
+                      </td>
                       {debugMode && (
                         <>
                           <td className="align-text-top">
@@ -268,7 +294,8 @@ function SuggestedActivityExplanationDialog({
                               className={'w-20'}
                               obj={{
                                 ...constraintsMap,
-                                '+:priority': selection.activity.priority,
+                                '+:priority':
+                                  suggestedActivity.activity.priority,
                               }}
                               options={{
                                 decimalPlaces: 0,
@@ -279,17 +306,15 @@ function SuggestedActivityExplanationDialog({
                             />
                           </td>
                           <td className="align-text-top">
-                            {selectionSlot && (
-                              <GenericObject
-                                className={'w-20'}
-                                obj={selectionSlot}
-                                options={{
-                                  jsonEditorProps: {
-                                    minWidth: 300,
-                                  },
-                                }}
-                              />
-                            )}
+                            <GenericObject
+                              className={'w-20'}
+                              obj={interval.slot || {}}
+                              options={{
+                                jsonEditorProps: {
+                                  minWidth: 300,
+                                },
+                              }}
+                            />
                           </td>
                         </>
                       )}
