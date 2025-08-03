@@ -173,35 +173,36 @@ export function TimeToNext({
   const nextActivityInThePast = isBefore(timestamp, currentTime || new Date())
 
   return (
-    <div className="p-10">
+    <div className="flex flex-col items-center justify-center gap-1 p-10">
       {displayTime && currentTime && (
-        <div>
+        <div className="mb-8">
           <div className="text-md font-bold md:text-xl xl:text-3xl">
-            The time is
+            the time is
           </div>
           <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
             {format(currentTime, 'h:mm aaa')}
           </div>
-          <div className="text-md font-bold md:text-xl xl:text-3xl">
-            and{' '}
-            {nextActivityInThePast ? 'this activity was suggested for' : "it's"}
-          </div>
         </div>
       )}
 
+      <div className="bg-base-content text-base-100 w-fit px-1 py-0.5 text-xl font-extrabold md:text-3xl xl:text-5xl">
+        {suggestedActivity.activity.name}
+      </div>
+
       {nextActivityInThePast ? (
         <>
+          <div className="text-md font-bold md:text-xl xl:text-3xl">
+            was the acttivity suggested
+          </div>
           <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
             {formatRelative(timestamp, currentTime || new Date(), dateOptions)}
           </div>
         </>
       ) : (
         <>
+          <div className="text-md font-bold md:text-xl xl:text-3xl">in</div>
           <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
             {diff}
-          </div>
-          <div className="text-md font-bold md:text-xl xl:text-3xl">
-            until the next activity
           </div>
         </>
       )}
