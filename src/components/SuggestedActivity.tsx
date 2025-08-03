@@ -183,6 +183,8 @@ function SuggestedActivityExplanationDialog({
   dialogId,
   selection,
 }: SuggestedActivityExplanationDialogProps) {
+  const { debugMode } = useFlags()
+
   const intervals = (
     'intervals' in selection
       ? selection.intervals!
@@ -226,9 +228,14 @@ function SuggestedActivityExplanationDialog({
                 <tr>
                   <th className="min-w-32">Time</th>
                   <th>Average Score</th>
-                  <th>Detailed Score</th>
-                  <th>Configuration</th>
-                  <th>Context</th>
+                  <th>Explanation</th>
+                  {debugMode && (
+                    <>
+                      <th>Detailed Score</th>
+                      <th>Configuration</th>
+                      <th>Context</th>
+                    </>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -238,49 +245,54 @@ function SuggestedActivityExplanationDialog({
                       <td className="align-text-top">
                         {formatInterval(interval.interval, 1)}
                       </td>
-                      <td className="align-text-top">
-                        {interval.score.toFixed(3)}
-                        {renderScore(interval.score)}
+                      <td className="flex flex-col align-text-top">
+                        <span>{interval.score.toFixed(3)}</span>
+                        <span>{renderScore(interval.score)}</span>
                       </td>
-                      <td className="align-text-top">
-                        {interval.constraintScores && (
-                          <GenericObject
-                            className={'w-40 text-sm'}
-                            obj={interval.constraintScores}
-                            options={{
-                              decimalPlaces: 2,
-                            }}
-                          />
-                        )}
-                      </td>
-                      <td className="align-text-top">
-                        <GenericObject
-                          className={'w-20'}
-                          obj={{
-                            ...constraintsMap,
-                            '+:priority': selection.activity.priority,
-                          }}
-                          options={{
-                            decimalPlaces: 0,
-                            jsonEditorProps: {
-                              minWidth: 300,
-                            },
-                          }}
-                        />
-                      </td>
-                      <td className="align-text-top">
-                        {selectionSlot && (
-                          <GenericObject
-                            className={'w-20'}
-                            obj={selectionSlot}
-                            options={{
-                              jsonEditorProps: {
-                                minWidth: 300,
-                              },
-                            }}
-                          />
-                        )}
-                      </td>
+                      <td className="align-text-top">AI description here</td>
+                      {debugMode && (
+                        <>
+                          <td className="align-text-top">
+                            {interval.constraintScores && (
+                              <GenericObject
+                                className={'w-40 text-sm'}
+                                obj={interval.constraintScores}
+                                options={{
+                                  decimalPlaces: 2,
+                                }}
+                              />
+                            )}
+                          </td>
+                          <td className="align-text-top">
+                            <GenericObject
+                              className={'w-20'}
+                              obj={{
+                                ...constraintsMap,
+                                '+:priority': selection.activity.priority,
+                              }}
+                              options={{
+                                decimalPlaces: 0,
+                                jsonEditorProps: {
+                                  minWidth: 300,
+                                },
+                              }}
+                            />
+                          </td>
+                          <td className="align-text-top">
+                            {selectionSlot && (
+                              <GenericObject
+                                className={'w-20'}
+                                obj={selectionSlot}
+                                options={{
+                                  jsonEditorProps: {
+                                    minWidth: 300,
+                                  },
+                                }}
+                              />
+                            )}
+                          </td>
+                        </>
+                      )}
                     </tr>
                   )
                 })}
