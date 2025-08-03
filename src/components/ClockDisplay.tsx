@@ -192,7 +192,7 @@ export function TimeToNext({
       {nextActivityInThePast ? (
         <>
           <div className="text-md font-bold md:text-xl xl:text-3xl">
-            was the acttivity suggested
+            was the activity suggested
           </div>
           <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
             {formatRelative(timestamp, currentTime || new Date(), dateOptions)}
