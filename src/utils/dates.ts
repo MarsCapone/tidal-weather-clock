@@ -30,7 +30,7 @@ export function formatInterval(
   }
 
   if (humanReadable) {
-    const startingAt = formatRelative(interval.start, new Date(), dateOptions)
+    const startingAt = formatRelative(interval.start, new Date())
     const duration = formatDuration(
       intervalToDuration({
         start: interval.start,
