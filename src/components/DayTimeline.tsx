@@ -1,7 +1,7 @@
 import { SunriseIcon, SunsetIcon } from '@/components/icons/SunStateIcon'
 import { HighWaterIcon, LowWaterIcon } from '@/components/icons/TideIcon'
 import { DataContext } from '@/types/context'
-import { formatTime, withFractionalTime } from '@/utils/dates'
+import { dateOptions, formatTime, withFractionalTime } from '@/utils/dates'
 import { compareAsc, parseISO } from 'date-fns'
 
 type TimelineItem = {
@@ -55,7 +55,7 @@ export default function DayTimeline({
       },
       Icon: SunriseIcon,
       label: 'Sunrise',
-      timestamp: sunData.sunRise,
+      timestamp: parseISO(sunData.sunRise, dateOptions),
     },
     {
       additionalClasses: {
@@ -65,18 +65,11 @@ export default function DayTimeline({
       },
       Icon: SunsetIcon,
       label: 'Sunset',
-      timestamp: sunData.sunSet,
+      timestamp: parseISO(sunData.sunSet, dateOptions),
     },
     ...tides,
   ]
     .filter(({ timestamp }) => timestamp !== null)
-    .map((item) => ({
-      ...item,
-      timestamp:
-        typeof item.timestamp === 'string'
-          ? parseISO(item.timestamp)
-          : item.timestamp,
-    }))
     .toSorted((a, b) => compareAsc(a.timestamp!, b.timestamp!))
 
   return (

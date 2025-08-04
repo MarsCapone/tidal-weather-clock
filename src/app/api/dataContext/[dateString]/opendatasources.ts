@@ -246,9 +246,20 @@ export class OpenMeteoAndEasyTideDataFetcher implements IDataContextFetcher {
       },
     )
 
-    return dates.map((d) =>
-      this.makeDataContext(d, easyTideData, hourlyPoints, dailyPoints),
-    )
+    return dates
+      .map((d) => {
+        try {
+          return this.makeDataContext(
+            d,
+            easyTideData,
+            hourlyPoints,
+            dailyPoints,
+          )
+        } catch {
+          return null
+        }
+      })
+      .filter((d) => d !== null) as DataContext[]
   }
 
   makeDataContext(
@@ -267,6 +278,15 @@ export class OpenMeteoAndEasyTideDataFetcher implements IDataContextFetcher {
         day.date ===
         formatISO(date, { ...dateOptions, representation: 'date' }),
     )
+
+    if (!dailyPoint || hourlyPoints.length === 0) {
+      this.logger.error('No data for date', {
+        date,
+        openMeteoDaily,
+        openMeteoHourly,
+      })
+      throw new Error('No data for date')
+    }
 
     return {
       referenceDate: formatISO(date, dateOptions),
