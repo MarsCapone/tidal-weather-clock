@@ -185,19 +185,22 @@ function SuggestedActivityExplanationDialog({
   dialogId,
   suggestedActivity,
 }: SuggestedActivityExplanationDialogProps) {
-  const { debugMode } = useFlags()
+  const { debugMode, usAiExplanations: useAiExplanations } = useFlags()
   const [aiExplanations, setAiExplanations] = React.useState<string[] | null>(
     null,
   )
   const isDarkMode = useContext(IsDarkContext)
 
   useEffect(() => {
+    if (!useAiExplanations) {
+      return
+    }
+
     // the relevant information to send to the AI for explanation is:
     // - the activity name
     // - the intervals with scores
     // - the constraints
     // - the context
-
     const intervals: ActivityGroupInfo[] = (
       suggestedActivity.intervals || [
         {
@@ -240,7 +243,7 @@ function SuggestedActivityExplanationDialog({
           setAiExplanations(data.explanation)
         }
       })
-  }, [suggestedActivity, debugMode])
+  }, [suggestedActivity, debugMode, useAiExplanations])
 
   const intervals = (
     'intervals' in suggestedActivity
@@ -278,8 +281,8 @@ function SuggestedActivityExplanationDialog({
                 <tr>
                   <th className="min-w-32">Time</th>
                   <th>Average Score</th>
-                  <th>Explanation</th>
-                  {debugMode && (
+                  {useAiExplanations && <th>Explanation</th>}
+                  {(debugMode || !useAiExplanations) && (
                     <>
                       <th>Detailed Score</th>
                       <th>Configuration</th>
@@ -299,22 +302,24 @@ function SuggestedActivityExplanationDialog({
                         <span>{interval.score.toFixed(3)}</span>
                         <span>{renderScore(interval.score)}</span>
                       </td>
-                      <td className="align-text-top">
-                        <MarkdownPreview
-                          source={
-                            aiExplanations
-                              ? aiExplanations[i]
-                                ? aiExplanations[i].trim()
-                                : 'No explanation available'
-                              : 'Thinking...'
-                          }
-                          className=""
-                          wrapperElement={{
-                            'data-color-mode': isDarkMode ? 'dark' : 'light',
-                          }}
-                        />
-                      </td>
-                      {debugMode && (
+                      {useAiExplanations && (
+                        <td className="align-text-top">
+                          <MarkdownPreview
+                            source={
+                              aiExplanations
+                                ? aiExplanations[i]
+                                  ? aiExplanations[i].trim()
+                                  : 'No explanation available'
+                                : 'Thinking...'
+                            }
+                            className=""
+                            wrapperElement={{
+                              'data-color-mode': isDarkMode ? 'dark' : 'light',
+                            }}
+                          />
+                        </td>
+                      )}
+                      {(debugMode || !useAiExplanations) && (
                         <>
                           <td className="align-text-top">
                             {interval.constraintScores && (
