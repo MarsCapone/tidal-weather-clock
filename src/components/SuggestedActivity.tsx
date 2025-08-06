@@ -5,7 +5,7 @@ import { ActivityGroupInfo, EnrichedActivityScore } from '@/utils/suggestions'
 import MarkdownPreview from '@uiw/react-markdown-preview'
 import { addHours, compareAsc } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
-import React, { use, useContext, useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import GenericObject from './GenericObject'
 
 export type SuggestedActivityProps = {
