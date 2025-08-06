@@ -13,10 +13,13 @@
     "start": "next start"
   },
   "dependencies": {
+    "@ai-sdk/amazon-bedrock": "^3.0.0",
     "@date-fns/tz": "^1.2.0",
     "@neondatabase/serverless": "^1.0.1",
+    "@uiw/react-markdown-preview": "^5.1.5",
     "@vercel/blob": "^1.1.1",
     "@vercel/edge-config": "^1.4.0",
+    "ai": "^5.0.0",
     "array-equal": "^2.0.0",
     "bun-plugin-tailwind": "^0.0.14",
     "change-case": "^5.4.4",

@@ -1,10 +1,11 @@
 import { Constraint } from '@/types/activity'
-import { WindInfo } from '@/types/context'
+import { IsDarkContext } from '@/utils/contexts'
 import { formatInterval } from '@/utils/dates'
 import { ActivityGroupInfo, EnrichedActivityScore } from '@/utils/suggestions'
-import { compareAsc } from 'date-fns'
+import MarkdownPreview from '@uiw/react-markdown-preview'
+import { addHours, compareAsc } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import GenericObject from './GenericObject'
 
 export type SuggestedActivityProps = {
@@ -80,6 +81,7 @@ export function getActivityGroupInfo(
           constraintScores: activityScore.constraintScores,
           interval: activityScore.interval,
           score: activityScore.score,
+          slot: activityScore.debug?.slot,
         },
       ]
 }
@@ -126,7 +128,7 @@ export function ExplainButton({ selection }: ExplainButtonProps) {
       </div>
       <SuggestedActivityExplanationDialog
         dialogId={dialogId}
-        selection={selection}
+        suggestedActivity={selection}
       />
     </>
   )
@@ -177,20 +179,78 @@ function NavButton({
 
 type SuggestedActivityExplanationDialogProps = {
   dialogId: string
-  selection: EnrichedActivityScore
+  suggestedActivity: EnrichedActivityScore
 }
 function SuggestedActivityExplanationDialog({
   dialogId,
-  selection,
+  suggestedActivity,
 }: SuggestedActivityExplanationDialogProps) {
+  const { debugMode } = useFlags()
+  const [aiExplanations, setAiExplanations] = React.useState<string[] | null>(
+    null,
+  )
+  const isDarkMode = useContext(IsDarkContext)
+
+  useEffect(() => {
+    // the relevant information to send to the AI for explanation is:
+    // - the activity name
+    // - the intervals with scores
+    // - the constraints
+    // - the context
+
+    const intervals: ActivityGroupInfo[] = (
+      suggestedActivity.intervals || [
+        {
+          constraintScores: suggestedActivity.constraintScores,
+          interval: suggestedActivity.interval,
+          score: suggestedActivity.score,
+          slot: suggestedActivity.debug?.slot,
+        },
+      ]
+    )
+      .sort((a, b) => compareAsc(a.interval.start, b.interval.start))
+      .map((agi) => {
+        const { start, end } = agi.interval
+        return {
+          ...agi,
+          interval: {
+            start,
+            end: addHours(end, 1), // end is inclusive, so we add 1 hour to make it exclusive
+          },
+        }
+      })
+
+    const scope = {
+      activityName: suggestedActivity.activity.name,
+      activityPriority: suggestedActivity.activity.priority,
+      contexts: intervals,
+      constraints: suggestedActivity.activity.constraints,
+    }
+
+    fetch('/api/explain', {
+      method: 'POST',
+      body: JSON.stringify({ scope, debugMode }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.explanation) {
+          setAiExplanations(data.explanation)
+        }
+      })
+  }, [suggestedActivity, debugMode])
+
   const intervals = (
-    'intervals' in selection
-      ? selection.intervals!
+    'intervals' in suggestedActivity
+      ? suggestedActivity.intervals!
       : [
           {
-            constraintScores: selection.constraintScores,
-            interval: selection.interval,
-            score: selection.score,
+            constraintScores: suggestedActivity.constraintScores,
+            interval: suggestedActivity.interval,
+            score: suggestedActivity.score,
+            slot: suggestedActivity.debug?.slot,
           },
         ]
   ).sort((a, b) => compareAsc(a.interval.start, b.interval.start))
@@ -198,27 +258,19 @@ function SuggestedActivityExplanationDialog({
   const constraintsMap: {
     [p: string]: Omit<Constraint, 'type'>
   } = Object.fromEntries(
-    selection.activity.constraints.map((constraint, index) => {
+    suggestedActivity.activity.constraints.map((constraint, index) => {
       const { type, ...constraintWithoutType } = constraint
 
       return [`${index}:${type}`, constraintWithoutType]
     }),
   )
 
-  const selectionWind = selection.debug?.slot?.wind as WindInfo | undefined
-  const slotWind = {
-    ...(selectionWind || {}),
-  }
-
-  const selectionSlot = {
-    ...(selection.debug?.slot || {}),
-    wind: slotWind,
-  }
-
   return (
     <dialog className="modal" id={dialogId}>
       <div className="modal-box max-h-5xl h-11/12 w-11/12 max-w-5xl">
-        <p className="text-2xl font-extrabold">{selection.activity.name}</p>
+        <p className="text-2xl font-extrabold">
+          {suggestedActivity.activity.name}
+        </p>
         <div className="">
           <div className="overflow-x-auto">
             <table className="table-primary table-md table-pin-rows table">
@@ -226,9 +278,14 @@ function SuggestedActivityExplanationDialog({
                 <tr>
                   <th className="min-w-32">Time</th>
                   <th>Average Score</th>
-                  <th>Detailed Score</th>
-                  <th>Configuration</th>
-                  <th>Context</th>
+                  <th>Explanation</th>
+                  {debugMode && (
+                    <>
+                      <th>Detailed Score</th>
+                      <th>Configuration</th>
+                      <th>Context</th>
+                    </>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -238,49 +295,67 @@ function SuggestedActivityExplanationDialog({
                       <td className="align-text-top">
                         {formatInterval(interval.interval, 1)}
                       </td>
-                      <td className="align-text-top">
-                        {interval.score.toFixed(3)}
-                        {renderScore(interval.score)}
+                      <td className="flex flex-col align-text-top">
+                        <span>{interval.score.toFixed(3)}</span>
+                        <span>{renderScore(interval.score)}</span>
                       </td>
                       <td className="align-text-top">
-                        {interval.constraintScores && (
-                          <GenericObject
-                            className={'w-40 text-sm'}
-                            obj={interval.constraintScores}
-                            options={{
-                              decimalPlaces: 2,
-                            }}
-                          />
-                        )}
-                      </td>
-                      <td className="align-text-top">
-                        <GenericObject
-                          className={'w-20'}
-                          obj={{
-                            ...constraintsMap,
-                            '+:priority': selection.activity.priority,
-                          }}
-                          options={{
-                            decimalPlaces: 0,
-                            jsonEditorProps: {
-                              minWidth: 300,
-                            },
+                        <MarkdownPreview
+                          source={
+                            aiExplanations
+                              ? aiExplanations[i]
+                                ? aiExplanations[i].trim()
+                                : 'No explanation available'
+                              : 'Thinking...'
+                          }
+                          className=""
+                          wrapperElement={{
+                            'data-color-mode': isDarkMode ? 'dark' : 'light',
                           }}
                         />
                       </td>
-                      <td className="align-text-top">
-                        {selectionSlot && (
-                          <GenericObject
-                            className={'w-20'}
-                            obj={selectionSlot}
-                            options={{
-                              jsonEditorProps: {
-                                minWidth: 300,
-                              },
-                            }}
-                          />
-                        )}
-                      </td>
+                      {debugMode && (
+                        <>
+                          <td className="align-text-top">
+                            {interval.constraintScores && (
+                              <GenericObject
+                                className={'w-40 text-sm'}
+                                obj={interval.constraintScores}
+                                options={{
+                                  decimalPlaces: 2,
+                                }}
+                              />
+                            )}
+                          </td>
+                          <td className="align-text-top">
+                            <GenericObject
+                              className={'w-20'}
+                              obj={{
+                                ...constraintsMap,
+                                '+:priority':
+                                  suggestedActivity.activity.priority,
+                              }}
+                              options={{
+                                decimalPlaces: 0,
+                                jsonEditorProps: {
+                                  minWidth: 300,
+                                },
+                              }}
+                            />
+                          </td>
+                          <td className="align-text-top">
+                            <GenericObject
+                              className={'w-20'}
+                              obj={interval.slot || {}}
+                              options={{
+                                jsonEditorProps: {
+                                  minWidth: 300,
+                                },
+                              }}
+                            />
+                          </td>
+                        </>
+                      )}
                     </tr>
                   )
                 })}

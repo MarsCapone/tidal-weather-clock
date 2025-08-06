@@ -16,7 +16,7 @@ export const dateOptions = {
 }
 
 export function formatTime(date: Date): string {
-  return format(date, 'HH:mm')
+  return format(date, 'HH:mm', dateOptions)
 }
 
 export function formatInterval(
@@ -41,7 +41,7 @@ export function formatInterval(
     return [`from ${startingAt}`, `for ${duration}`]
   }
 
-  return [`${formatTime(interval.start)} - ${formatTime(end)}`]
+  return [`${formatTime(interval.start)} - ${formatTime(end)} UTC`]
 }
 
 export function withFractionalTime(date: Date | string, time: number): Date {
