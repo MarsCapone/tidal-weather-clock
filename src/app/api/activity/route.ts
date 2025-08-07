@@ -1,6 +1,9 @@
 import logger from '@/app/api/pinoLogger'
+import { db } from '@/db/context'
+import { activityTable, constraintTable } from '@/db/schemas/activity'
 import { Activity } from '@/types/activity'
 import { neon } from '@neondatabase/serverless'
+import { notInArray } from 'drizzle-orm'
 import { NextRequest } from 'next/server'
 
 const sql = neon(process.env.DATABASE_URL!)
@@ -44,37 +47,41 @@ export async function PUT(request: NextRequest): Promise<Response> {
   const activities = data.activities
 
   // upsert all the activities
-  const activityIds: string[] = (
-    await Promise.all(
-      activities.map((activity) => {
-        return sql`
-            INSERT INTO public.activity (id, name, priority, description, user_id)
-                VALUES (${activity.id}, ${activity.name}, ${activity.priority}, ${activity.description}, ${userId})
-            ON CONFLICT (id) DO UPDATE
-            SET 
-                name = EXCLUDED.name,
-                priority = EXCLUDED.priority,
-                description = EXCLUDED.description,
-                user_id = EXCLUDED.user_id
-            RETURNING id
-    `
-      }),
-    )
-  ).map((result) => result[0].id)
+  const inserts = activities.map((a) => {
+    const activityToInsert: typeof activityTable.$inferInsert = {
+      ...a,
+      user_id: userId,
+    }
+    return db
+      .insert(activityTable)
+      .values(activityToInsert)
+      .onConflictDoUpdate({
+        target: activityTable.id,
+        set: {
+          name: activityToInsert.name,
+          priority: activityToInsert.priority,
+          description: activityToInsert.description,
+          user_id: activityToInsert.user_id,
+        },
+      })
+      .returning({ id: activityTable.id })
+  })
 
+  const activityIds = (await Promise.all(inserts)).flatMap((res) =>
+    res.map((r) => r.id),
+  )
   logger.debug('updated activities', { activityIds })
 
   // first delete all the constraints. we can delete the ones for the activities we have because we're about to add
   // new constraints for them, and we can delete all the rest because we're going to delete any unlisted activities
-  await sql`DELETE FROM public.constraint`
+  await db.delete(constraintTable)
   logger.debug('deleted all constraints')
 
-  const array = `(${activityIds.join(', ')})`
-  logger.debug('array', { array })
   // now we can delete all activities that weren't sent to this endpoint
-  const deletedIds = await sql.query(
-    `DELETE FROM public.activity WHERE id NOT IN ${array} RETURNING id`,
-  )
+  const deletedIds = await db
+    .delete(activityTable)
+    .where(notInArray(activityTable.id, activityIds))
+    .returning({ id: activityTable.id })
   logger.debug('deleted all unreferenced activities', {
     deletedIds: deletedIds.map((d) => d.id),
   })
@@ -82,15 +89,11 @@ export async function PUT(request: NextRequest): Promise<Response> {
   // then re-add all the constraints
   const constraintInsertions = activities.flatMap((activity, index) => {
     return activity.constraints.map((constraint) => {
-      return sql`
-        INSERT INTO public.constraint (id, activity_id, type, content)
-        VALUES (
-          gen_random_uuid(),
-          ${activityIds[index]},
-          ${constraint.type},
-          ${JSON.stringify(constraint)}
-        )
-      `
+      return db.insert(constraintTable).values({
+        activity_id: activityIds[index],
+        type: constraint.type,
+        content: constraint,
+      })
     })
   })
   await Promise.all(constraintInsertions)

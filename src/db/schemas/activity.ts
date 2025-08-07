@@ -1,7 +1,7 @@
 import { integer, json, pgTable, text } from 'drizzle-orm/pg-core'
 import { v4 as uuidv4 } from 'uuid'
 
-export const activity = pgTable('activity', {
+export const activityTable = pgTable('activity', {
   id: text()
     .primaryKey()
     .$default(() => uuidv4()),
@@ -11,11 +11,11 @@ export const activity = pgTable('activity', {
   user_id: text(),
 })
 
-export const constraint = pgTable('constraint', {
+export const constraintTable = pgTable('constraint', {
   id: text()
     .primaryKey()
     .$default(() => uuidv4()),
-  activity_id: text().references(() => activity.id),
+  activity_id: text().references(() => activityTable.id),
   type: text(),
   content: json(),
 })
