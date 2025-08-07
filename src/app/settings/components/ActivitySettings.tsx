@@ -109,7 +109,7 @@ export default function ActivitySettings() {
           </div>
         </div>
       </div>
-      {activities.map((activity, index) => (
+      {internalActivities.map((activity, index) => (
         <ActivityCard
           key={activity.id}
           activity={activity}
