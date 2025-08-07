@@ -17,47 +17,103 @@ import {
   WeatherConstraint,
   WindConstraint,
 } from '@/types/activity'
+import { IsDarkContext } from '@/utils/contexts'
 import { fractionalTimeToString } from '@/utils/dates'
+import logger from '@/utils/logger'
 import { capitalize } from '@/utils/string'
-import { PencilIcon, PlusIcon, SaveIcon, TrashIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import diff from 'diff-arrays-of-objects'
+import {
+  FilterFunction,
+  githubDarkTheme,
+  githubLightTheme,
+  JsonEditor,
+  JsonEditorProps,
+} from 'json-edit-react'
+import { PlusIcon, TrashIcon } from 'lucide-react'
+import { useContext, useEffect, useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 export default function ActivitySettings() {
-  const initialActivities = useActivities(APP_CONFIG.activityFetcher)
-  const [activities, setActivities] = useState<Activity[]>([])
+  const [activities, updateActivities] = useActivities(
+    APP_CONFIG.activityFetcher,
+  )
+  const [internalActivities, setInternalActivities] = useState<Activity[]>([])
+
+  // most operations will operate on internal activities, so we first reflect them here
   useEffect(() => {
-    setActivities(initialActivities)
-  }, [initialActivities])
+    setInternalActivities(activities)
+  }, [activities])
 
   const onDeleteActivity = (id: string) => {
-    setActivities(activities.filter((item) => item.id !== id))
+    setInternalActivities(internalActivities.filter((item) => item.id !== id))
   }
 
   const addActivity = () => {
-    setActivities([
+    setInternalActivities([
       {
+        id: uuidv4(),
+        name: 'Sample name',
+        description: 'Sample description',
+        priority: 0,
         constraints: [],
-        description: '',
-        id: `abc-${activities.length + 1}`,
-        name: 'random name',
-        priority: 5,
       },
-      ...activities,
+      ...internalActivities,
     ])
   }
+
+  const setActivityFactory = (index: number) => {
+    return (activity: Activity) => {
+      const newActivities = [...internalActivities]
+      newActivities[index] = activity
+      setInternalActivities(newActivities)
+    }
+  }
+
+  // when we're ready, we can push our internal changes to the server
+  const commitChanges = () => {
+    updateActivities(internalActivities)
+    logger.info('Pushing activities to server', {
+      previousActivities: activities,
+      newActivities: internalActivities,
+    })
+  }
+
+  const changes = diff(activities, internalActivities, 'id')
+
+  const changeCount =
+    changes.added.length + changes.removed.length + changes.updated.length
 
   return (
     <div>
       <div className="mb-4 flex flex-row items-center justify-between">
         <SettingTitle title={'Activity Settings'} />
-        <button className="btn btn-primary rounded-field" onClick={addActivity}>
-          Add Activity <PlusIcon className="h-4 w-4" />
-        </button>
+        <div className="flex gap-2">
+          <button
+            className="btn btn-primary rounded-field"
+            onClick={addActivity}
+          >
+            Add Activity <PlusIcon className="h-4 w-4" />
+          </button>
+          <div className="indicator">
+            {changeCount > 0 && (
+              <span className="indicator-item badge badge-neutral">
+                {changeCount}
+              </span>
+            )}
+            <button
+              className={`btn btn-secondary rounded-field ${changeCount === 0 ? 'btn-disabled' : ''}`}
+              onClick={commitChanges}
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
       </div>
-      {activities.map((activity) => (
+      {internalActivities.map((activity, index) => (
         <ActivityCard
-          activity={activity}
           key={activity.id}
+          activity={activity}
+          setActivity={setActivityFactory(index)}
           onDelete={() => {
             onDeleteActivity(activity.id)
           }}
@@ -69,54 +125,23 @@ export default function ActivitySettings() {
 
 type ActivityCardProps = {
   activity: Activity
+  setActivity: (activity: Activity) => void
   onDelete: () => void
 }
 
-function ActivityCard({ activity, onDelete }: ActivityCardProps) {
-  const [editable, setEditable] = useState(false)
-  const [constraints, setConstraints] = useState(activity.constraints)
-  const onEdit = () => {
-    setEditable(!editable)
-  }
+const restrictChanges = ({ key }: { key: string }) => {
+  return key === 'id'
+}
 
-  const onAdd = () => {
-    setConstraints([...constraints, { type: 'tide' }])
-  }
+function ActivityCard({ activity, setActivity, onDelete }: ActivityCardProps) {
+  const isDarkTheme = useContext(IsDarkContext)
 
   return (
     <div className="card card-lg my-2 shadow-sm">
       <div className="card-body">
         <div className="card-title flex flex-row justify-between">
           <div className="flex-1">
-            <input
-              className={`input input-lg ${editable ? '' : 'input-ghost'}`}
-              defaultValue={activity.name}
-              readOnly={!editable}
-              type="text"
-            />
-          </div>
-          <div className="tooltip tooltip-bottom" data-tip="Add constraint">
-            <button
-              className="btn btn-ghost hover:btn-primary rounded-field aspect-square p-1"
-              onClick={onAdd}
-            >
-              <PlusIcon className="h-4 w-4" />
-            </button>
-          </div>
-          <div
-            className="tooltip tooltip-bottom"
-            data-tip={editable ? 'Save' : 'Edit'}
-          >
-            <button
-              className={`btn ${editable ? 'btn-accent' : 'btn-ghost'} rounded-field aspect-square p-1`}
-              onClick={onEdit}
-            >
-              {editable ? (
-                <SaveIcon className="h-4 w-4" />
-              ) : (
-                <PencilIcon className="h-4 w-4" />
-              )}
-            </button>
+            <div className="text-lg">{activity.name}</div>
           </div>
           <div className="tooltip tooltip-bottom" data-tip="Delete activity">
             <button
@@ -128,25 +153,18 @@ function ActivityCard({ activity, onDelete }: ActivityCardProps) {
           </div>
         </div>
         <div>
-          <input
-            className={`input input-md w-full ${editable ? '' : 'input-ghost'}`}
-            defaultValue={activity.description}
-            readOnly={!editable}
-            type="text"
-          />
+          <div>{activity.description}</div>
         </div>
         <div className="flex flex-col gap-2">
-          {constraints.map((constraint, i) => (
-            <ActivityConstraint
-              constraint={constraint}
-              constraintId={`${i}:${constraint.type}`}
-              editable={editable}
-              key={`${i}:${constraint.type}`}
-              onDelete={() => {
-                setConstraints(activity.constraints.filter((c, j) => i !== j))
-              }}
-            />
-          ))}
+          <JsonEditor
+            data={activity}
+            setData={setActivity as JsonEditorProps['setData']}
+            restrictAdd={true}
+            restrictDelete={true}
+            restrictEdit={restrictChanges as FilterFunction}
+            theme={isDarkTheme ? githubDarkTheme : githubLightTheme}
+            rootName={''}
+          />
         </div>
       </div>
     </div>

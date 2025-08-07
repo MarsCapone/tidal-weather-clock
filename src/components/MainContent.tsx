@@ -56,7 +56,7 @@ export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
 }
 
 function MainContentWithoutDate({ date }: { date: Date }) {
-  const activities = useActivities(APP_CONFIG.activityFetcher)
+  const [activities] = useActivities(APP_CONFIG.activityFetcher)
   const { showSuggestedActivity, showActivityTable } = useFlags()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)

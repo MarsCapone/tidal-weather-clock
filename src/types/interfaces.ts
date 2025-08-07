@@ -46,4 +46,9 @@ export interface IActivityRecommender<DebugType = never> {
 
 export interface IActivityFetcher {
   getActivities(userId: string | undefined): Promise<Activity[]>
+
+  setActivities(
+    userId: string | undefined,
+    activities: Activity[],
+  ): Promise<void>
 }
