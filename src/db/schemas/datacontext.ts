@@ -8,7 +8,7 @@ import {
   uniqueIndex,
 } from 'drizzle-orm/pg-core'
 
-export const datacontextTable = pgTable(
+export const datacontext = pgTable(
   'datacontext',
   {
     id: serial().primaryKey(),
