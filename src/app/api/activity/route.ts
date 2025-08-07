@@ -1,40 +1,50 @@
 import logger from '@/app/api/pinoLogger'
 import { db } from '@/db/context'
 import { activityTable, constraintTable } from '@/db/schemas/activity'
-import { Activity } from '@/types/activity'
-import { neon } from '@neondatabase/serverless'
-import { notInArray } from 'drizzle-orm'
+import { Activity, Constraint } from '@/types/activity'
+import { eq, notInArray, sql } from 'drizzle-orm'
 import { NextRequest } from 'next/server'
-
-const sql = neon(process.env.DATABASE_URL!)
 
 export async function GET(request: NextRequest): Promise<Response> {
   const searchParams = request.nextUrl.searchParams || {}
 
   const userId = searchParams.get('user_id') || 'demouser'
 
-  const activityResponses = (await sql`
-    SELECT
-      a.id,
-      a.name,
-      a.priority,
-      a.description,
-      jsonb_agg(
-        jsonb_set(c.content::jsonb,
-                  '{type}'::text[],
-                  to_jsonb(c.type))
-      ) AS "constraints"
-    FROM public.activity a
-      LEFT JOIN public.constraint c ON a.id = c.activity_id
-    WHERE a.user_id = ${userId}
-    GROUP BY a.id, a.name, a.priority, a.description`) as Activity[]
+  const activityResponses: Activity[] = await db
+    .select({
+      id: activityTable.id,
+      name: activityTable.name,
+      description: activityTable.description,
+      priority: activityTable.priority,
+      constraints: sql<Constraint[]>`jsonb_agg(
+        jsonb_set(${constraintTable.content}::jsonb, '{type}'::text[], to_jsonb(${constraintTable.type}))
+    )`,
+    })
+    .from(activityTable)
+    .leftJoin(
+      constraintTable,
+      eq(activityTable.id, constraintTable.activity_id),
+    )
+    .where(eq(activityTable.user_id, userId))
+    .groupBy(
+      activityTable.id,
+      activityTable.name,
+      activityTable.description,
+      activityTable.priority,
+    )
 
   logger.info('fetched activities from db', {
     activityCount: activityResponses.length,
     userId,
   })
 
-  return Response.json(activityResponses)
+  return Response.json(
+    activityResponses.map((activityResponse) => ({
+      ...activityResponse,
+      // sometimes null gets set as the value
+      constraints: activityResponse.constraints.filter((v) => v !== null),
+    })),
+  )
 }
 
 export async function PUT(request: NextRequest): Promise<Response> {

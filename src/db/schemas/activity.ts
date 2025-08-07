@@ -5,9 +5,9 @@ export const activityTable = pgTable('activity', {
   id: text()
     .primaryKey()
     .$default(() => uuidv4()),
-  name: text(),
-  description: text(),
-  priority: integer(),
+  name: text().notNull(),
+  description: text().notNull(),
+  priority: integer().notNull(),
   user_id: text(),
 })
 
@@ -16,6 +16,6 @@ export const constraintTable = pgTable('constraint', {
     .primaryKey()
     .$default(() => uuidv4()),
   activity_id: text().references(() => activityTable.id),
-  type: text(),
+  type: text().notNull(),
   content: json(),
 })
