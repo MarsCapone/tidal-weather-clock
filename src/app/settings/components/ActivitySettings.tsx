@@ -19,7 +19,9 @@ import {
 } from '@/types/activity'
 import { IsDarkContext } from '@/utils/contexts'
 import { fractionalTimeToString } from '@/utils/dates'
+import logger from '@/utils/logger'
 import { capitalize } from '@/utils/string'
+import diff from 'diff-arrays-of-objects'
 import {
   FilterFunction,
   githubDarkTheme,
@@ -32,18 +34,22 @@ import { useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 export default function ActivitySettings() {
-  const initialActivities = useActivities(APP_CONFIG.activityFetcher)
-  const [activities, setActivities] = useState<Activity[]>([])
+  const [activities, updateActivities] = useActivities(
+    APP_CONFIG.activityFetcher,
+  )
+  const [internalActivities, setInternalActivities] = useState<Activity[]>([])
+
+  // most operations will operate on internal activities, so we first reflect them here
   useEffect(() => {
-    setActivities(initialActivities)
-  }, [initialActivities])
+    setInternalActivities(activities)
+  }, [activities])
 
   const onDeleteActivity = (id: string) => {
-    setActivities(activities.filter((item) => item.id !== id))
+    setInternalActivities(internalActivities.filter((item) => item.id !== id))
   }
 
   const addActivity = () => {
-    setActivities([
+    setInternalActivities([
       {
         id: uuidv4(),
         name: 'Sample name',
@@ -51,25 +57,57 @@ export default function ActivitySettings() {
         priority: 0,
         constraints: [],
       },
-      ...activities,
+      ...internalActivities,
     ])
   }
 
   const setActivityFactory = (index: number) => {
     return (activity: Activity) => {
-      const newActivities = [...activities]
+      const newActivities = [...internalActivities]
       newActivities[index] = activity
-      setActivities(newActivities)
+      setInternalActivities(newActivities)
     }
   }
+
+  // when we're ready, we can push our internal changes to the server
+  const commitChanges = () => {
+    updateActivities(internalActivities)
+    logger.info('Pushing activities to server', {
+      previousActivities: activities,
+      newActivities: internalActivities,
+    })
+  }
+
+  const changes = diff(activities, internalActivities, 'id')
+
+  const changeCount =
+    changes.added.length + changes.removed.length + changes.updated.length
 
   return (
     <div>
       <div className="mb-4 flex flex-row items-center justify-between">
         <SettingTitle title={'Activity Settings'} />
-        <button className="btn btn-primary rounded-field" onClick={addActivity}>
-          Add Activity <PlusIcon className="h-4 w-4" />
-        </button>
+        <div className="flex gap-2">
+          <button
+            className="btn btn-primary rounded-field"
+            onClick={addActivity}
+          >
+            Add Activity <PlusIcon className="h-4 w-4" />
+          </button>
+          <div className="indicator">
+            {changeCount > 0 && (
+              <span className="indicator-item badge badge-neutral">
+                {changeCount}
+              </span>
+            )}
+            <button
+              className={`btn btn-secondary rounded-field ${changeCount === 0 ? 'btn-disabled' : ''}`}
+              onClick={commitChanges}
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
       </div>
       {activities.map((activity, index) => (
         <ActivityCard
