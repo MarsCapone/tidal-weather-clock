@@ -129,12 +129,12 @@ type ActivityCardProps = {
   onDelete: () => void
 }
 
+const restrictChanges = ({ key }: { key: string }) => {
+  return key === 'id'
+}
+
 function ActivityCard({ activity, setActivity, onDelete }: ActivityCardProps) {
   const isDarkTheme = useContext(IsDarkContext)
-
-  const restrictChanges = ({ key }: { key: string }) => {
-    return key === 'id'
-  }
 
   return (
     <div className="card card-lg my-2 shadow-sm">
