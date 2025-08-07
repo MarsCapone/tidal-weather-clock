@@ -48,28 +48,36 @@ export async function PUT(request: NextRequest): Promise<Response> {
     await Promise.all(
       activities.map((activity) => {
         return sql`
-      INSERT INTO public.activity (id, name, priority, description, user_id)
-      VALUES (${activity.id}, ${activity.name}, ${activity.priority}, ${activity.description}, ${userId})
-      ON CONFLICT (id) DO
-      UPDATE public.activity SET 
-        name = EXCLUDED.name,
-        priority = EXCLUDED.priority,
-        description = EXCLUDED.description,
-        user_id = EXCLUDED.user_id
-      RETURNING id
+            INSERT INTO public.activity (id, name, priority, description, user_id)
+                VALUES (${activity.id}, ${activity.name}, ${activity.priority}, ${activity.description}, ${userId})
+            ON CONFLICT (id) DO UPDATE
+            SET 
+                name = EXCLUDED.name,
+                priority = EXCLUDED.priority,
+                description = EXCLUDED.description,
+                user_id = EXCLUDED.user_id
+            RETURNING id
     `
       }),
     )
   ).map((result) => result[0].id)
 
-  // delete all the constraints for the activities we are editing
-  await Promise.all(
-    activityIds.map((activityId) => {
-      return sql`
-        DELETE FROM public.constraint WHERE activity_id = ${activityId}
-    `
-    }),
+  logger.debug('updated activities', { activityIds })
+
+  // first delete all the constraints. we can delete the ones for the activities we have because we're about to add
+  // new constraints for them, and we can delete all the rest because we're going to delete any unlisted activities
+  await sql`DELETE FROM public.constraint`
+  logger.debug('deleted all constraints')
+
+  const array = `(${activityIds.join(', ')})`
+  logger.debug('array', { array })
+  // now we can delete all activities that weren't sent to this endpoint
+  const deletedIds = await sql.query(
+    `DELETE FROM public.activity WHERE id NOT IN ${array} RETURNING id`,
   )
+  logger.debug('deleted all unreferenced activities', {
+    deletedIds: deletedIds.map((d) => d.id),
+  })
 
   // then re-add all the constraints
   const constraintInsertions = activities.flatMap((activity, index) => {
@@ -78,15 +86,15 @@ export async function PUT(request: NextRequest): Promise<Response> {
         INSERT INTO public.constraint (id, activity_id, type, content)
         VALUES (
           gen_random_uuid(),
-          ${activityIds[index]}
-          ${constraint.type}
-          ${JSON.stringify(constraint)},
+          ${activityIds[index]},
+          ${constraint.type},
+          ${JSON.stringify(constraint)}
         )
       `
     })
   })
-
   await Promise.all(constraintInsertions)
+  logger.debug('added all constraints')
 
   return new Response('', { status: 201 })
 }
