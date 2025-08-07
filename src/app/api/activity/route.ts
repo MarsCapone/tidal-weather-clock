@@ -33,3 +33,60 @@ export async function GET(request: NextRequest): Promise<Response> {
 
   return Response.json(activityResponses)
 }
+
+export async function PUT(request: NextRequest): Promise<Response> {
+  const data: { userId?: string; activities: Activity[] } = await request.json()
+  if (!data.activities) {
+    return Response.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+
+  const userId = data.userId || 'demouser'
+  const activities = data.activities
+
+  // upsert all the activities
+  const activityIds: string[] = (
+    await Promise.all(
+      activities.map((activity) => {
+        return sql`
+      INSERT INTO public.activity (id, name, priority, description, user_id)
+      VALUES (${activity.id}, ${activity.name}, ${activity.priority}, ${activity.description}, ${userId})
+      ON CONFLICT (id) DO
+      UPDATE public.activity SET 
+        name = EXCLUDED.name,
+        priority = EXCLUDED.priority,
+        description = EXCLUDED.description,
+        user_id = EXCLUDED.user_id
+      RETURNING id
+    `
+      }),
+    )
+  ).map((result) => result[0].id)
+
+  // delete all the constraints for the activities we are editing
+  await Promise.all(
+    activityIds.map((activityId) => {
+      return sql`
+        DELETE FROM public.constraint WHERE activity_id = ${activityId}
+    `
+    }),
+  )
+
+  // then re-add all the constraints
+  const constraintInsertions = activities.flatMap((activity, index) => {
+    return activity.constraints.map((constraint) => {
+      return sql`
+        INSERT INTO public.constraint (id, activity_id, type, content)
+        VALUES (
+          gen_random_uuid(),
+          ${activityIds[index]}
+          ${constraint.type}
+          ${JSON.stringify(constraint)},
+        )
+      `
+    })
+  })
+
+  await Promise.all(constraintInsertions)
+
+  return new Response('', { status: 201 })
+}
