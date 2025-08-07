@@ -8,6 +8,7 @@ import { DataContext } from '@/types/context'
 import { dateOptions, formatInterval, getFractionalTime } from '@/utils/dates'
 import { EnrichedActivityScore } from '@/utils/suggestions'
 import {
+  Duration,
   format,
   formatDuration,
   formatRelative,
@@ -145,7 +146,9 @@ export function TimeToNext({
   displayTime = true,
 }: ClockDisplayProps & { displayTime?: boolean; type: 'descriptive' }) {
   const [diff, setDiff] = React.useState<string | number | null>(null)
-  const [currentTime, setCurrentTime] = React.useState<Date | null>(null)
+  const [currentTime, setCurrentTime] = React.useState<Date>(new Date())
+  const { showSecondsCountdown } = useFlags()
+
   useEffect(() => {
     const updateTime = () => {
       if (!suggestedActivity) {
@@ -156,13 +159,19 @@ export function TimeToNext({
         start: current,
         end: parseISO(suggestedActivity?.timestamp, dateOptions),
       })
-      const formatted = formatDuration(duration)
+
+      const additionalFormats: (keyof Duration)[] = showSecondsCountdown
+        ? ['seconds']
+        : []
+      const formatted = formatDuration(duration, {
+        format: ['weeks', 'days', 'hours', 'minutes', ...additionalFormats],
+      })
       setDiff(formatted)
       setCurrentTime(current)
     }
     const interval = setInterval(updateTime, 1000)
     return () => clearInterval(interval)
-  }, [suggestedActivity])
+  }, [suggestedActivity, showSecondsCountdown])
 
   if (!suggestedActivity) {
     return null
@@ -170,7 +179,7 @@ export function TimeToNext({
 
   const timestamp = parseISO(suggestedActivity?.timestamp, dateOptions)
 
-  const nextActivityInThePast = isBefore(timestamp, currentTime || new Date())
+  const nextActivityInThePast = isBefore(timestamp, currentTime)
 
   return (
     <div className="flex flex-col items-center justify-center gap-1 p-10">
@@ -200,7 +209,7 @@ export function TimeToNext({
             was the activity suggested
           </div>
           <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
-            {formatRelative(timestamp, currentTime || new Date(), dateOptions)}
+            {formatRelative(timestamp, currentTime, dateOptions)}
           </div>
         </>
       ) : (
