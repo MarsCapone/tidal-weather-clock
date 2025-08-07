@@ -17,11 +17,18 @@ import {
   WeatherConstraint,
   WindConstraint,
 } from '@/types/activity'
+import { IsDarkContext } from '@/utils/contexts'
 import { fractionalTimeToString } from '@/utils/dates'
 import { capitalize } from '@/utils/string'
-import { JsonEditor, JsonEditorProps } from 'json-edit-react'
+import {
+  FilterFunction,
+  githubDarkTheme,
+  githubLightTheme,
+  JsonEditor,
+  JsonEditorProps,
+} from 'json-edit-react'
 import { PlusIcon, TrashIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 export default function ActivitySettings() {
@@ -85,6 +92,12 @@ type ActivityCardProps = {
 }
 
 function ActivityCard({ activity, setActivity, onDelete }: ActivityCardProps) {
+  const isDarkTheme = useContext(IsDarkContext)
+
+  const restrictChanges = ({ key }: { key: string }) => {
+    return key === 'id'
+  }
+
   return (
     <div className="card card-lg my-2 shadow-sm">
       <div className="card-body">
@@ -108,6 +121,11 @@ function ActivityCard({ activity, setActivity, onDelete }: ActivityCardProps) {
           <JsonEditor
             data={activity}
             setData={setActivity as JsonEditorProps['setData']}
+            restrictAdd={true}
+            restrictDelete={true}
+            restrictEdit={restrictChanges as FilterFunction}
+            theme={isDarkTheme ? githubDarkTheme : githubLightTheme}
+            rootName={''}
           />
         </div>
       </div>
