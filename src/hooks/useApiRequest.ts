@@ -41,7 +41,8 @@ export function useActivities(
   return [val, updateActivities]
 }
 
-type MagicUpdate<T> = Dispatch<T | null> | (() => void)
+type MagicUpdate<T> = (() => void) | ((v: T | null) => void)
+
 export function useSetting<T>(
   settingName: string,
 ): [T | null, MagicUpdate<T>, Dispatch<T | null>] {
@@ -66,7 +67,9 @@ export function useSetting<T>(
     }).then(() => setRefresh(!refresh))
   }
 
-  function updateGivenOrInternal(v: T | null | undefined = undefined) {
+  function updateGivenOrInternal(): void
+  function updateGivenOrInternal(v: T | null): void
+  function updateGivenOrInternal(v: T | null | undefined = undefined): void {
     if (v === undefined) {
       // update with the internal state
       updateSetting(val)

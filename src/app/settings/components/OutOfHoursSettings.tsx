@@ -1,9 +1,6 @@
 import { SettingTitle } from '@/app/settings/components/common'
-import { db } from '@/db'
-import { settingsTable } from '@/db/schemas/settings'
 import { useSetting } from '@/hooks/useApiRequest'
-import { eq } from 'drizzle-orm'
-import { Suspense, useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 type WorkingHoursSetting = {
   startHour: number
@@ -25,6 +22,7 @@ export default function OutOfHoursSettings() {
     setWorkingHours(defaultSetting)
   }, [setWorkingHours])
 
+  // @ts-ignore
   return (
     <div>
       <div className="mb-4 flex flex-row items-center justify-between">
