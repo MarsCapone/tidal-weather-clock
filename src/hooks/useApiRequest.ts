@@ -41,35 +41,34 @@ export function useActivities(
   return [val, updateActivities]
 }
 
-type MagicUpdate<T> = (() => void) | ((v: T | null) => void)
+type PersistUpdate<T = void> = (arg?: T) => void
 
 export function useSetting<T>(
   settingName: string,
-): [T | null, MagicUpdate<T>, Dispatch<T | null>] {
-  const [val, setVal] = useState<T | null>(null)
+  initialValue: T,
+): [T, PersistUpdate<T>, Dispatch<T>] {
+  const [val, setVal] = useState<T>(initialValue)
   const [refresh, setRefresh] = useState(false)
 
   useEffect(() => {
     fetch(`/api/settings?name=${settingName}`)
       .then((res) => res.json())
       .then((body: { value: T }) => {
-        setVal(body.value || null)
+        setVal(body.value)
       })
   }, [settingName, refresh])
 
-  const updateSetting = (setting: T | null) => {
+  const updateSetting = (settingValue: T) => {
     fetch(`/api/settings`, {
       method: 'PUT',
       body: JSON.stringify({
         name: settingName,
-        value: setting,
+        value: settingValue,
       }),
     }).then(() => setRefresh(!refresh))
   }
 
-  function updateGivenOrInternal(): void
-  function updateGivenOrInternal(v: T | null): void
-  function updateGivenOrInternal(v: T | null | undefined = undefined): void {
+  function updateGivenOrInternal(v?: T | void): void {
     if (v === undefined) {
       // update with the internal state
       updateSetting(val)
@@ -80,5 +79,5 @@ export function useSetting<T>(
   }
 
   // value, set the state internally, update the internal state OR update the given value
-  return [val, updateGivenOrInternal, setVal]
+  return [val, updateGivenOrInternal as PersistUpdate<T>, setVal]
 }

@@ -16,11 +16,7 @@ const defaultSetting: WorkingHoursSetting = {
 
 export default function OutOfHoursSettings() {
   const [workingHours, updateWorkingHours, setWorkingHours] =
-    useSetting<WorkingHoursSetting>('working_hours')
-
-  useEffect(() => {
-    setWorkingHours(defaultSetting)
-  }, [setWorkingHours])
+    useSetting<WorkingHoursSetting>('working_hours', defaultSetting)
 
   // @ts-ignore
   return (
