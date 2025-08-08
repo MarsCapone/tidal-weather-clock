@@ -40,3 +40,42 @@ export function useActivities(
 
   return [val, updateActivities]
 }
+
+type MagicUpdate<T> = Dispatch<T | null> | (() => void)
+export function useSetting<T>(
+  settingName: string,
+): [T | null, MagicUpdate<T>, Dispatch<T | null>] {
+  const [val, setVal] = useState<T | null>(null)
+  const [refresh, setRefresh] = useState(false)
+
+  useEffect(() => {
+    fetch(`/api/settings?name=${settingName}`)
+      .then((res) => res.json())
+      .then((body: { value: T }) => {
+        setVal(body.value || null)
+      })
+  }, [settingName, refresh])
+
+  const updateSetting = (setting: T | null) => {
+    fetch(`/api/settings`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        name: settingName,
+        value: setting,
+      }),
+    }).then(() => setRefresh(!refresh))
+  }
+
+  function updateGivenOrInternal(v: T | null | undefined = undefined) {
+    if (v === undefined) {
+      // update with the internal state
+      updateSetting(val)
+    } else {
+      // update with the given value
+      updateSetting(v)
+    }
+  }
+
+  // value, set the state internally, update the internal state OR update the given value
+  return [val, updateGivenOrInternal, setVal]
+}

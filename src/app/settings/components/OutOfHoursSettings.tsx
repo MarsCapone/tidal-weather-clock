@@ -1,6 +1,7 @@
 import { SettingTitle } from '@/app/settings/components/common'
 import { db } from '@/db'
 import { settingsTable } from '@/db/schemas/settings'
+import { useSetting } from '@/hooks/useApiRequest'
 import { eq } from 'drizzle-orm'
 import { Suspense, useEffect, useState } from 'react'
 
@@ -17,36 +18,23 @@ const defaultSetting: WorkingHoursSetting = {
 }
 
 export default function OutOfHoursSettings() {
-  const [setting, setSetting] = useState<WorkingHoursSetting | null>(null)
+  const [workingHours, updateWorkingHours, setWorkingHours] =
+    useSetting<WorkingHoursSetting>('working_hours')
 
   useEffect(() => {
-    fetch(`/api/settings?name=working_hours`)
-      .then((res) => res.json())
-      .then((data) => {
-        setSetting(data.value || defaultSetting)
-      })
-  }, [])
-
-  const updateSetting = async () => {
-    await fetch(`/api/settings`, {
-      method: 'PUT',
-      body: JSON.stringify({
-        name: 'working_hours',
-        value: setting,
-      }),
-    })
-  }
+    setWorkingHours(defaultSetting)
+  }, [setWorkingHours])
 
   return (
     <div>
       <div className="mb-4 flex flex-row items-center justify-between">
         <SettingTitle title={'Out of Hours'} />
-        <button onClick={updateSetting} className="btn">
+        <button onClick={() => updateWorkingHours()} className="btn">
           Update setting
         </button>
       </div>
       <div>Do not suggest activities outside of these hours.</div>
-      <div>{JSON.stringify(setting, null, 2)}</div>
+      <div>{JSON.stringify(workingHours, null, 2)}</div>
     </div>
   )
 }
