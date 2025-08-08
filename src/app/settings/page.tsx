@@ -1,6 +1,7 @@
 'use client'
 
 import ActivitySettings from '@/app/settings/components/ActivitySettings'
+import OutOfHoursSettings from '@/app/settings/components/OutOfHoursSettings'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -8,6 +9,11 @@ export default function Page() {
   const [hash, setHash] = useState('#activities')
 
   const links = [
+    {
+      Component: OutOfHoursSettings,
+      id: 'working-hours',
+      label: 'Working Hours',
+    },
     { Component: ActivitySettings, id: 'activities', label: 'Activities' },
   ]
 
