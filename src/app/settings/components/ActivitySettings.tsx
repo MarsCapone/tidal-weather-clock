@@ -34,9 +34,7 @@ import { useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 export default function ActivitySettings() {
-  const [activities, updateActivities] = useActivities(
-    APP_CONFIG.activityFetcher,
-  )
+  const [activities, updateActivities] = useActivities([])
   const [internalActivities, setInternalActivities] = useState<Activity[]>([])
 
   // most operations will operate on internal activities, so we first reflect them here

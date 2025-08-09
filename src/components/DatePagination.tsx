@@ -1,4 +1,4 @@
-import useApiRequest from '@/hooks/apiRequests'
+import useApiRequest, { useDataContextInfo } from '@/hooks/apiRequests'
 import { dateOptions } from '@/utils/dates'
 import { format, formatISO, parseISO } from 'date-fns'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
@@ -57,11 +57,7 @@ export default function DatePagination({
 export function CalendarDateSelector({ popoverId }: { popoverId: string }) {
   const [date, setDate] = React.useState<Date | undefined>(undefined)
   const router = useRouter()
-  const response = useApiRequest<{
-    earliest: string
-    latest: string
-    all: string[]
-  }>('/api/dataContext')
+  const response = useDataContextInfo(null)
 
   const updateDate = (newDate: Date | undefined) => {
     setDate(newDate)
