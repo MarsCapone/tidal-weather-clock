@@ -7,7 +7,7 @@ import {
   PrefixSuffixInput,
 } from '@/components/forms/FormComponents'
 import { APP_CONFIG } from '@/config'
-import { useActivities } from '@/hooks/useApiRequest'
+import { useActivities } from '@/hooks/apiRequests'
 import {
   Activity,
   Constraint,

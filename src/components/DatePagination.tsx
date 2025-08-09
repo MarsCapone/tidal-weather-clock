@@ -1,4 +1,4 @@
-import useApiRequest from '@/hooks/useApiRequest'
+import useApiRequest from '@/hooks/apiRequests'
 import { dateOptions } from '@/utils/dates'
 import { format, formatISO, parseISO } from 'date-fns'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'

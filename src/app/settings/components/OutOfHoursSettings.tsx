@@ -1,12 +1,5 @@
 import { SettingTitle } from '@/app/settings/components/common'
-import { useSetting } from '@/hooks/useApiRequest'
-import { useEffect } from 'react'
-
-type WorkingHoursSetting = {
-  startHour: number
-  endHour: number
-  enabled: boolean
-}
+import { useWorkingHours, WorkingHoursSetting } from '@/hooks/settings'
 
 const defaultSetting: WorkingHoursSetting = {
   startHour: 8,
@@ -15,8 +8,12 @@ const defaultSetting: WorkingHoursSetting = {
 }
 
 export default function OutOfHoursSettings() {
-  const [workingHours, updateWorkingHours, setWorkingHours] =
-    useSetting<WorkingHoursSetting>('working_hours', defaultSetting)
+  const [workingHours, updateWorkingHours, setWorkingHours] = useWorkingHours(
+    { ...defaultSetting, endHour: 10 },
+    {
+      settingName: 'working_hours',
+    },
+  )
 
   // @ts-ignore
   return (
