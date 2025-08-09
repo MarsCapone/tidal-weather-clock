@@ -1,6 +1,7 @@
 import {
   date,
   decimal,
+  index,
   json,
   pgTable,
   serial,
@@ -19,7 +20,12 @@ export const datacontext = pgTable(
     last_updated: timestamp().defaultNow(),
   },
   (table) => [
-    uniqueIndex('idx_datacontext_date_location').on(
+    index('idx_datacontext_date_location').on(
+      table.date,
+      table.latitude,
+      table.longitude,
+    ),
+    uniqueIndex('unique_date_location').on(
       table.date,
       table.latitude,
       table.longitude,
