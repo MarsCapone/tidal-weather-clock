@@ -3,16 +3,14 @@ import { apiHookFactory } from '@/hooks/apiRequests'
 const settingFactory = <SettingValueType>() => {
   return apiHookFactory<SettingValueType, { settingName: string }>({
     fetchEndpointInfo: {
-      method: 'GET',
-      endpoint: ({ settingName }) => `/api/settings?name=${settingName}`,
+      endpoint: (params) => `/api/settings?name=${(params || {}).settingName}`,
       getBody: (body: any) => body.value,
-      dependencies: ({ settingName }) => [settingName],
+      dependencies: (params) => (params ? [params.settingName] : []),
     },
     updateEndpointInfo: {
-      method: 'PUT',
       endpoint: () => '/api/settings',
       makeBody: (arg, params) => ({
-        name: params.settingName,
+        name: (params || {}).settingName,
         value: arg,
       }),
     },

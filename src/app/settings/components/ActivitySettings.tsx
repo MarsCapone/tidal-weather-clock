@@ -1,6 +1,6 @@
 'use client'
 
-import { SettingTitle } from '@/app/settings/components/common'
+import { SettingCard, SettingTitle } from '@/app/settings/components/common'
 import {
   Fieldset,
   Input,
@@ -134,38 +134,34 @@ const restrictChanges = ({ key }: { key: string }) => {
 function ActivityCard({ activity, setActivity, onDelete }: ActivityCardProps) {
   const isDarkTheme = useContext(IsDarkContext)
 
-  return (
-    <div className="card card-lg my-2 shadow-sm">
-      <div className="card-body">
-        <div className="card-title flex flex-row justify-between">
-          <div className="flex-1">
-            <div className="text-lg">{activity.name}</div>
-          </div>
-          <div className="tooltip tooltip-bottom" data-tip="Delete activity">
-            <button
-              className="btn btn-ghost hover:btn-error rounded-field aspect-square p-1"
-              onClick={onDelete}
-            >
-              <TrashIcon className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-        <div>
-          <div>{activity.description}</div>
-        </div>
-        <div className="flex flex-col gap-2">
-          <JsonEditor
-            data={activity}
-            setData={setActivity as JsonEditorProps['setData']}
-            restrictAdd={true}
-            restrictDelete={true}
-            restrictEdit={restrictChanges as FilterFunction}
-            theme={isDarkTheme ? githubDarkTheme : githubLightTheme}
-            rootName={''}
-          />
-        </div>
-      </div>
+  const buttons = (
+    <div className="tooltip tooltip-bottom" data-tip="Delete activity">
+      <button
+        className="btn btn-ghost hover:btn-error rounded-field aspect-square p-1"
+        onClick={onDelete}
+      >
+        <TrashIcon className="h-4 w-4" />
+      </button>
     </div>
+  )
+
+  return (
+    <SettingCard title={activity.name} buttons={buttons}>
+      <div>
+        <div>{activity.description}</div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <JsonEditor
+          data={activity}
+          setData={setActivity as JsonEditorProps['setData']}
+          restrictAdd={true}
+          restrictDelete={true}
+          restrictEdit={restrictChanges as FilterFunction}
+          theme={isDarkTheme ? githubDarkTheme : githubLightTheme}
+          rootName={''}
+        />
+      </div>
+    </SettingCard>
   )
 }
 

@@ -28,6 +28,7 @@
     "diff-arrays-of-objects": "^1.1.9",
     "drizzle-orm": "^0.44.4",
     "express": "^5.1.0",
+    "fast-equals": "^5.2.2",
     "json-edit-react": "^1.28.2",
     "launchdarkly-react-client-sdk": "^3.8.1",
     "lucide-react": "^0.533.0",
