@@ -9,13 +9,11 @@ import {
 import { WindIcon } from '@/components/icons/WindIcon'
 import { DataContext } from '@/types/context'
 import {
-  formatTime,
   utcDateStringAddFractional,
   utcDateStringToLocalTimeString,
 } from '@/utils/dates'
 import { calcMean } from '@/utils/math'
 import { mpsToKnots } from '@/utils/units'
-import { parseISO } from 'date-fns'
 import { ArrowBigUpIcon } from 'lucide-react'
 import React from 'react'
 
