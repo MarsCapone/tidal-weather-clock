@@ -10,6 +10,7 @@ import { APP_CONFIG } from '@/config'
 import { useActivities } from '@/hooks/apiRequests'
 import { DateInfo } from '@/hooks/useDateString'
 import { DataContext } from '@/types/context'
+import { dateOptions } from '@/utils/dates'
 import tryDataFetchersWithCache from '@/utils/fetchData'
 import logger from '@/utils/logger'
 import { ActivityRecommender, groupScores } from '@/utils/suggestions'
@@ -56,7 +57,7 @@ export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
 }
 
 function MainContentWithoutDate({ date }: { date: Date }) {
-  const [activities] = useActivities(APP_CONFIG.activityFetcher)
+  const [activities] = useActivities([])
   const { showSuggestedActivity, showActivityTable } = useFlags()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -65,7 +66,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
   useEffect(() => {
     tryDataFetchersWithCache(
       logger,
-      startOfDay(date),
+      startOfDay(date, dateOptions),
       APP_CONFIG.dataFetchers,
       APP_CONFIG.clientCache,
       (lat, lng, date) =>
