@@ -23,4 +23,13 @@ export type WorkingHoursSetting = {
   enabled: boolean
 }
 
-export const useWorkingHours = settingFactory<WorkingHoursSetting>()
+export const defaultWorkingHours: WorkingHoursSetting = {
+  startHour: 0,
+  endHour: 0,
+  enabled: false,
+}
+
+export const useWorkingHours = () =>
+  settingFactory<WorkingHoursSetting>()(defaultWorkingHours, {
+    settingName: 'working_hours',
+  })

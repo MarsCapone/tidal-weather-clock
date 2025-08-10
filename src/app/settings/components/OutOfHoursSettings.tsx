@@ -6,12 +6,6 @@ import { shallowEqual } from 'fast-equals'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 
-const defaultSetting: WorkingHoursSetting = {
-  startHour: 0,
-  endHour: 0,
-  enabled: false,
-}
-
 type WorkingHoursForm = {
   startHour: string
   endHour: string
@@ -19,12 +13,7 @@ type WorkingHoursForm = {
 }
 
 export default function OutOfHoursSettings() {
-  const [workingHours, updateWorkingHours, setWorkingHours] = useWorkingHours(
-    defaultSetting,
-    {
-      settingName: 'working_hours',
-    },
-  )
+  const [workingHours, updateWorkingHours, setWorkingHours] = useWorkingHours()
   const {
     register,
     handleSubmit,
