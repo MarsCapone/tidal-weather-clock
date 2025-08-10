@@ -8,10 +8,12 @@ import {
 } from '@/components/icons/TideIcon'
 import { WindIcon } from '@/components/icons/WindIcon'
 import { DataContext } from '@/types/context'
-import { formatTime, withFractionalTime } from '@/utils/dates'
+import {
+  utcDateStringAddFractional,
+  utcDateStringToLocalTimeString,
+} from '@/utils/dates'
 import { calcMean } from '@/utils/math'
 import { mpsToKnots } from '@/utils/units'
-import { parseISO } from 'date-fns'
 import { ArrowBigUpIcon } from 'lucide-react'
 import React from 'react'
 
@@ -74,7 +76,9 @@ type DataTableRow = {
 function getDataTable(dataContext: DataContext): DataTableRow[] {
   const tides = dataContext.tideData.map((t) => ({
     ...t,
-    display: formatTime(withFractionalTime(dataContext.referenceDate, t.time)),
+    display: utcDateStringToLocalTimeString(
+      utcDateStringAddFractional(dataContext.referenceDate, t.time),
+    ),
   }))
 
   const highTides = tides.filter((t) => t.type === 'high')
@@ -126,11 +130,7 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       label: 'Sunrise',
       values: [
         dataContext.sunData.sunRise
-          ? formatTime(
-              typeof dataContext.sunData.sunRise === 'string'
-                ? parseISO(dataContext.sunData.sunRise)
-                : dataContext.sunData.sunRise,
-            )
+          ? utcDateStringToLocalTimeString(dataContext.sunData.sunRise)
           : undefined,
       ],
     },
@@ -139,11 +139,7 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       label: 'Sunset',
       values: [
         dataContext.sunData.sunSet
-          ? formatTime(
-              typeof dataContext.sunData.sunSet === 'string'
-                ? parseISO(dataContext.sunData.sunSet)
-                : dataContext.sunData.sunSet,
-            )
+          ? utcDateStringToLocalTimeString(dataContext.sunData.sunSet)
           : undefined,
       ],
     },

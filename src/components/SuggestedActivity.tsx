@@ -1,5 +1,5 @@
 import { Constraint } from '@/types/activity'
-import { IsDarkContext } from '@/utils/contexts'
+import { DarkModeContext } from '@/utils/contexts'
 import { formatInterval } from '@/utils/dates'
 import { ActivityGroupInfo, EnrichedActivityScore } from '@/utils/suggestions'
 import MarkdownPreview from '@uiw/react-markdown-preview'
@@ -189,7 +189,7 @@ function SuggestedActivityExplanationDialog({
   const [aiExplanations, setAiExplanations] = React.useState<string[] | null>(
     null,
   )
-  const isDarkMode = useContext(IsDarkContext)
+  const isDarkMode = useContext(DarkModeContext)
 
   useEffect(() => {
     if (!useAiExplanations) {

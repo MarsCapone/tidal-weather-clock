@@ -2,14 +2,17 @@ import { uploadDebugData } from '@/app/api/dataContext/[dateString]/debug'
 import CONSTANTS from '@/constants'
 import { DataContext } from '@/types/context'
 import { IDataContextFetcher, ILogger } from '@/types/interfaces'
-import { dateOptions, getFractionalTime } from '@/utils/dates'
+import {
+  dateOptions,
+  utcDateStringToFractionalUtc,
+  utcDateStringToUtc,
+} from '@/utils/dates'
 import { TZDate } from '@date-fns/tz'
 import {
   addDays,
   eachDayOfInterval,
   formatISO,
   isEqual,
-  parseISO,
   startOfToday,
 } from 'date-fns'
 
@@ -295,10 +298,10 @@ export class OpenMeteoAndEasyTideDataFetcher implements IDataContextFetcher {
         sunSet: dailyPoint?.sunset || '',
       },
       tideData: easyTideData.tidalEventList
-        .filter((event) => isEqual(parseISO(event.date, dateOptions), date))
+        .filter((event) => isEqual(utcDateStringToUtc(event.date), date))
         .map((event) => ({
           height: event.height,
-          time: getFractionalTime(parseISO(event.dateTime, dateOptions)),
+          time: utcDateStringToFractionalUtc(event.dateTime),
           timestamp: event.dateTime,
           type: event.eventType === 0 ? 'high' : 'low',
         })),

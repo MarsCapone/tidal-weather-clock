@@ -1,7 +1,20 @@
 import { WorkingHoursSetting } from '@/hooks/settings'
-import { dateOptions } from '@/utils/dates'
+import {
+  Activity,
+  ActivityScore,
+  Constraint,
+  SunConstraint,
+  TideConstraint,
+  TimeConstraint,
+  WeatherConstraint,
+  WindConstraint,
+} from '@/types/activity'
+import { DataContext, TideInfo, WeatherInfo, WindInfo } from '@/types/context'
+import { IActivityRecommender } from '@/types/interfaces'
+import { dateOptions, utcDateStringToUtc } from '@/utils/dates'
 import logger from '@/utils/logger'
 import { calcMean } from '@/utils/math'
+import { TZDate } from '@date-fns/tz'
 import {
   differenceInHours,
   eachHourOfInterval,
@@ -13,18 +26,6 @@ import {
   parseISO,
   startOfDay,
 } from 'date-fns'
-import {
-  Activity,
-  ActivityScore,
-  Constraint,
-  SunConstraint,
-  TideConstraint,
-  TimeConstraint,
-  WeatherConstraint,
-  WindConstraint,
-} from '../types/activity'
-import { DataContext, TideInfo, WeatherInfo, WindInfo } from '../types/context'
-import { IActivityRecommender } from '../types/interfaces'
 
 type TimeSlot = {
   hour: number
@@ -42,7 +43,7 @@ type TimeSlot = {
 
 export type ActivityGroupInfo = {
   constraintScores: ActivityScore['constraintScores']
-  interval: Interval<Date, Date>
+  interval: Interval<TZDate, TZDate>
   score: ActivityScore['score']
   slot: TimeSlot | undefined
 }
@@ -50,7 +51,7 @@ export type ActivityGroupInfo = {
 export type DefaultActivityScore = ActivityScore<{ slot: TimeSlot }>
 
 export type EnrichedActivityScore = DefaultActivityScore & {
-  interval: Interval<Date, Date>
+  interval: Interval<TZDate, TZDate>
   intervals?: ActivityGroupInfo[]
 }
 export function groupScores(
@@ -65,7 +66,7 @@ export function groupScores(
 
   if (groupByType === 'none') {
     return scores.map((score) => {
-      const start = parseISO(score.timestamp)
+      const start = utcDateStringToUtc(score.timestamp)
       const interval = { end: start, start }
       return { ...score, interval }
     })
@@ -89,8 +90,8 @@ export function groupScores(
           return [[currentValue], ...acc]
         }
 
-        const currentTime = parseISO(currentValue.timestamp)
-        const prevTime = parseISO(head.at(-1)!.timestamp)
+        const currentTime = utcDateStringToUtc(currentValue.timestamp)
+        const prevTime = utcDateStringToUtc(head.at(-1)!.timestamp)
 
         if (differenceInHours(currentTime, prevTime) !== 1) {
           return [[currentValue], ...acc]
@@ -104,8 +105,8 @@ export function groupScores(
     .reverse()
     .map((group: DefaultActivityScore[]) => {
       const interval = {
-        end: parseISO(group.at(-1)!.timestamp),
-        start: parseISO(group[0].timestamp),
+        end: utcDateStringToUtc(group.at(-1)!.timestamp),
+        start: utcDateStringToUtc(group[0].timestamp),
       }
       return {
         ...group[0],

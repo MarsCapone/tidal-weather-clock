@@ -16,8 +16,8 @@ import {
   WeatherConstraint,
   WindConstraint,
 } from '@/types/activity'
-import { IsDarkContext } from '@/utils/contexts'
-import { fractionalTimeToString } from '@/utils/dates'
+import { DarkModeContext } from '@/utils/contexts'
+import { fractionalUtcToLocalTimeString } from '@/utils/dates'
 import logger from '@/utils/logger'
 import { capitalize } from '@/utils/string'
 import diff from 'diff-arrays-of-objects'
@@ -131,7 +131,7 @@ const restrictChanges = ({ key }: { key: string }) => {
 }
 
 function ActivityCard({ activity, setActivity, onDelete }: ActivityCardProps) {
-  const isDarkTheme = useContext(IsDarkContext)
+  const isDarkTheme = useContext(DarkModeContext)
 
   const buttons = (
     <div className="tooltip tooltip-bottom" data-tip="Delete activity">
@@ -245,14 +245,22 @@ function TimeConstraintControls({
   return (
     <div className="flex flex-row gap-2">
       <PrefixSuffixInput
-        defaultValue={fractionalTimeToString(constraint.earliestHour)}
+        defaultValue={
+          constraint.earliestHour
+            ? fractionalUtcToLocalTimeString(constraint.earliestHour)
+            : undefined
+        }
         label="Earliest time"
         optional={true}
         readonly={!editable}
         type="time"
       />
       <PrefixSuffixInput
-        defaultValue={fractionalTimeToString(constraint.latestHour)}
+        defaultValue={
+          constraint.latestHour
+            ? fractionalUtcToLocalTimeString(constraint.latestHour)
+            : undefined
+        }
         label="Latest time"
         optional={true}
         readonly={!editable}

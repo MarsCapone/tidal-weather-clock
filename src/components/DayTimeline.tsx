@@ -1,7 +1,12 @@
 import { SunriseIcon, SunsetIcon } from '@/components/icons/SunStateIcon'
 import { HighWaterIcon, LowWaterIcon } from '@/components/icons/TideIcon'
 import { DataContext } from '@/types/context'
-import { dateOptions, formatTime, withFractionalTime } from '@/utils/dates'
+import {
+  dateOptions,
+  formatTime,
+  utcDateStringAddFractional,
+  utcDateStringToUtc,
+} from '@/utils/dates'
 import { compareAsc, parseISO } from 'date-fns'
 
 type TimelineItem = {
@@ -43,7 +48,9 @@ export default function DayTimeline({
           },
     Icon: t.type === 'high' ? HighWaterIcon : LowWaterIcon,
     label: t.type === 'high' ? 'HW' : 'LW',
-    timestamp: withFractionalTime(referenceDate, t.time),
+    timestamp: utcDateStringToUtc(
+      utcDateStringAddFractional(referenceDate, t.time),
+    ),
   }))
 
   const timelineItems: TimelineItem[] = [

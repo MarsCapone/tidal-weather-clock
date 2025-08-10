@@ -1,4 +1,4 @@
-import { IsDarkContext } from '@/utils/contexts'
+import { DarkModeContext } from '@/utils/contexts'
 import {
   githubDarkTheme,
   githubLightTheme,
@@ -22,7 +22,7 @@ export default function GenericObject({
   obj,
   options,
 }: GenericObjectProps) {
-  const isDarkTheme = useContext(IsDarkContext)
+  const isDarkTheme = useContext(DarkModeContext)
   const renderValue = (v: number | string | boolean) => {
     if (v === null) {
       return 'NULL'
