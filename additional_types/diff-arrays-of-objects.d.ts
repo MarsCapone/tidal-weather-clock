@@ -17,7 +17,6 @@ declare module 'diff-arrays-of-objects' {
         'id'
       );
 
-      console.log(result)
       // {
       //   added: [
       //     { id: 7, name: 'e' }

@@ -60,7 +60,6 @@ export default function useDateString(
         prevPath: '/',
       }
     }
-    console.log('dateInfo', dateInfo)
     setDateInfo(dateInfo)
   })
 

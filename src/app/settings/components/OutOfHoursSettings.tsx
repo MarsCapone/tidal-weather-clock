@@ -57,7 +57,6 @@ export default function OutOfHoursSettings() {
     getNewWorkingHoursSetting(current),
     workingHours,
   )
-  console.log(getNewWorkingHoursSetting(current), workingHours)
 
   const onSubmit: SubmitHandler<WorkingHoursForm> = (data) => {
     const newVal = getNewWorkingHoursSetting(data)
