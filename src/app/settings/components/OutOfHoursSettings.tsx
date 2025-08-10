@@ -1,6 +1,7 @@
 import { SettingCard, SettingTitle } from '@/app/settings/components/common'
 import { Input } from '@/app/settings/components/form'
 import { useWorkingHours, WorkingHoursSetting } from '@/hooks/settings'
+import { tzOffset } from '@date-fns/tz'
 import { shallowEqual } from 'fast-equals'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -167,13 +168,25 @@ const getTimeString = (fractionalTime: number | null): string => {
     return '00:00'
   }
 
-  const hours = Math.floor(fractionalTime)
-  const minutes = (fractionalTime - hours) * 60
+  // this time is in UTC, but we need to convert it to the local time for display
+  // result is minutes, so divide by 60 to get hours
+  const timeZoneOffset = tzOffset('Europe/London', new Date()) / 60
+
+  const hours = Math.floor(fractionalTime + timeZoneOffset)
+  const minutes = (fractionalTime + timeZoneOffset - hours) * 60
 
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
 }
 
 const getFractionalTime = (timeString: string) => {
+  // users will enter this data according to their experience of a day, but
+  // we need to save it as UTC. so we need to work out what timezone we are
+  // in, then subtract that diff from whichever numbers are given
+
   const [hours, minutes] = timeString.split(':')
-  return Number.parseInt(hours) + Number.parseInt(minutes) / 60
+  const fractionalTime = Number.parseInt(hours) + Number.parseInt(minutes) / 60
+
+  // this should return the minutes ahead of UTC the current time is
+  const timeZoneOffset = tzOffset('Europe/London', new Date())
+  return fractionalTime - timeZoneOffset / 60
 }
