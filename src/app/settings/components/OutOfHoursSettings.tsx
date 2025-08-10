@@ -1,7 +1,10 @@
 import { SettingCard, SettingTitle } from '@/app/settings/components/common'
 import { Input } from '@/app/settings/components/form'
 import { useWorkingHours, WorkingHoursSetting } from '@/hooks/settings'
-import { tzOffset } from '@date-fns/tz'
+import {
+  fractionalUtcToLocalTimeString,
+  localTimeStringToFractionalUtc,
+} from '@/utils/dates'
 import { shallowEqual } from 'fast-equals'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -22,8 +25,11 @@ export default function OutOfHoursSettings() {
     setValue,
   } = useForm<WorkingHoursForm>()
   useEffect(() => {
-    setValue('startHour', getTimeString(workingHours.startHour))
-    setValue('endHour', getTimeString(workingHours.endHour))
+    setValue(
+      'startHour',
+      fractionalUtcToLocalTimeString(workingHours.startHour),
+    )
+    setValue('endHour', fractionalUtcToLocalTimeString(workingHours.endHour))
     setValue('enabled', workingHours.enabled)
   }, [
     workingHours.startHour,
@@ -38,11 +44,11 @@ export default function OutOfHoursSettings() {
   ): WorkingHoursSetting => {
     const startHour =
       data.startHour !== undefined
-        ? getFractionalTime(data.startHour)
+        ? localTimeStringToFractionalUtc(data.startHour)
         : workingHours.startHour
     const endHour =
       data.endHour !== undefined
-        ? getFractionalTime(data.endHour)
+        ? localTimeStringToFractionalUtc(data.endHour)
         : workingHours.endHour
     const enabled =
       data.enabled !== undefined ? data.enabled : workingHours.enabled
@@ -83,7 +89,9 @@ export default function OutOfHoursSettings() {
               className="input w-36"
               inputProps={{
                 type: 'time',
-                defaultValue: getTimeString(workingHours.startHour),
+                defaultValue: fractionalUtcToLocalTimeString(
+                  workingHours.startHour,
+                ),
                 ...register('startHour'),
               }}
               suffix={
@@ -102,7 +110,9 @@ export default function OutOfHoursSettings() {
               className="input w-36"
               inputProps={{
                 type: 'time',
-                defaultValue: getTimeString(workingHours.endHour),
+                defaultValue: fractionalUtcToLocalTimeString(
+                  workingHours.endHour,
+                ),
                 ...register('endHour'),
               }}
               suffix={
@@ -133,48 +143,4 @@ export default function OutOfHoursSettings() {
       </form>
     </div>
   )
-}
-
-type TimeInputProps = {
-  title: string
-  fractionalTime: number
-  setFractionalTime: (ft: number) => void
-  placeholder?: string
-}
-
-function TimeInput({
-  title,
-  fractionalTime,
-  setFractionalTime,
-  placeholder,
-}: TimeInputProps) {
-  return <div></div>
-}
-
-const getTimeString = (fractionalTime: number | null): string => {
-  if (fractionalTime === null) {
-    return '00:00'
-  }
-
-  // this time is in UTC, but we need to convert it to the local time for display
-  // result is minutes, so divide by 60 to get hours
-  const timeZoneOffset = tzOffset('Europe/London', new Date()) / 60
-
-  const hours = Math.floor(fractionalTime + timeZoneOffset)
-  const minutes = (fractionalTime + timeZoneOffset - hours) * 60
-
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
-}
-
-const getFractionalTime = (timeString: string) => {
-  // users will enter this data according to their experience of a day, but
-  // we need to save it as UTC. so we need to work out what timezone we are
-  // in, then subtract that diff from whichever numbers are given
-
-  const [hours, minutes] = timeString.split(':')
-  const fractionalTime = Number.parseInt(hours) + Number.parseInt(minutes) / 60
-
-  // this should return the minutes ahead of UTC the current time is
-  const timeZoneOffset = tzOffset('Europe/London', new Date())
-  return fractionalTime - timeZoneOffset / 60
 }

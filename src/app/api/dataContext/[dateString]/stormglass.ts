@@ -8,7 +8,7 @@ import {
   stormglassWeatherParams,
   StormglassWeatherResponse,
 } from '@/types/stormglass'
-import { dateOptions, getFractionalTime } from '@/utils/dates'
+import { dateOptions, utcDateStringToFractionalUtc } from '@/utils/dates'
 import {
   eachDayOfInterval,
   endOfDay,
@@ -197,7 +197,7 @@ export class DemoStormglassDataFetcher implements IDataContextFetcher {
     tideResponse.forEach((r) => {
       result.tideData.push({
         height: r.height,
-        time: getFractionalTime(parseISO(r.time)),
+        time: utcDateStringToFractionalUtc(r.time),
         type: r.type,
       })
     })

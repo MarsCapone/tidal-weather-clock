@@ -5,7 +5,11 @@ import ClockChart, {
 } from '@/components/ClockChart'
 import { getActivityGroupInfo } from '@/components/SuggestedActivity'
 import { DataContext } from '@/types/context'
-import { dateOptions, formatInterval, getFractionalTime } from '@/utils/dates'
+import {
+  dateOptions,
+  formatInterval,
+  naiveDateToFractionalLocal,
+} from '@/utils/dates'
 import { EnrichedActivityScore } from '@/utils/suggestions'
 import {
   Duration,
@@ -83,7 +87,7 @@ export function AnalogActivityRanges({
     })),
   ].map((s) => ({
     color: 'warning',
-    hour: 'hour' in s ? s.hour : getFractionalTime(s.timestamp!),
+    hour: 'hour' in s ? s.hour : naiveDateToFractionalLocal(s.timestamp!),
     id: s.label.toLowerCase(),
     isOutside: s.isOutside,
     label: s.label,
@@ -131,10 +135,10 @@ export function AnalogActivityRanges({
     .map((agi, index) => {
       return {
         color: scoreToColor(index),
-        endHour: getFractionalTime(agi.interval.end) + 1,
+        endHour: naiveDateToFractionalLocal(agi.interval.end) + 1,
         id: `${suggestedActivity.activity.id}-${formatInterval(agi.interval)}`,
         label: formatInterval(agi.interval).join(' '),
-        startHour: getFractionalTime(agi.interval.start),
+        startHour: naiveDateToFractionalLocal(agi.interval.start),
       }
     })
 
@@ -177,7 +181,10 @@ export function TimeToNext({
     return null
   }
 
-  const timestamp = parseISO(suggestedActivity?.timestamp, dateOptions)
+  const timestamp = parseISO(
+    suggestedActivity?.timestamp,
+    dateOptions,
+  ).withTimeZone('Europe/London')
 
   const nextActivityInThePast = isBefore(timestamp, currentTime)
 
@@ -209,7 +216,7 @@ export function TimeToNext({
             was the activity suggested
           </div>
           <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
-            {formatRelative(timestamp, currentTime, dateOptions)}
+            {formatRelative(timestamp, currentTime)}
           </div>
         </>
       ) : (

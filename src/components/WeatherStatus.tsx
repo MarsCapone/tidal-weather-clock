@@ -8,7 +8,11 @@ import {
 } from '@/components/icons/TideIcon'
 import { WindIcon } from '@/components/icons/WindIcon'
 import { DataContext } from '@/types/context'
-import { formatTime, withFractionalTime } from '@/utils/dates'
+import {
+  formatTime,
+  utcDateStringAddFractional,
+  utcDateStringToLocalTimeString,
+} from '@/utils/dates'
 import { calcMean } from '@/utils/math'
 import { mpsToKnots } from '@/utils/units'
 import { parseISO } from 'date-fns'
@@ -74,7 +78,9 @@ type DataTableRow = {
 function getDataTable(dataContext: DataContext): DataTableRow[] {
   const tides = dataContext.tideData.map((t) => ({
     ...t,
-    display: formatTime(withFractionalTime(dataContext.referenceDate, t.time)),
+    display: utcDateStringToLocalTimeString(
+      utcDateStringAddFractional(dataContext.referenceDate, t.time),
+    ),
   }))
 
   const highTides = tides.filter((t) => t.type === 'high')
