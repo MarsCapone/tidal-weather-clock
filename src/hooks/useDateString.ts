@@ -1,3 +1,4 @@
+import { dateOptions } from '@/utils/dates'
 import { addDays, formatISO, parseISO, startOfToday } from 'date-fns'
 import { useState } from 'react'
 
@@ -11,7 +12,7 @@ export default function useDateString(
   params: Promise<{ dateString?: string[] | undefined }> | undefined,
 ): DateInfo {
   const [dateInfo, setDateInfo] = useState<DateInfo | null>()
-  const today = startOfToday()
+  const today = startOfToday(dateOptions)
   const fallback = {
     date: today,
     nextPath: '/plus/1',

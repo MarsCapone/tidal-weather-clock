@@ -1,5 +1,5 @@
 import logger from '@/app/api/pinoLogger'
-import { db } from '@/db/context'
+import { db } from '@/db'
 import { activityTable, constraintTable } from '@/db/schemas/activity'
 import { Activity, Constraint } from '@/types/activity'
 import { eq, notInArray, sql } from 'drizzle-orm'

@@ -1,5 +1,6 @@
 import MainContent from '@/components/MainContent'
 import CONSTANTS from '@/constants'
+import { dateOptions } from '@/utils/dates'
 import { addDays, startOfToday } from 'date-fns'
 
 export default async function Page({
@@ -9,7 +10,7 @@ export default async function Page({
 }) {
   const { diff } = await params
 
-  const today = startOfToday()
+  const today = startOfToday(dateOptions)
   const diffDays = Number.parseInt(diff)
 
   const prevPath =

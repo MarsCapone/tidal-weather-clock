@@ -1,6 +1,7 @@
 import {
   date,
   decimal,
+  index,
   json,
   pgTable,
   serial,
@@ -8,7 +9,7 @@ import {
   uniqueIndex,
 } from 'drizzle-orm/pg-core'
 
-export const datacontextTable = pgTable(
+export const datacontext = pgTable(
   'datacontext',
   {
     id: serial().primaryKey(),
@@ -19,7 +20,12 @@ export const datacontextTable = pgTable(
     last_updated: timestamp().defaultNow(),
   },
   (table) => [
-    uniqueIndex('idx_datacontext_date_location').on(
+    index('idx_datacontext_date_location').on(
+      table.date,
+      table.latitude,
+      table.longitude,
+    ),
+    uniqueIndex('unique_date_location').on(
       table.date,
       table.latitude,
       table.longitude,

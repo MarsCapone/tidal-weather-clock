@@ -24,7 +24,7 @@ export async function addDataContext(
       ${dataContext},
       ${new Date()}
     )
-    ON CONFLICT ON CONSTRAINT unique_date_location
+    ON CONFLICT (date, latitude, longitude)
     DO UPDATE SET 
       data = EXCLUDED.data,
       date = EXCLUDED.date,

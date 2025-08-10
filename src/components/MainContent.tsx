@@ -7,9 +7,11 @@ import DayTimeline from '@/components/DayTimeline'
 import SuggestedActivity from '@/components/SuggestedActivity'
 import WeatherStatus from '@/components/WeatherStatus'
 import { APP_CONFIG } from '@/config'
-import { useActivities } from '@/hooks/useApiRequest'
+import { useActivities } from '@/hooks/apiRequests'
+import { useWorkingHours } from '@/hooks/settings'
 import { DateInfo } from '@/hooks/useDateString'
 import { DataContext } from '@/types/context'
+import { dateOptions } from '@/utils/dates'
 import tryDataFetchersWithCache from '@/utils/fetchData'
 import logger from '@/utils/logger'
 import { ActivityRecommender, groupScores } from '@/utils/suggestions'
@@ -56,7 +58,8 @@ export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
 }
 
 function MainContentWithoutDate({ date }: { date: Date }) {
-  const [activities] = useActivities(APP_CONFIG.activityFetcher)
+  const [activities] = useActivities([])
+  const [workingHours] = useWorkingHours()
   const { showSuggestedActivity, showActivityTable } = useFlags()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -65,7 +68,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
   useEffect(() => {
     tryDataFetchersWithCache(
       logger,
-      startOfDay(date),
+      startOfDay(date, dateOptions),
       APP_CONFIG.dataFetchers,
       APP_CONFIG.clientCache,
       (lat, lng, date) =>
@@ -102,6 +105,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
 
   const suggestions = new ActivityRecommender(
     dataContext,
+    workingHours,
   ).getRecommendedActivities(activities || [])
   const filteredSuggestions = groupScores(
     suggestions.filter((r) => r.feasible),
