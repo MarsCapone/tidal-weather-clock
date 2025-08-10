@@ -14,8 +14,12 @@ export const dateOptions = {
   in: tz('+00:00'),
 }
 
+export const dateOptionsUK = {
+  in: tz('Europe/London'),
+}
+
 export function formatTime(date: Date): string {
-  return format(date, 'HH:mm', dateOptions)
+  return utcDateToLocalTimeString(new TZDate(date))
 }
 
 export function formatInterval(
@@ -95,8 +99,8 @@ export const fractionalUtcToLocalTimeString = (
   // result is minutes, so divide by 60 to get hours
   const timeZoneOffset = tzOffsetHours()
 
-  const hours = Math.floor(fractionalTime + timeZoneOffset)
-  const minutes = (fractionalTime + timeZoneOffset - hours) * 60
+  const hours = Math.floor(fractionalTime) + timeZoneOffset
+  const minutes = Math.floor((fractionalTime + timeZoneOffset - hours) * 60)
 
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
 }
@@ -118,5 +122,5 @@ export const localTimeStringToFractionalUtc = (timeString: string) => {
 }
 
 export function tzOffsetHours(): number {
-  return tzOffset('Europe/London', new Date())
+  return tzOffset('Europe/London', new Date()) / 60
 }
