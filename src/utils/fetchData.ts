@@ -1,7 +1,8 @@
 import CONSTANTS from '@/constants'
 import { DataContext } from '@/types/context'
 import { ICache, IDataContextFetcher, ILogger } from '@/types/interfaces'
-import { formatISO, parseISO } from 'date-fns'
+import { utcDateStringToUtc } from '@/utils/dates'
+import { formatISO } from 'date-fns'
 
 export class ServerDataFetcher implements IDataContextFetcher {
   constructor(private readonly logger: ILogger) {
@@ -109,7 +110,7 @@ export default async function tryDataFetchersWithCache(
     const key = getCacheKeyFn(cacheKeyFn)(
       lat,
       lng,
-      parseISO(dataContext.referenceDate),
+      utcDateStringToUtc(dataContext.referenceDate),
     )
     logger.debug('caching data context', {
       cache: cache.constructor.name,

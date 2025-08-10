@@ -1,6 +1,7 @@
 import { tz, TZDate, tzOffset } from '@date-fns/tz'
 import {
   addHours,
+  format,
   formatDuration,
   formatISO,
   formatRelative,
@@ -11,10 +12,6 @@ import {
 
 export const dateOptions = {
   in: tz('+00:00'),
-}
-
-export const dateOptionsUK = {
-  in: tz('Europe/London'),
 }
 
 export function formatTime(date: Date): string {
@@ -32,7 +29,10 @@ export function formatInterval(
   }
 
   if (humanReadable) {
-    const startingAt = formatRelative(interval.start, new TZDate())
+    const startingAt = formatRelative(
+      interval.start.withTimeZone('Europe/London'),
+      new TZDate().withTimeZone('Europe/London'),
+    )
     const duration = formatDuration(
       intervalToDuration({
         start: interval.start,
@@ -83,8 +83,8 @@ export function utcDateStringToFractionalUtc(s: string): number {
 }
 
 export function utcDateStringToLocalTimeString(s: string): string {
-  const fractional = utcDateStringToFractionalUtc(s)
-  return fractionalUtcToLocalTimeString(fractional)
+  const date = utcDateStringToUtc(s)
+  return utcDateToLocalTimeString(date)
 }
 
 export const fractionalUtcToLocalTimeString = (
@@ -105,8 +105,8 @@ export const fractionalUtcToLocalTimeString = (
 }
 
 export function utcDateToLocalTimeString(date: TZDate): string {
-  const fractionalUtc = naiveDateToFractionalUtc(date)
-  return fractionalUtcToLocalTimeString(fractionalUtc)
+  const localTime = date.withTimeZone('Europe/London')
+  return format(localTime, 'HH:mm')
 }
 export const localTimeStringToFractionalUtc = (timeString: string) => {
   // users will enter this data according to their experience of a day, but

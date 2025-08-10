@@ -1,5 +1,5 @@
-import { dateOptions } from '@/utils/dates'
-import { addDays, formatISO, parseISO, startOfToday } from 'date-fns'
+import { dateOptions, utcDateStringToUtc } from '@/utils/dates'
+import { addDays, formatISO, startOfToday } from 'date-fns'
 import { useState } from 'react'
 
 export type DateInfo = {
@@ -35,7 +35,7 @@ export default function useDateString(
       if (dateString.length === 1) {
         // it's just a date string, so we can parse it and give the absolute
         // dates for next and previous
-        const date = parseISO(dateString[0])
+        const date = utcDateStringToUtc(dateString[0])
         dateInfo = {
           date,
           nextPath: `/${formatISO(addDays(date, 1))}`,

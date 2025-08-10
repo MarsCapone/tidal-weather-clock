@@ -6,9 +6,9 @@ import ClockChart, {
 import { getActivityGroupInfo } from '@/components/SuggestedActivity'
 import { DataContext } from '@/types/context'
 import {
-  dateOptions,
   formatInterval,
   naiveDateToFractionalLocal,
+  utcDateStringToUtc,
 } from '@/utils/dates'
 import { EnrichedActivityScore } from '@/utils/suggestions'
 import {
@@ -18,7 +18,6 @@ import {
   formatRelative,
   intervalToDuration,
   isBefore,
-  parseISO,
 } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import React, { useEffect } from 'react'
@@ -67,12 +66,12 @@ export function AnalogActivityRanges({
     {
       isOutside: true,
       label: 'Sunrise',
-      timestamp: sunData.sunRise ? parseISO(sunData.sunRise) : null,
+      timestamp: sunData.sunRise ? utcDateStringToUtc(sunData.sunRise) : null,
     },
     {
       isOutside: true,
       label: 'Sunset',
-      timestamp: sunData.sunSet ? parseISO(sunData.sunSet) : null,
+      timestamp: sunData.sunSet ? utcDateStringToUtc(sunData.sunSet) : null,
     },
     ...highTides.map((t, i) => ({
       hour: t.time,
@@ -161,7 +160,7 @@ export function TimeToNext({
       const current = new Date()
       const duration = intervalToDuration({
         start: current,
-        end: parseISO(suggestedActivity?.timestamp, dateOptions),
+        end: utcDateStringToUtc(suggestedActivity.timestamp),
       })
 
       const additionalFormats: (keyof Duration)[] = showSecondsCountdown
@@ -181,9 +180,8 @@ export function TimeToNext({
     return null
   }
 
-  const timestamp = parseISO(
-    suggestedActivity?.timestamp,
-    dateOptions,
+  const timestamp = utcDateStringToUtc(
+    suggestedActivity.timestamp,
   ).withTimeZone('Europe/London')
 
   const nextActivityInThePast = isBefore(timestamp, currentTime)

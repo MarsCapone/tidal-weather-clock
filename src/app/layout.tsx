@@ -4,16 +4,17 @@ import ColorschemeToggle from '@/components/Colorscheme'
 import CONSTANTS from '@/constants'
 import Link from 'next/link'
 import './globals.css'
-import { IsDarkContext } from '@/utils/contexts'
+import { DarkModeContext, TimeZoneContext } from '@/utils/contexts'
 import { LDProvider } from 'launchdarkly-react-client-sdk'
 import React from 'react'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isDarkMode, setIsDarkMode] = React.useState<boolean>(false)
+  const [timeZone, setTimeZone] = React.useState('Europe/London')
 
   return (
     <Root>
-      <IsDarkContext value={isDarkMode}>
+      <DarkModeContext value={isDarkMode}>
         <div>
           <div className="navbar bg-base-100 shadow-sm">
             <div className="flex-1">
@@ -33,6 +34,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     Settings
                   </Link>
                 </li>
+                {/*<li>*/}
+                {/*  <TimeZoneSelector timeZone={timeZone} setTimeZone={setTimeZone} />*/}
+                {/*</li>*/}
                 <li>
                   <ColorschemeToggle setIsDarkMode={setIsDarkMode} />
                 </li>
@@ -40,10 +44,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="mx-auto flex min-w-full flex-col justify-center gap-10 p-10 text-center md:min-w-0">
-            {children}
+            <TimeZoneContext value={timeZone}>{children}</TimeZoneContext>
           </div>
         </div>
-      </IsDarkContext>
+      </DarkModeContext>
     </Root>
   )
 }

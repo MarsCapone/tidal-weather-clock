@@ -16,7 +16,7 @@ import {
   WeatherConstraint,
   WindConstraint,
 } from '@/types/activity'
-import { IsDarkContext } from '@/utils/contexts'
+import { DarkModeContext } from '@/utils/contexts'
 import { fractionalUtcToLocalTimeString } from '@/utils/dates'
 import logger from '@/utils/logger'
 import { capitalize } from '@/utils/string'
@@ -131,7 +131,7 @@ const restrictChanges = ({ key }: { key: string }) => {
 }
 
 function ActivityCard({ activity, setActivity, onDelete }: ActivityCardProps) {
-  const isDarkTheme = useContext(IsDarkContext)
+  const isDarkTheme = useContext(DarkModeContext)
 
   const buttons = (
     <div className="tooltip tooltip-bottom" data-tip="Delete activity">

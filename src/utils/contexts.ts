@@ -1,3 +1,5 @@
 import { createContext } from 'react'
 
-export const IsDarkContext = createContext<boolean>(false)
+export const DarkModeContext = createContext<boolean>(false)
+
+export const TimeZoneContext = createContext<string>('Etc/UTC')
