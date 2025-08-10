@@ -1,4 +1,5 @@
 import MainContent from '@/components/MainContent'
+import { dateOptions } from '@/utils/dates'
 import { addDays, formatISO, FormatISOOptions, parseISO } from 'date-fns'
 
 export default async function Page({
@@ -9,7 +10,7 @@ export default async function Page({
   const { dateString } = await params
 
   const formatOptions = { representation: 'date' } as FormatISOOptions
-  const date = parseISO(dateString)
+  const date = parseISO(dateString, dateOptions)
 
   return (
     <MainContent

@@ -2,11 +2,12 @@
 
 import MainContent from '@/components/MainContent'
 import useDateString from '@/hooks/useDateString'
+import { dateOptions } from '@/utils/dates'
 import { differenceInMilliseconds, startOfToday } from 'date-fns'
 import React from 'react'
 import logger from '../utils/logger'
 
-const today = startOfToday()
+const today = startOfToday(dateOptions)
 
 export default function Page() {
   const { date, nextPath, prevPath } = useDateString(undefined)
