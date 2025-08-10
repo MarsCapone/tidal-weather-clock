@@ -105,6 +105,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
 
   const suggestions = new ActivityRecommender(
     dataContext,
+    workingHours,
   ).getRecommendedActivities(activities || [])
   const filteredSuggestions = groupScores(
     suggestions.filter((r) => r.feasible),

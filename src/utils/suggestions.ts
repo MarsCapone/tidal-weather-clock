@@ -1,3 +1,5 @@
+import { WorkingHoursSetting } from '@/hooks/settings'
+import { dateOptions } from '@/utils/dates'
 import logger from '@/utils/logger'
 import { calcMean } from '@/utils/math'
 import {
@@ -161,12 +163,12 @@ export class ActivityRecommender
 {
   private slots: TimeSlot[]
 
-  constructor(context: DataContext) {
+  constructor(context: DataContext, workingHours: WorkingHoursSetting) {
     if (context === undefined) {
       logger.warn('cannot suggest activity because data context is undefined')
       this.slots = []
     } else {
-      this.slots = generateTimeSlots(context)
+      this.slots = generateTimeSlots(context, workingHours)
     }
   }
 
@@ -248,12 +250,31 @@ export class ActivityRecommender
   }
 }
 
-function generateTimeSlots(dc: DataContext): TimeSlot[] {
-  const refDate = startOfDay(parseISO(dc.referenceDate))
+function generateTimeSlots(
+  dc: DataContext,
+  workingHours: WorkingHoursSetting,
+): TimeSlot[] {
+  const refDate = startOfDay(parseISO(dc.referenceDate, dateOptions))
 
   const timeSlots = eachHourOfInterval({
     end: endOfDay(refDate),
     start: refDate,
+  }).filter((date) => {
+    if (!workingHours.enabled) {
+      // don't filter at all
+      return true
+    }
+
+    // this date is in UTC and working hours are also UTC, but in fractionalTime
+    const hours = date.getHours()
+    const minutes = date.getMinutes()
+    const fractionalTime = hours + minutes / 60
+
+    // filter for only within the given times
+    return (
+      fractionalTime >= workingHours.startHour &&
+      fractionalTime <= workingHours.endHour
+    )
   })
 
   return timeSlots
