@@ -6,6 +6,9 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev --turbopack",
+    "e2e": "playwright test",
+    "e2e:debug": "playwright test --debug",
+    "e2e:headed": "playwright test --headed",
     "format": "prettier --experimental-cli --write . && next lint --fix",
     "lint": "next lint",
     "lint:format": "prettier --experimental-cli --cache --check .",
@@ -52,6 +55,7 @@
     "@eslint/eslintrc": "^3",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.2",
     "@nkzw/eslint-config": "^3.0.2",
+    "@playwright/test": "^1.54.2",
     "@pollyjs/adapter-fetch": "^6.0.7",
     "@pollyjs/core": "^6.0.6",
     "@pollyjs/persister-fs": "^6.0.6",
