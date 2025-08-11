@@ -1,8 +1,6 @@
 'use client'
 
-import ColorschemeToggle from '@/components/Colorscheme'
 import CONSTANTS from '@/constants'
-import Link from 'next/link'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import { DarkModeContext, TimeZoneContext } from '@/utils/contexts'

@@ -1,7 +1,6 @@
 import Navbar from '@/components/Navbar'
 import CONSTANTS from '@/constants'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { text } from 'drizzle-orm/pg-core'
 import React from 'react'
 
 describe('Navbar', () => {
