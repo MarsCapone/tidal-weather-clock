@@ -55,6 +55,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.2",
+    "@ljharb/tsconfig": "^0.3.2",
     "@nkzw/eslint-config": "^3.0.2",
     "@playwright/test": "^1.54.2",
     "@pollyjs/adapter-fetch": "^6.0.7",
