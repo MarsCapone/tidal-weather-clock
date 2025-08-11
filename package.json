@@ -10,7 +10,8 @@
     "lint": "next lint",
     "lint:format": "prettier --experimental-cli --cache --check .",
     "pre-commit": "prettier --experimental-cli --write --ignore-unknown",
-    "start": "next start"
+    "start": "next start",
+    "test": "vitest"
   },
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "^3.0.0",
@@ -53,18 +54,24 @@
     "@prettier/plugin-oxc": "^0.0.4",
     "@tailwindcss/cli": "^4",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.6.4",
+    "@testing-library/react": "^16.3.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^5.0.0",
     "daisyui": "^5.0.46",
     "dotenv": "^17.2.1",
     "drizzle-kit": "^0.31.4",
     "eslint": "^9.30.1",
     "eslint-config-next": "^15.4.4",
     "eslint-config-prettier": "^10.1.8",
+    "happy-dom": "^18.0.1",
     "prettier": "^3.6.2",
     "prettier-plugin-packagejson": "^2.5.18",
     "prettier-plugin-tailwindcss": "^0.6.13",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4"
   }
 }
