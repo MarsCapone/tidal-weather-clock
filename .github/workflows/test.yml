@@ -13,14 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
-      - id: cache-dependencies
-        uses: actions/cache@v4
-        with:
-          path: .bun_cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
       - name: Install dependencies
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
-        run: bun install --cache-dir=.bun_cache
+        run: bun install
 
       - name: Run unit tests
         run: bun run test:ci
