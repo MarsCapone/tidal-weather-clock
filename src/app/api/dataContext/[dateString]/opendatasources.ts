@@ -1,12 +1,14 @@
 import { uploadDebugData } from '@/app/api/dataContext/[dateString]/debug'
 import CONSTANTS from '@/constants'
-import { DataContext } from '@/types/context'
+import { DataContext, TideInfo } from '@/types/context'
 import { IDataContextFetcher, ILogger } from '@/types/interfaces'
 import {
   dateOptions,
+  utcDateStringAddFractional,
   utcDateStringToFractionalUtc,
   utcDateStringToUtc,
 } from '@/utils/dates'
+import { calcMean } from '@/utils/math'
 import { TZDate } from '@date-fns/tz'
 import {
   addDays,
@@ -271,6 +273,7 @@ export class OpenMeteoAndEasyTideDataFetcher implements IDataContextFetcher {
     openMeteoHourly: OpenMeteoHourlyPoint[],
     openMeteoDaily: OpenMeteoDailyPoint[],
   ): DataContext {
+    const referenceDate = formatISO(date, dateOptions)
     const hourlyPoints = openMeteoHourly.filter((hour) =>
       hour.timestamp.startsWith(
         formatISO(date, { ...dateOptions, representation: 'date' }),
@@ -291,20 +294,57 @@ export class OpenMeteoAndEasyTideDataFetcher implements IDataContextFetcher {
       throw new Error('No data for date')
     }
 
+    const tideData: TideInfo[] = easyTideData.tidalEventList
+      .filter((event) => isEqual(utcDateStringToUtc(event.date), date))
+      .map((event) => ({
+        height: event.height,
+        time: utcDateStringToFractionalUtc(event.dateTime),
+        timestamp: event.dateTime,
+        type: event.eventType === 0 ? 'high' : 'low',
+      }))
+
+    const lowTidePoints = tideData.filter((tide) => tide.type === 'low')
+    if (lowTidePoints.length === 0) {
+      // the source isn't providing any, so we need to interpolate them
+      const highTidePoints = tideData.filter((tide) => tide.type === 'high')
+
+      // these will be fractional times
+      const potentialLowTides: number[] = []
+      if (highTidePoints.length === 2) {
+        // average the points
+        potentialLowTides.push(calcMean(highTidePoints.map((ht) => ht.time)))
+      }
+      // either way, calculate 6 hours before the first and 6 hours after the last
+      potentialLowTides.push(
+        highTidePoints[0].time - 6,
+        highTidePoints.at(-1)!.time + 6,
+      )
+
+      // now filter those for ones that are in the current day, and convert to real tide info
+      const newLowTides: TideInfo[] = potentialLowTides
+        .filter((lt) => lt >= 0 && lt < 24)
+        .map((lt) => {
+          return {
+            height: 0,
+            time: lt,
+            timestamp: utcDateStringAddFractional(referenceDate, lt),
+            type: 'low',
+          }
+        })
+      this.logger.warn('Interpolated new low tide data', {
+        highTides: highTidePoints,
+        lowTides: newLowTides,
+      })
+      tideData.push(...newLowTides)
+    }
+
     return {
-      referenceDate: formatISO(date, dateOptions),
+      referenceDate,
       sunData: {
         sunRise: dailyPoint?.sunrise || '',
         sunSet: dailyPoint?.sunset || '',
       },
-      tideData: easyTideData.tidalEventList
-        .filter((event) => isEqual(utcDateStringToUtc(event.date), date))
-        .map((event) => ({
-          height: event.height,
-          time: utcDateStringToFractionalUtc(event.dateTime),
-          timestamp: event.dateTime,
-          type: event.eventType === 0 ? 'high' : 'low',
-        })),
+      tideData,
       weatherData: {
         points: hourlyPoints.map((point) => ({
           cloudCover: point.cloudCover,

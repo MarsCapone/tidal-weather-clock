@@ -50,19 +50,6 @@ export function AnalogActivityRanges({
   const highTides = tideData.filter((t) => t.type === 'high')
   const lowTides = tideData.filter((t) => t.type === 'low')
 
-  let lowTideEstimate = false
-  if (lowTides.length === 0 && highTides.length > 0) {
-    lowTideEstimate = true
-    // If there are no low tides, we create a fake one 6 hours after the first high tide, or 6 hours before (if it
-    // would be after midnight)
-    lowTides.push({
-      height: 0,
-      time:
-        highTides[0].time >= 18 ? highTides[0].time - 6 : highTides[0].time + 6,
-      type: 'low',
-    })
-  }
-
   const timePointers: TimePointer[] = [
     {
       isOutside: true,
@@ -82,8 +69,7 @@ export function AnalogActivityRanges({
     ...lowTides.map((t, i) => ({
       hour: t.time,
       isOutside: true,
-      label:
-        `LW (${t.time >= 12 ? 'pm' : 'am'}) ${lowTideEstimate ? '[est.]' : ''}`.trim(),
+      label: `LW (${t.time >= 12 ? 'pm' : 'am'})`,
     })),
   ].map((s) => ({
     color: 'warning',

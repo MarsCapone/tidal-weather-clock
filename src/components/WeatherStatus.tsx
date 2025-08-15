@@ -1,17 +1,10 @@
 import { SimpleCloudIcon } from '@/components/icons/CloudIcon'
 import { SunriseIcon, SunsetIcon } from '@/components/icons/SunStateIcon'
 import { CelsiusIcon } from '@/components/icons/TemperatureIcon'
-import {
-  HighWaterIcon,
-  LowWaterIcon,
-  TideHeightIcon,
-} from '@/components/icons/TideIcon'
+import { HighWaterIcon, LowWaterIcon } from '@/components/icons/TideIcon'
 import { WindIcon } from '@/components/icons/WindIcon'
 import { DataContext } from '@/types/context'
-import {
-  utcDateStringAddFractional,
-  utcDateStringToLocalTimeString,
-} from '@/utils/dates'
+import { utcDateStringToLocalTimeString } from '@/utils/dates'
 import { calcMean } from '@/utils/math'
 import { mpsToKnots } from '@/utils/units'
 import { ArrowBigUpIcon } from 'lucide-react'
@@ -52,10 +45,10 @@ function WeatherStatusRow({ Icon, label, values }: DataTableRow) {
             <Icon height={36} width={36} />
           </div>
         )}
-        <div>{label}</div>
+        <div data-testid="weather-status-label">{label}</div>
       </div>
       <div>
-        <ul>
+        <ul data-testid={`${label}-value`}>
           {values
             .filter((v) => v !== undefined)
             .map((value, i) => (
@@ -76,9 +69,19 @@ type DataTableRow = {
 function getDataTable(dataContext: DataContext): DataTableRow[] {
   const tides = dataContext.tideData.map((t) => ({
     ...t,
-    display: utcDateStringToLocalTimeString(
-      utcDateStringAddFractional(dataContext.referenceDate, t.time),
-    ),
+    display: () => {
+      const timeString = utcDateStringToLocalTimeString(t.timestamp)
+      return (
+        <div className={'flex flex-row items-center justify-between gap-x-2'}>
+          <span>{timeString}</span>
+          {t.height === 0 ? (
+            <span>approx.</span>
+          ) : (
+            <span>({t.height.toFixed(1)} m)</span>
+          )}
+        </div>
+      )
+    },
   }))
 
   const highTides = tides.filter((t) => t.type === 'high')
@@ -119,7 +122,7 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       label: 'Temperature',
       values: [
         temperature.length > 0
-          ? `${calcMean(temperature).toFixed(1)}°C`
+          ? `${calcMean(temperature).toFixed(1)}ºC`
           : undefined,
       ],
     },
@@ -149,13 +152,12 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
     {
       Icon: HighWaterIcon,
       label: 'HW',
-      values: highTides.map((t) => t.display),
+      values: highTides.map((t) => t.display()),
     },
-    { Icon: LowWaterIcon, label: 'LW', values: lowTides.map((t) => t.display) },
     {
-      Icon: TideHeightIcon,
-      label: 'Tide Heights',
-      values: tides.map((t) => `${t.height.toFixed(2)}m`),
+      Icon: LowWaterIcon,
+      label: 'LW',
+      values: lowTides.map((t) => t.display()),
     },
   ]
 }
