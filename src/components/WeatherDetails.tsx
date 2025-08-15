@@ -2,6 +2,8 @@ import { describeCloudiness } from '@/components/WeatherStatus'
 import { DataContext, Timestamp, WeatherInfo, WindInfo } from '@/types/context'
 import { utcDateStringToLocalTimeString } from '@/utils/dates'
 import {
+  AccessorKeyColumnDef,
+  ColumnDef,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
@@ -18,29 +20,30 @@ type AggregatedDataPoint = WindInfo & WeatherInfo
 
 const columnHelper = createColumnHelper<AggregatedDataPoint>()
 
-const columns = [
+const columns: AccessorKeyColumnDef<AggregatedDataPoint, any>[] = [
   columnHelper.accessor('timestamp', {
+    header: () => <span>Time</span>,
     cell: (info) => utcDateStringToLocalTimeString(info.getValue()),
+  }),
+  columnHelper.accessor('direction', {
+    header: () => '',
+    cell: (info) => {
+      return (
+        <div className="flex flex-row items-center gap-2">
+          <ArrowBigUpIcon
+            className={`fill-accent h-4 w-4`}
+            style={{ rotate: `${info.getValue() + 180}deg` }}
+          />
+          {info.getValue()}º
+        </div>
+      )
+    },
   }),
   columnHelper.accessor('speed', {
     header: () => <span>Wind Speed</span>,
   }),
   columnHelper.accessor('gustSpeed', {
     header: () => <span>Gusts</span>,
-  }),
-  columnHelper.accessor('direction', {
-    header: () => <span>Wind Direction</span>,
-    cell: (info) => {
-      return (
-        <div>
-          <ArrowBigUpIcon
-            className={`fill-accent h-4 w-4`}
-            style={{ rotate: String(info.getValue()) }}
-          />
-          {info.getValue()}
-        </div>
-      )
-    },
   }),
   columnHelper.accessor('cloudCover', {
     header: () => <span>Cloudiness</span>,
@@ -71,7 +74,7 @@ export function WeatherDetails({ dataContext }: WeatherDetailsProps) {
 
   return (
     <div className="p-2">
-      <table>
+      <table className="table">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
