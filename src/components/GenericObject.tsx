@@ -22,7 +22,7 @@ export default function GenericObject({
   obj,
   options,
 }: GenericObjectProps) {
-  const isDarkTheme = useContext(DarkModeContext)
+  const { isDarkMode } = useContext(DarkModeContext)
   const renderValue = (v: number | string | boolean) => {
     if (v === null) {
       return 'NULL'
@@ -70,7 +70,7 @@ export default function GenericObject({
       showArrayIndices: false,
       showCollectionCount: false,
       showStringQuotes: false,
-      theme: isDarkTheme ? githubDarkTheme : githubLightTheme,
+      theme: isDarkMode ? githubDarkTheme : githubLightTheme,
       viewOnly: true,
       ...(options?.jsonEditorProps || {}),
     }

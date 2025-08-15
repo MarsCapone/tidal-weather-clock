@@ -19,40 +19,10 @@ import { ActivityRecommender, groupScores } from '@/utils/suggestions'
 import { formatISO, startOfDay } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import { useSwipeable } from 'react-swipeable'
 
 export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
-  const router = useRouter()
-  const handlers = useSwipeable({
-    onSwiped: ({ dir, event }) => {
-      if (event.target !== null && event.target !== undefined) {
-        const modals = document.getElementsByClassName('modal')
-        for (let i = 0; i < modals.length; i++) {
-          if (modals[i].contains(event.target as Node)) {
-            logger.debug('not changing page because dialog is open', {
-              dialog: modals[i],
-              target: event.target,
-            })
-            // a dialog is open, so don't do the usual action
-            return
-          }
-        }
-      }
-
-      // swipe left means you want to see what's on the right, i.e. next
-      if (nextPath && dir === 'Left') {
-        router.push(nextPath)
-      }
-      if (prevPath && dir === 'Right') {
-        router.push(prevPath)
-      }
-    },
-  })
   return (
-    // TODO: make this controlled by a setting or feature flag
-    // <div {...handlers}>
     <div>
       <DatePagination date={date} nextPath={nextPath} prevPath={prevPath} />
       <MainContentWithoutDate date={date} />

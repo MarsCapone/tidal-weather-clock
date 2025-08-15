@@ -1,13 +1,10 @@
 import ColorschemeToggle from '@/components/Colorscheme'
+import ProfileMenu from '@/components/ProfileMenu'
 import CONSTANTS from '@/constants'
 import Link from 'next/link'
-import React, { Dispatch } from 'react'
+import React from 'react'
 
-type NavbarProps = {
-  setIsDarkMode: Dispatch<boolean>
-}
-
-export default function Navbar({ setIsDarkMode }: NavbarProps) {
+export default function Navbar() {
   return (
     <div className="navbar bg-base-100 shadow-sm">
       <div className="flex-1">
@@ -31,7 +28,10 @@ export default function Navbar({ setIsDarkMode }: NavbarProps) {
           {/*  <TimeZoneSelector timeZone={timeZone} setTimeZone={setTimeZone} />*/}
           {/*</li>*/}
           <li>
-            <ColorschemeToggle setIsDarkMode={setIsDarkMode} />
+            <ColorschemeToggle />
+          </li>
+          <li>
+            <ProfileMenu />
           </li>
         </ul>
       </div>

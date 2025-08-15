@@ -189,7 +189,7 @@ function SuggestedActivityExplanationDialog({
   const [aiExplanations, setAiExplanations] = React.useState<string[] | null>(
     null,
   )
-  const isDarkMode = useContext(DarkModeContext)
+  const { isDarkMode } = useContext(DarkModeContext)
 
   useEffect(() => {
     if (!useAiExplanations) {
