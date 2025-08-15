@@ -71,7 +71,8 @@ export function WeatherDetailsInternal({
       },
       filterFn: (row, columnId, filterValue) => {
         // if filterValue is true, it means showOutOfHours, therefore no filtering
-        if (filterValue === true) {
+        // or if the working hours are not enabled
+        if (filterValue === true || !workingHours.enabled) {
           return true
         }
 
@@ -90,7 +91,7 @@ export function WeatherDetailsInternal({
         const fractionalVal = utcDateStringToFractionalUtc(val)
         return (
           fractionalVal >= workingHours.startHour &&
-          fractionalVal <= workingHours.endHour
+          fractionalVal < workingHours.endHour
         )
       },
     }),
@@ -148,19 +149,22 @@ export function WeatherDetailsInternal({
   return (
     <div className="">
       <div className="flex flex-row items-center justify-end gap-2">
-        <label className="label">
-          Show
-          <input
-            className="toggle"
-            defaultChecked
-            onChange={() => {
-              setShowOutOfHours(!showOutOfHours)
-              table.getColumn('timestamp')?.setFilterValue(showOutOfHours)
-            }}
-            type="checkbox"
-          />
-          Hide Out of Hours
-        </label>
+        {workingHours.enabled && (
+          <label className="label">
+            Show
+            <input
+              data-testid="ooh-toggle"
+              className="toggle"
+              defaultChecked
+              onChange={() => {
+                setShowOutOfHours(!showOutOfHours)
+                table.getColumn('timestamp')?.setFilterValue(showOutOfHours)
+              }}
+              type="checkbox"
+            />
+            Hide Out of Hours
+          </label>
+        )}
       </div>
       <div className="min-w-full overflow-x-auto">
         <table className="table-pin-rows table">
@@ -181,10 +185,10 @@ export function WeatherDetailsInternal({
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row) => (
+            {table.getRowModel().rows.map((row, rowIndex) => (
               <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id}>
+                  <td key={cell.id} data-testid={`${cell.column.id}-data`}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
