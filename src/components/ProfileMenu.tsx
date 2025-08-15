@@ -59,7 +59,3 @@ function ProfileMenuWrapper({
     </div>
   )
 }
-
-function LoginMenu() {}
-
-function LogoutMenu({ session }: { session: SessionData }) {}

@@ -1,4 +1,5 @@
 import ColorschemeToggle from '@/components/Colorscheme'
+import ProfileMenu from '@/components/ProfileMenu'
 import CONSTANTS from '@/constants'
 import Link from 'next/link'
 import React from 'react'
@@ -28,6 +29,9 @@ export default function Navbar() {
           {/*</li>*/}
           <li>
             <ColorschemeToggle />
+          </li>
+          <li>
+            <ProfileMenu />
           </li>
         </ul>
       </div>
