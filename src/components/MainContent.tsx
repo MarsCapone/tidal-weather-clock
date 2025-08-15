@@ -51,7 +51,9 @@ export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
     },
   })
   return (
-    <div {...handlers}>
+    // TODO: make this controlled by a setting or feature flag
+    // <div {...handlers}>
+    <div>
       <DatePagination date={date} nextPath={nextPath} prevPath={prevPath} />
       <MainContentWithoutDate date={date} />
     </div>
