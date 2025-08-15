@@ -102,6 +102,10 @@ export function WeatherDetails({ dataContext }: WeatherDetailsProps) {
       header: () => <span>Gusts</span>,
       cell: (info) => <div>{info.getValue().toFixed(1)} kts</div>,
     }),
+    columnHelper.accessor('temperature', {
+      header: () => <span>Temperature</span>,
+      cell: (info) => `${info.getValue()}ºC`,
+    }),
     columnHelper.accessor('cloudCover', {
       header: () => <span>Cloudiness</span>,
       cell: (info) => describeCloudiness(info.getValue()),
