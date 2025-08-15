@@ -8,7 +8,7 @@ export type TideInfo = {
   height: number
   time: number
   type: TideType
-} & Partial<Timestamp>
+} & Timestamp
 
 export type SunData = {
   sunRise: string

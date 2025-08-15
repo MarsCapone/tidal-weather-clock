@@ -8,12 +8,10 @@ import {
 } from '@/components/icons/TideIcon'
 import { WindIcon } from '@/components/icons/WindIcon'
 import { DataContext } from '@/types/context'
-import {
-  utcDateStringAddFractional,
-  utcDateStringToLocalTimeString,
-} from '@/utils/dates'
+import { utcDateStringToLocalTimeString } from '@/utils/dates'
 import { calcMean } from '@/utils/math'
 import { mpsToKnots } from '@/utils/units'
+import { divisor } from 'happy-dom/lib/PropertySymbol.d.ts.js'
 import { ArrowBigUpIcon } from 'lucide-react'
 import React from 'react'
 
@@ -76,9 +74,19 @@ type DataTableRow = {
 function getDataTable(dataContext: DataContext): DataTableRow[] {
   const tides = dataContext.tideData.map((t) => ({
     ...t,
-    display: utcDateStringToLocalTimeString(
-      utcDateStringAddFractional(dataContext.referenceDate, t.time),
-    ),
+    display: () => {
+      const timeString = utcDateStringToLocalTimeString(t.timestamp)
+      return (
+        <div className={'flex flex-row items-center justify-between gap-x-2'}>
+          <span>{timeString}</span>
+          {t.height === 0 ? (
+            <span>approx.</span>
+          ) : (
+            <span>({t.height.toFixed(1)} m)</span>
+          )}
+        </div>
+      )
+    },
   }))
 
   const highTides = tides.filter((t) => t.type === 'high')
@@ -149,13 +157,12 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
     {
       Icon: HighWaterIcon,
       label: 'HW',
-      values: highTides.map((t) => t.display),
+      values: highTides.map((t) => t.display()),
     },
-    { Icon: LowWaterIcon, label: 'LW', values: lowTides.map((t) => t.display) },
     {
-      Icon: TideHeightIcon,
-      label: 'Tide Heights',
-      values: tides.map((t) => `${t.height.toFixed(2)}m`),
+      Icon: LowWaterIcon,
+      label: 'LW',
+      values: lowTides.map((t) => t.display()),
     },
   ]
 }
