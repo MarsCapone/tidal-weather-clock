@@ -1,17 +1,12 @@
 import { SimpleCloudIcon } from '@/components/icons/CloudIcon'
 import { SunriseIcon, SunsetIcon } from '@/components/icons/SunStateIcon'
 import { CelsiusIcon } from '@/components/icons/TemperatureIcon'
-import {
-  HighWaterIcon,
-  LowWaterIcon,
-  TideHeightIcon,
-} from '@/components/icons/TideIcon'
+import { HighWaterIcon, LowWaterIcon } from '@/components/icons/TideIcon'
 import { WindIcon } from '@/components/icons/WindIcon'
 import { DataContext } from '@/types/context'
 import { utcDateStringToLocalTimeString } from '@/utils/dates'
 import { calcMean } from '@/utils/math'
 import { mpsToKnots } from '@/utils/units'
-import { divisor } from 'happy-dom/lib/PropertySymbol.d.ts.js'
 import { ArrowBigUpIcon } from 'lucide-react'
 import React from 'react'
 
@@ -50,10 +45,10 @@ function WeatherStatusRow({ Icon, label, values }: DataTableRow) {
             <Icon height={36} width={36} />
           </div>
         )}
-        <div>{label}</div>
+        <div data-testid="weather-status-label">{label}</div>
       </div>
       <div>
-        <ul>
+        <ul data-testid={`${label}-value`}>
           {values
             .filter((v) => v !== undefined)
             .map((value, i) => (
@@ -127,7 +122,7 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       label: 'Temperature',
       values: [
         temperature.length > 0
-          ? `${calcMean(temperature).toFixed(1)}°C`
+          ? `${calcMean(temperature).toFixed(1)}ºC`
           : undefined,
       ],
     },
