@@ -14,7 +14,6 @@ import {
 } from '@/utils/dates'
 import { calcMean } from '@/utils/math'
 import { mpsToKnots } from '@/utils/units'
-import { direction } from 'direction'
 import { ArrowBigUpIcon } from 'lucide-react'
 import React from 'react'
 
