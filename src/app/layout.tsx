@@ -1,32 +1,10 @@
-'use client'
-
 import CONSTANTS from '@/constants'
 import './globals.css'
 import Navbar from '@/components/Navbar'
-import { DarkModeContext, TimeZoneContext } from '@/utils/contexts'
-import { LDProvider } from 'launchdarkly-react-client-sdk'
+import Providers from '@/components/Providers'
 import React from 'react'
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  const [isDarkMode, setIsDarkMode] = React.useState<boolean>(false)
-  const [timeZone, setTimeZone] = React.useState('Europe/London')
-
-  return (
-    <Root>
-      <DarkModeContext value={isDarkMode}>
-        <div>
-          <Navbar setIsDarkMode={setIsDarkMode} />
-          <div className="mx-auto flex min-w-full flex-col justify-center gap-10 p-10 text-center md:min-w-0">
-            <TimeZoneContext value={timeZone}>{children}</TimeZoneContext>
-          </div>
-        </div>
-      </DarkModeContext>
-    </Root>
-  )
-}
-
-function Root({ children }: { children: React.ReactNode }) {
-  // return <div>{children}</div>
+export default function Layout({ children }: React.PropsWithChildren) {
   return (
     <html lang="en">
       <head>
@@ -36,11 +14,10 @@ function Root({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <div id="root">
-          <React.StrictMode>
-            <LDProvider clientSideID={CONSTANTS.LD_CLIENT_ID}>
-              {children}
-            </LDProvider>
-          </React.StrictMode>
+          <Providers>
+            <Navbar />
+            {children}
+          </Providers>
         </div>
       </body>
     </html>

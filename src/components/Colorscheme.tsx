@@ -1,11 +1,12 @@
-import { MoonIcon, SunIcon } from 'lucide-react'
-import React from 'react'
+'use client'
 
-export default function ColorschemeToggle({
-  setIsDarkMode,
-}: {
-  setIsDarkMode: (isDark: boolean) => void
-}) {
+import { DarkModeContext } from '@/utils/contexts'
+import { MoonIcon, SunIcon } from 'lucide-react'
+import React, { useContext } from 'react'
+
+export default function ColorschemeToggle() {
+  const { setIsDarkMode } = useContext(DarkModeContext)
+
   return (
     <div>
       <label className="flex cursor-pointer gap-2">
@@ -24,11 +25,4 @@ export default function ColorschemeToggle({
       </label>
     </div>
   )
-}
-
-export function isDarkMode(): boolean {
-  const element = document.getElementById(
-    'theme-controller',
-  ) as HTMLInputElement
-  return element.checked
 }

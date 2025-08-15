@@ -131,7 +131,7 @@ const restrictChanges = ({ key }: { key: string }) => {
 }
 
 function ActivityCard({ activity, setActivity, onDelete }: ActivityCardProps) {
-  const isDarkTheme = useContext(DarkModeContext)
+  const { isDarkMode } = useContext(DarkModeContext)
 
   const buttons = (
     <div className="tooltip tooltip-bottom" data-tip="Delete activity">
@@ -156,7 +156,7 @@ function ActivityCard({ activity, setActivity, onDelete }: ActivityCardProps) {
           restrictAdd={true}
           restrictDelete={true}
           restrictEdit={restrictChanges as FilterFunction}
-          theme={isDarkTheme ? githubDarkTheme : githubLightTheme}
+          theme={isDarkMode ? githubDarkTheme : githubLightTheme}
           rootName={''}
         />
       </div>
