@@ -5,6 +5,7 @@ import ClockDisplay from '@/components/ClockDisplay'
 import DatePagination from '@/components/DatePagination'
 import DayTimeline from '@/components/DayTimeline'
 import SuggestedActivity from '@/components/SuggestedActivity'
+import { WeatherDetails } from '@/components/WeatherDetails'
 import WeatherStatus from '@/components/WeatherStatus'
 import { APP_CONFIG } from '@/config'
 import { useActivities } from '@/hooks/apiRequests'
@@ -148,6 +149,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
               suggestedActivity={suggestedActivity}
               dataContext={dataContext}
             />
+            <WeatherDetails dataContext={dataContext} />
           </div>
           <div className="w-full md:w-1/3">
             {showSuggestedActivity && (

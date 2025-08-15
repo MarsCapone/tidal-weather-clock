@@ -1,6 +1,6 @@
 export type TideType = 'high' | 'low'
 
-type Timestamp = {
+export type Timestamp = {
   timestamp: string
 }
 
