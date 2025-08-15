@@ -165,7 +165,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
             <WeatherStatus dataContext={dataContext} />
           </div>
         </div>
-        {showActivityTable && (
+        {showActivityTable && showSuggestedActivity && (
           <div className="my-8">
             <ActivityScoreList scores={suggestions} />
           </div>
