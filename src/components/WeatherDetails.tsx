@@ -3,7 +3,7 @@ import {
   describeUvIndex,
   describeWindDirection,
 } from '@/components/WeatherStatus'
-import { useWorkingHours } from '@/hooks/settings'
+import { useWorkingHours, WorkingHoursSetting } from '@/hooks/settings'
 import { DataContext, Timestamp, WeatherInfo, WindInfo } from '@/types/context'
 import {
   utcDateStringToFractionalUtc,
@@ -11,7 +11,6 @@ import {
 } from '@/utils/dates'
 import {
   AccessorKeyColumnDef,
-  ColumnDef,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
@@ -19,26 +18,41 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { ArrowBigUpIcon } from 'lucide-react'
-import React, { useCallback, useEffect } from 'react'
+import React, { useEffect } from 'react'
 
 export type WeatherDetailsProps = {
   dataContext: DataContext
 }
 
-type AggregatedDataPoint = WindInfo & WeatherInfo
+export type AggregatedDataPoint = WindInfo & WeatherInfo
 
 const columnHelper = createColumnHelper<AggregatedDataPoint>()
 const DEFAULT_SHOW_OUT_OF_HOURS = false
 
 export function WeatherDetails({ dataContext }: WeatherDetailsProps) {
-  const [data, setData] = React.useState(() => [
-    ...getAggregatedDatapoints(dataContext),
-  ])
+  const [workingHours] = useWorkingHours()
+
+  return (
+    <WeatherDetailsInternal
+      aggregatedDataPoints={getAggregatedDatapoints(dataContext)}
+      workingHours={workingHours}
+    />
+  )
+}
+
+type WeatherDetailsInternalProps = {
+  aggregatedDataPoints: AggregatedDataPoint[]
+  workingHours: WorkingHoursSetting
+}
+
+export function WeatherDetailsInternal({
+  aggregatedDataPoints,
+  workingHours,
+}: WeatherDetailsInternalProps) {
+  const [data, setData] = React.useState(() => [...aggregatedDataPoints])
   const [showOutOfHours, setShowOutOfHours] = React.useState(
     DEFAULT_SHOW_OUT_OF_HOURS,
   )
-  const [workingHours] = useWorkingHours()
-
   const columns: AccessorKeyColumnDef<AggregatedDataPoint, any>[] = [
     columnHelper.accessor('timestamp', {
       header: () => <span>Time</span>,
