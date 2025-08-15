@@ -14,6 +14,7 @@ import {
 } from '@/utils/dates'
 import { calcMean } from '@/utils/math'
 import { mpsToKnots } from '@/utils/units'
+import { direction } from 'direction'
 import { ArrowBigUpIcon } from 'lucide-react'
 import React from 'react'
 
@@ -103,12 +104,14 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
           : undefined,
         <div key={'wind'} className="flex flex-row items-center gap-x-1">
           {dominantWindDirection && (
-            <ArrowBigUpIcon
-              className={`fill-accent h-4 w-4`}
-              style={{ rotate: `${dominantWindDirection + 180}deg` }}
-            />
+            <>
+              <ArrowBigUpIcon
+                className={`fill-accent h-4 w-4`}
+                style={{ rotate: `${dominantWindDirection + 180}deg` }}
+              />
+              {describeWindDirection(dominantWindDirection, true)}
+            </>
           )}
-          {dataContext.windData.dominantDirection}°
         </div>,
       ],
     },
@@ -184,4 +187,20 @@ export function describeCloudiness(cloudCover: number | undefined): string {
     return 'Mostly Cloudy'
   }
   return 'Overcast'
+}
+
+export function describeWindDirection(
+  direction: number,
+  includeDegrees: boolean = true,
+): string {
+  const points = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
+
+  const val = Math.round((direction * points.length) / 360)
+
+  const cardinal = points[(val + points.length) % points.length]
+
+  if (!includeDegrees) {
+    return cardinal
+  }
+  return `${cardinal} (${direction}º)`
 }

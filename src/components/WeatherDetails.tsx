@@ -1,4 +1,7 @@
-import { describeCloudiness } from '@/components/WeatherStatus'
+import {
+  describeCloudiness,
+  describeWindDirection,
+} from '@/components/WeatherStatus'
 import { DataContext, Timestamp, WeatherInfo, WindInfo } from '@/types/context'
 import { utcDateStringToLocalTimeString } from '@/utils/dates'
 import {
@@ -34,29 +37,31 @@ const columns: AccessorKeyColumnDef<AggregatedDataPoint, any>[] = [
             className={`fill-accent h-4 w-4`}
             style={{ rotate: `${info.getValue() + 180}deg` }}
           />
-          {info.getValue()}º
+          {describeWindDirection(info.getValue(), true)}
         </div>
       )
     },
   }),
   columnHelper.accessor('speed', {
     header: () => <span>Wind Speed</span>,
+    cell: (info) => <div>{info.getValue().toFixed(1)} kts</div>,
   }),
   columnHelper.accessor('gustSpeed', {
     header: () => <span>Gusts</span>,
+    cell: (info) => <div>{info.getValue().toFixed(1)} kts</div>,
   }),
   columnHelper.accessor('cloudCover', {
     header: () => <span>Cloudiness</span>,
     cell: (info) => describeCloudiness(info.getValue()),
   }),
-  columnHelper.accessor('sunshineDuration', {
-    header: () => <span>Sunshine %</span>,
+  columnHelper.accessor('uvIndex', {
+    header: () => 'UV Index',
     cell: (info) => {
-      const v = info.getValue()
-      if (v) {
-        return (v * 100) / 3600
+      const val = info.getValue()
+      if (val === 0) {
+        return '0'
       }
-      return null
+      return val.toFixed(1)
     },
   }),
 ]
