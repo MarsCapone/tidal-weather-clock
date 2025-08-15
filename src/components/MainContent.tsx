@@ -5,6 +5,7 @@ import ClockDisplay from '@/components/ClockDisplay'
 import DatePagination from '@/components/DatePagination'
 import DayTimeline from '@/components/DayTimeline'
 import SuggestedActivity from '@/components/SuggestedActivity'
+import { WeatherDetails } from '@/components/WeatherDetails'
 import WeatherStatus from '@/components/WeatherStatus'
 import { APP_CONFIG } from '@/config'
 import { useActivities } from '@/hooks/apiRequests'
@@ -50,7 +51,9 @@ export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
     },
   })
   return (
-    <div {...handlers}>
+    // TODO: make this controlled by a setting or feature flag
+    // <div {...handlers}>
+    <div>
       <DatePagination date={date} nextPath={nextPath} prevPath={prevPath} />
       <MainContentWithoutDate date={date} />
     </div>
@@ -148,6 +151,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
               suggestedActivity={suggestedActivity}
               dataContext={dataContext}
             />
+            <WeatherDetails dataContext={dataContext} />
           </div>
           <div className="w-full md:w-1/3">
             {showSuggestedActivity && (
@@ -165,7 +169,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
             <WeatherStatus dataContext={dataContext} />
           </div>
         </div>
-        {showActivityTable && (
+        {showActivityTable && showSuggestedActivity && (
           <div className="my-8">
             <ActivityScoreList scores={suggestions} />
           </div>

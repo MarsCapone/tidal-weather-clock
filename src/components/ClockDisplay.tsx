@@ -11,6 +11,7 @@ import {
   utcDateStringToUtc,
 } from '@/utils/dates'
 import { EnrichedActivityScore } from '@/utils/suggestions'
+import { TZDate } from '@date-fns/tz'
 import {
   Duration,
   format,
@@ -148,13 +149,13 @@ export function TimeToNext({
   suggestedActivity,
   displayTime = true,
 }: ClockDisplayProps & { displayTime?: boolean; type: 'descriptive' }) {
-  const [diff, setDiff] = React.useState<string | number | null>(null)
+  const [diff, setDiff] = React.useState<string | null>(null)
   const [currentTime, setCurrentTime] = React.useState<Date>(new Date())
-  const { showSecondsCountdown } = useFlags()
+  const { showSecondsCountdown, showSuggestedActivity } = useFlags()
 
   useEffect(() => {
     const updateTime = () => {
-      if (!suggestedActivity) {
+      if (!suggestedActivity || !showSuggestedActivity) {
         return
       }
       const current = new Date()
@@ -174,17 +175,24 @@ export function TimeToNext({
     }
     const interval = setInterval(updateTime, 1000)
     return () => clearInterval(interval)
-  }, [suggestedActivity, showSecondsCountdown])
+  }, [suggestedActivity, showSecondsCountdown, showSuggestedActivity])
 
-  if (!suggestedActivity) {
-    return null
-  }
+  const timestamp =
+    suggestedActivity &&
+    utcDateStringToUtc(suggestedActivity.timestamp).withTimeZone(
+      'Europe/London',
+    )
 
-  const timestamp = utcDateStringToUtc(
-    suggestedActivity.timestamp,
-  ).withTimeZone('Europe/London')
-
-  const nextActivityInThePast = isBefore(timestamp, currentTime)
+  const activityView = getActivityView(
+    suggestedActivity,
+    timestamp ? isBefore(timestamp, currentTime) : false,
+    showSuggestedActivity,
+    {
+      diff,
+      currentTime,
+      timestamp,
+    },
+  )
 
   return (
     <div className="flex flex-col items-center justify-center gap-1 p-10">
@@ -198,33 +206,65 @@ export function TimeToNext({
           </div>
         </div>
       )}
-
-      {!nextActivityInThePast && (
-        <div className="text-md font-bold md:text-xl xl:text-3xl">
-          the selected activity is
-        </div>
-      )}
-      <div className="bg-base-content text-base-100 w-fit px-1 py-0.5 text-xl font-extrabold md:text-3xl xl:text-5xl">
-        {suggestedActivity.activity.name}
-      </div>
-
-      {nextActivityInThePast ? (
-        <>
-          <div className="text-md font-bold md:text-xl xl:text-3xl">
-            was the activity suggested
-          </div>
-          <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
-            {formatRelative(timestamp, currentTime)}
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="text-md font-bold md:text-xl xl:text-3xl">in</div>
-          <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
-            {diff}
-          </div>
-        </>
-      )}
+      {activityView}
     </div>
+  )
+}
+
+function getActivityView(
+  suggestedActivity: EnrichedActivityScore | null,
+  isInThePast: boolean,
+  shouldShow: boolean,
+  timings: {
+    timestamp: TZDate | null
+    currentTime: Date
+    diff: string | null
+  },
+): React.ReactNode | null {
+  if (!shouldShow || !suggestedActivity) {
+    return null
+  }
+
+  // if it's in the past, we want to show:
+  // ACTIVITY was the activity suggested TIME
+
+  // if it's in the future, we want to show
+  // the selected activity is ACTIVITY in TIME
+
+  const activity = (
+    <div className="bg-base-content text-base-100 w-fit px-1 py-0.5 text-xl font-extrabold md:text-3xl xl:text-5xl">
+      {suggestedActivity.activity.name}
+    </div>
+  )
+
+  if (isInThePast) {
+    return (
+      <>
+        {activity}
+        <div className="bg-base-content text-base-100 w-fit px-1 py-0.5 text-xl font-extrabold md:text-3xl xl:text-5xl">
+          {suggestedActivity.activity.name}
+        </div>
+        <div className="text-md font-bold md:text-xl xl:text-3xl">
+          was the activity suggested
+        </div>
+        <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
+          {timings.timestamp &&
+            formatRelative(timings.timestamp, timings.currentTime)}
+        </div>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <div className="text-md font-bold md:text-xl xl:text-3xl">
+        the selected activity is
+      </div>
+      {activity}
+      <div className="text-md font-bold md:text-xl xl:text-3xl">in</div>
+      <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
+        {timings.diff}
+      </div>
+    </>
   )
 }
