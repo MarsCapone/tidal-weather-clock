@@ -12,6 +12,7 @@ export default function ColorschemeToggle() {
       <label className="flex cursor-pointer gap-2">
         <SunIcon height={20} />
         <input
+          data-testid={'colorscheme-toggle'}
           id="theme-controller"
           className="toggle theme-controller"
           type="checkbox"
