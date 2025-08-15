@@ -1,19 +1,25 @@
 import {
   describeCloudiness,
+  describeUvIndex,
   describeWindDirection,
 } from '@/components/WeatherStatus'
+import { useWorkingHours } from '@/hooks/settings'
 import { DataContext, Timestamp, WeatherInfo, WindInfo } from '@/types/context'
-import { utcDateStringToLocalTimeString } from '@/utils/dates'
+import {
+  utcDateStringToFractionalUtc,
+  utcDateStringToLocalTimeString,
+} from '@/utils/dates'
 import {
   AccessorKeyColumnDef,
   ColumnDef,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 import { ArrowBigUpIcon } from 'lucide-react'
-import React from 'react'
+import React, { useCallback, useEffect } from 'react'
 
 export type WeatherDetailsProps = {
   dataContext: DataContext
@@ -22,64 +28,123 @@ export type WeatherDetailsProps = {
 type AggregatedDataPoint = WindInfo & WeatherInfo
 
 const columnHelper = createColumnHelper<AggregatedDataPoint>()
-
-const columns: AccessorKeyColumnDef<AggregatedDataPoint, any>[] = [
-  columnHelper.accessor('timestamp', {
-    header: () => <span>Time</span>,
-    cell: (info) => utcDateStringToLocalTimeString(info.getValue()),
-  }),
-  columnHelper.accessor('direction', {
-    header: () => '',
-    cell: (info) => {
-      return (
-        <div className="flex flex-row items-center gap-2">
-          <ArrowBigUpIcon
-            className={`fill-accent h-4 w-4`}
-            style={{ rotate: `${info.getValue() + 180}deg` }}
-          />
-          {describeWindDirection(info.getValue(), true)}
-        </div>
-      )
-    },
-  }),
-  columnHelper.accessor('speed', {
-    header: () => <span>Wind Speed</span>,
-    cell: (info) => <div>{info.getValue().toFixed(1)} kts</div>,
-  }),
-  columnHelper.accessor('gustSpeed', {
-    header: () => <span>Gusts</span>,
-    cell: (info) => <div>{info.getValue().toFixed(1)} kts</div>,
-  }),
-  columnHelper.accessor('cloudCover', {
-    header: () => <span>Cloudiness</span>,
-    cell: (info) => describeCloudiness(info.getValue()),
-  }),
-  columnHelper.accessor('uvIndex', {
-    header: () => 'UV Index',
-    cell: (info) => {
-      const val = info.getValue()
-      if (val === 0) {
-        return '0'
-      }
-      return val.toFixed(1)
-    },
-  }),
-]
+const DEFAULT_SHOW_OUT_OF_HOURS = false
 
 export function WeatherDetails({ dataContext }: WeatherDetailsProps) {
   const [data, setData] = React.useState(() => [
     ...getAggregatedDatapoints(dataContext),
   ])
+  const [showOutOfHours, setShowOutOfHours] = React.useState(
+    DEFAULT_SHOW_OUT_OF_HOURS,
+  )
+  const [workingHours] = useWorkingHours()
 
-  const table = useReactTable({
+  const columns: AccessorKeyColumnDef<AggregatedDataPoint, any>[] = [
+    columnHelper.accessor('timestamp', {
+      header: () => <span>Time</span>,
+      cell: (info) => {
+        const val = info.getValue()
+        const fractionalVal = utcDateStringToFractionalUtc(val)
+        const timeString = utcDateStringToLocalTimeString(val)
+        if (
+          fractionalVal >= workingHours.startHour &&
+          fractionalVal <= workingHours.endHour
+        ) {
+          // it's working hours, so show in bold
+          return <span className={'font-bold'}>{timeString}</span>
+        }
+        return <span>{timeString}</span>
+      },
+      filterFn: (row, columnId, filterValue) => {
+        // if filterValue is true, it means showOutOfHours, therefore no filtering
+        if (filterValue === true) {
+          return true
+        }
+
+        if (
+          workingHours.startHour === workingHours.endHour &&
+          workingHours.startHour === 0
+        ) {
+          // we're still loading the working hours, so filter out everything
+          // this will make it look like the data is loaded from somewhere when the page loads
+          return false
+        }
+
+        // otherwise we only want to show things that are in-hours
+
+        const val = row.getValue(columnId) as string
+        const fractionalVal = utcDateStringToFractionalUtc(val)
+        return (
+          fractionalVal >= workingHours.startHour &&
+          fractionalVal <= workingHours.endHour
+        )
+      },
+    }),
+    columnHelper.accessor('direction', {
+      header: () => '',
+      cell: (info) => {
+        return (
+          <div className="flex flex-row items-center gap-2">
+            <ArrowBigUpIcon
+              className={`fill-accent h-4 w-4`}
+              style={{ rotate: `${info.getValue() + 180}deg` }}
+            />
+            {describeWindDirection(info.getValue(), true)}
+          </div>
+        )
+      },
+    }),
+    columnHelper.accessor('speed', {
+      header: () => <span>Wind Speed</span>,
+      cell: (info) => <div>{info.getValue().toFixed(1)} kts</div>,
+    }),
+    columnHelper.accessor('gustSpeed', {
+      header: () => <span>Gusts</span>,
+      cell: (info) => <div>{info.getValue().toFixed(1)} kts</div>,
+    }),
+    columnHelper.accessor('cloudCover', {
+      header: () => <span>Cloudiness</span>,
+      cell: (info) => describeCloudiness(info.getValue()),
+    }),
+    columnHelper.accessor('uvIndex', {
+      header: () => 'UV Index',
+      cell: (info) => {
+        const val = info.getValue()
+        return describeUvIndex(val, true)
+      },
+    }),
+  ]
+  const table = useReactTable<AggregatedDataPoint>({
     data,
     columns,
+    initialState: {
+      columnFilters: [{ id: 'timestamp', value: true }],
+    },
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
   })
+  useEffect(() => {
+    table.getColumn('timestamp')?.setFilterValue(showOutOfHours)
+  }, [table, showOutOfHours, workingHours])
 
   return (
     <div className="p-2">
-      <table className="table">
+      <div className="flex flex-row items-center justify-end gap-2">
+        <label className="label">
+          Show Out of Hours
+          <input
+            className="toggle"
+            defaultChecked
+            onChange={() => {
+              setShowOutOfHours(!showOutOfHours)
+              table.getColumn('timestamp')?.setFilterValue(showOutOfHours)
+            }}
+            type="checkbox"
+          />
+          Hide Out of Hours
+        </label>
+      </div>
+      <table className="table overflow-x-scroll">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>

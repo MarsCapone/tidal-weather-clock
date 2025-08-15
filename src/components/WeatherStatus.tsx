@@ -204,3 +204,44 @@ export function describeWindDirection(
   }
   return `${cardinal} (${direction}º)`
 }
+
+export function describeUvIndex(
+  uvIndex: number,
+  includeIndex: boolean = true,
+): React.ReactNode {
+  // https://en.wikipedia.org/wiki/Ultraviolet_index#Index_usage
+  let color = '#B567A4'
+  let description = 'Extreme'
+  let invertText = true
+
+  if (uvIndex < 3) {
+    color = '#3EA72D'
+    description = 'Low'
+  } else if (uvIndex < 5) {
+    color = '#FFF300'
+    description = 'Moderate'
+    invertText = false
+  } else if (uvIndex < 8) {
+    color = '#F18B00'
+    description = 'High'
+    invertText = false
+  } else if (uvIndex < 11) {
+    color = '#E53210'
+    description = 'Very High'
+  }
+
+  return (
+    <div className="flex flex-row items-center justify-between">
+      {description}
+      <div
+        style={{
+          backgroundColor: color,
+          color: invertText ? 'white' : 'black',
+        }}
+        className="w-9 p-2"
+      >
+        {includeIndex && <span>{uvIndex.toFixed(1)}</span>}
+      </div>
+    </div>
+  )
+}
