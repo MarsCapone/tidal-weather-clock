@@ -24,9 +24,6 @@ export default function Navbar() {
               Settings
             </Link>
           </li>
-          {/*<li>*/}
-          {/*  <TimeZoneSelector timeZone={timeZone} setTimeZone={setTimeZone} />*/}
-          {/*</li>*/}
           <li>
             <ColorschemeToggle />
           </li>

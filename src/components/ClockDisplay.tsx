@@ -5,13 +5,14 @@ import ClockChart, {
 } from '@/components/ClockChart'
 import { getActivityGroupInfo } from '@/components/SuggestedActivity'
 import { DataContext } from '@/types/context'
+import { TimeZoneContext } from '@/utils/contexts'
 import {
   formatInterval,
   naiveDateToFractionalLocal,
   utcDateStringToUtc,
 } from '@/utils/dates'
 import { EnrichedActivityScore } from '@/utils/suggestions'
-import { TZDate } from '@date-fns/tz'
+import { tz, TZDate } from '@date-fns/tz'
 import {
   Duration,
   format,
@@ -21,7 +22,7 @@ import {
   isBefore,
 } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 
 export type ClockDisplayProps = {
   suggestedActivity: EnrichedActivityScore | null
@@ -136,15 +137,16 @@ export function TimeToNext({
   displayTime = true,
 }: ClockDisplayProps & { displayTime?: boolean; type: 'descriptive' }) {
   const [diff, setDiff] = React.useState<string | null>(null)
-  const [currentTime, setCurrentTime] = React.useState<Date>(new Date())
+  const [currentTime, setCurrentTime] = React.useState<TZDate>(new TZDate())
   const { showSecondsCountdown, showSuggestedActivity } = useFlags()
+  const { timeZone } = useContext(TimeZoneContext)
 
   useEffect(() => {
     const updateTime = () => {
       if (!suggestedActivity || !showSuggestedActivity) {
         return
       }
-      const current = new Date()
+      const current = new TZDate().withTimeZone(timeZone)
       const duration = intervalToDuration({
         start: current,
         end: utcDateStringToUtc(suggestedActivity.timestamp),
@@ -161,13 +163,11 @@ export function TimeToNext({
     }
     const interval = setInterval(updateTime, 1000)
     return () => clearInterval(interval)
-  }, [suggestedActivity, showSecondsCountdown, showSuggestedActivity])
+  }, [suggestedActivity, showSecondsCountdown, showSuggestedActivity, timeZone])
 
   const timestamp =
     suggestedActivity &&
-    utcDateStringToUtc(suggestedActivity.timestamp).withTimeZone(
-      'Europe/London',
-    )
+    utcDateStringToUtc(suggestedActivity.timestamp).withTimeZone(timeZone)
 
   const activityView = getActivityView(
     suggestedActivity,
@@ -188,7 +188,7 @@ export function TimeToNext({
             the time is
           </div>
           <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
-            {format(currentTime, 'h:mm aaa')}
+            {format(currentTime, 'h:mm aaa', { in: tz(timeZone) })}
           </div>
         </div>
       )}

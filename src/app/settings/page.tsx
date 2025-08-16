@@ -2,13 +2,19 @@
 
 import ActivitySettings from '@/app/settings/components/ActivitySettings'
 import OutOfHoursSettings from '@/app/settings/components/OutOfHoursSettings'
+import TimeZoneSettings from '@/app/settings/components/TimeZoneSettings'
 import Link from 'next/link'
 import { useState } from 'react'
 
 export default function Page() {
-  const [hash, setHash] = useState('#activities')
+  const [hash, setHash] = useState('')
 
   const links = [
+    {
+      Component: TimeZoneSettings,
+      id: 'timezone',
+      label: 'Timezone',
+    },
     {
       Component: OutOfHoursSettings,
       id: 'working-hours',

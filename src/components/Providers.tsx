@@ -13,7 +13,9 @@ export default function Providers({ children }: React.PropsWithChildren) {
     <React.StrictMode>
       <LDProvider clientSideID={CONSTANTS.LD_CLIENT_ID}>
         <DarkModeContext value={{ isDarkMode, setIsDarkMode }}>
-          <TimeZoneContext value={timeZone}>{children}</TimeZoneContext>
+          <TimeZoneContext value={{ timeZone, setTimeZone }}>
+            {children}
+          </TimeZoneContext>
         </DarkModeContext>
       </LDProvider>
     </React.StrictMode>

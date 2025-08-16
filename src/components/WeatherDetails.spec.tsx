@@ -2,9 +2,11 @@ import {
   AggregatedDataPoint,
   WeatherDetailsInternal,
 } from '@/components/WeatherDetails'
+import { TimeZoneContext } from '@/utils/contexts'
 import { utcDateStringToLocalTimeString } from '@/utils/dates'
 import { fireEvent, render, screen } from '@testing-library/react'
 
+const dateFnOptions = { tz: 'Europe/London' }
 const exampleData: AggregatedDataPoint[] = [
   // 08:00
   {
@@ -67,21 +69,25 @@ const exampleData: AggregatedDataPoint[] = [
 describe('WeatherDetails', () => {
   beforeEach(() => {
     render(
-      <WeatherDetailsInternal
-        aggregatedDataPoints={exampleData}
-        workingHours={{
-          startHour: 9,
-          endHour: 17,
-          enabled: true,
-        }}
-      />,
+      <TimeZoneContext
+        value={{ timeZone: 'Europe/London', setTimeZone: () => null }}
+      >
+        <WeatherDetailsInternal
+          aggregatedDataPoints={exampleData}
+          workingHours={{
+            startHour: 9,
+            endHour: 17,
+            enabled: true,
+          }}
+        />
+      </TimeZoneContext>,
     )
   })
 
   test('on load, only working hours are visible', () => {
     const hours = exampleData
       .slice(1, 3)
-      .map((e) => utcDateStringToLocalTimeString(e.timestamp))
+      .map((e) => utcDateStringToLocalTimeString(e.timestamp, dateFnOptions))
 
     expect(
       screen.getAllByTestId('timestamp-data').map((t) => t.textContent),
@@ -93,7 +99,7 @@ describe('WeatherDetails', () => {
     fireEvent.click(toggle)
 
     const hours = exampleData.map((e) =>
-      utcDateStringToLocalTimeString(e.timestamp),
+      utcDateStringToLocalTimeString(e.timestamp, dateFnOptions),
     )
     expect(
       screen.getAllByTestId('timestamp-data').map((t) => t.textContent),
@@ -119,14 +125,18 @@ describe('WeatherDetails', () => {
 describe('WeatherDetails w/o Working Hours', () => {
   beforeEach(() => {
     render(
-      <WeatherDetailsInternal
-        aggregatedDataPoints={exampleData}
-        workingHours={{
-          startHour: 9,
-          endHour: 17,
-          enabled: false,
-        }}
-      />,
+      <TimeZoneContext
+        value={{ timeZone: 'Europe/London', setTimeZone: () => null }}
+      >
+        <WeatherDetailsInternal
+          aggregatedDataPoints={exampleData}
+          workingHours={{
+            startHour: 9,
+            endHour: 17,
+            enabled: false,
+          }}
+        />
+      </TimeZoneContext>,
     )
   })
 
@@ -136,9 +146,8 @@ describe('WeatherDetails w/o Working Hours', () => {
 
   test('there is no filtering on the visible hours', () => {
     const expectedHours = exampleData.map((e) =>
-      utcDateStringToLocalTimeString(e.timestamp),
+      utcDateStringToLocalTimeString(e.timestamp, dateFnOptions),
     )
-    // in BST all hours will be shifted by one
 
     expect(
       screen.getAllByTestId('timestamp-data').map((t) => t.textContent),

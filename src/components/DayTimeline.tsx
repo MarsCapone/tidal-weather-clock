@@ -1,6 +1,7 @@
 import { SunriseIcon, SunsetIcon } from '@/components/icons/SunStateIcon'
 import { HighWaterIcon, LowWaterIcon } from '@/components/icons/TideIcon'
 import { DataContext } from '@/types/context'
+import { TimeZoneContext } from '@/utils/contexts'
 import {
   dateOptions,
   formatTime,
@@ -8,6 +9,7 @@ import {
   utcDateStringToUtc,
 } from '@/utils/dates'
 import { compareAsc, parseISO } from 'date-fns'
+import { useContext } from 'react'
 
 type TimelineItem = {
   additionalClasses: {
@@ -32,6 +34,8 @@ export default function DayTimeline({
   sunData,
   tideData,
 }: DayTimelineProps) {
+  const { timeZone } = useContext(TimeZoneContext)
+  const dateFnOptions = { tz: timeZone }
   const tides = tideData.map((t) => ({
     ...t,
     additionalClasses:
@@ -106,7 +110,7 @@ export default function DayTimeline({
           <div
             className={`timeline-end timeline-box font-mono ${additionalClasses.time || ''} ${additionalClasses.all || ''}`}
           >
-            {formatTime(timestamp!)}
+            {formatTime(timestamp!, dateFnOptions)}
           </div>
           <hr className={additionalClasses.line || 'bg-primary'} />
         </li>

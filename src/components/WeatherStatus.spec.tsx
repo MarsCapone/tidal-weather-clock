@@ -1,3 +1,4 @@
+import { TimeZoneContext } from '@/utils/contexts'
 import { exampleDataContext } from '@/utils/test-data'
 import { render, screen } from '@testing-library/react'
 import React from 'react'
@@ -15,7 +16,13 @@ const expectedStatuses = [
 
 describe('WeatherStatus', () => {
   beforeEach(() => {
-    render(<WeatherStatus dataContext={exampleDataContext} />)
+    render(
+      <TimeZoneContext
+        value={{ timeZone: 'Europe/London', setTimeZone: () => null }}
+      >
+        <WeatherStatus dataContext={exampleDataContext} />
+      </TimeZoneContext>,
+    )
   })
 
   test('expected statuses are shown', () => {

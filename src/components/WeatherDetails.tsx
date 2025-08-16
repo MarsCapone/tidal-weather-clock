@@ -5,6 +5,7 @@ import {
 } from '@/components/WeatherStatus'
 import { useWorkingHours, WorkingHoursSetting } from '@/hooks/settings'
 import { DataContext, Timestamp, WeatherInfo, WindInfo } from '@/types/context'
+import { TimeZoneContext } from '@/utils/contexts'
 import {
   utcDateStringToFractionalUtc,
   utcDateStringToLocalTimeString,
@@ -18,7 +19,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { ArrowBigUpIcon } from 'lucide-react'
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 
 export type WeatherDetailsProps = {
   dataContext: DataContext
@@ -53,13 +54,14 @@ export function WeatherDetailsInternal({
   const [showOutOfHours, setShowOutOfHours] = React.useState(
     DEFAULT_SHOW_OUT_OF_HOURS,
   )
+  const { timeZone } = useContext(TimeZoneContext)
   const columns: AccessorKeyColumnDef<AggregatedDataPoint, any>[] = [
     columnHelper.accessor('timestamp', {
       header: () => <span>Time</span>,
       cell: (info) => {
         const val = info.getValue()
         const fractionalVal = utcDateStringToFractionalUtc(val)
-        const timeString = utcDateStringToLocalTimeString(val)
+        const timeString = utcDateStringToLocalTimeString(val, { tz: timeZone })
         if (
           fractionalVal >= workingHours.startHour &&
           fractionalVal <= workingHours.endHour

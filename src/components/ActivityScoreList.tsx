@@ -1,3 +1,4 @@
+import { TimeZoneContext } from '@/utils/contexts'
 import { formatInterval } from '@/utils/dates'
 import {
   DefaultActivityScore,
@@ -10,7 +11,7 @@ import {
   TrashIcon,
   XCircleIcon,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { ExplainButton } from './SuggestedActivity'
 
 type ActivityScoreListProps = {
@@ -24,7 +25,9 @@ export default function ActivityScoreList({ scores }: ActivityScoreListProps) {
   const [groupByTime, setGroupByTime] = useState(true)
   const [groupByActivity, setGroupByActivity] = useState(true)
   const [limit, setLimit] = useState(DEFAULT_LIMIT)
+  const { timeZone } = useContext(TimeZoneContext)
 
+  const dateFnOptions = { tz: timeZone }
   const filteredScores: EnrichedActivityScore[] = groupScores(
     scores.filter((item) => {
       if (showInfeasible) {
@@ -112,14 +115,19 @@ export default function ActivityScoreList({ scores }: ActivityScoreListProps) {
                       .intervals!.slice(0, limit || score.intervals!.length)
                       .flatMap((agi, i) => [
                         <div key={`interval-${i}`}>
-                          {formatInterval(agi.interval, 1)}
+                          {formatInterval(
+                            agi.interval,
+                            1,
+                            false,
+                            dateFnOptions,
+                          )}
                         </div>,
                         <div
                           className="divider my-1 md:hidden"
                           key={`divider-${i}`}
                         />,
                       ])
-                  : formatInterval(score.interval, 1)
+                  : formatInterval(score.interval, 1, false, dateFnOptions)
 
               const scoreVal =
                 'intervals' in score
