@@ -15,11 +15,11 @@ import {
   TimeConstraint,
   WeatherConstraint,
   WindConstraint,
-} from '@/types/activity'
-import { DarkModeContext } from '@/utils/contexts'
-import { fractionalUtcToLocalTimeString } from '@/utils/dates'
-import logger from '@/utils/logger'
-import { capitalize } from '@/utils/string'
+} from '@/lib/types/activity'
+import { DarkModeContext } from '@/lib/utils/contexts'
+import { fractionalUtcToLocalTimeString } from '@/lib/utils/dates'
+import logger from '@/lib/utils/logger'
+import { capitalize } from '@/lib/utils/string'
 import diff from 'diff-arrays-of-objects'
 import {
   FilterFunction,

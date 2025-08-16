@@ -4,14 +4,14 @@ import ClockChart, {
   TimeRange,
 } from '@/components/ClockChart'
 import { getActivityGroupInfo } from '@/components/SuggestedActivity'
-import { DataContext } from '@/types/context'
-import { TimeZoneContext } from '@/utils/contexts'
+import { DataContext } from '@/lib/types/context'
+import { TimeZoneContext } from '@/lib/utils/contexts'
 import {
   formatInterval,
   naiveDateToFractionalLocal,
   utcDateStringToUtc,
-} from '@/utils/dates'
-import { EnrichedActivityScore } from '@/utils/suggestions'
+} from '@/lib/utils/dates'
+import { EnrichedActivityScore } from '@/lib/utils/suggestions'
 import { tz, TZDate } from '@date-fns/tz'
 import {
   Duration,

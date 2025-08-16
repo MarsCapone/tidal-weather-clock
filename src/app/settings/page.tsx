@@ -3,10 +3,11 @@
 import ActivitySettings from '@/app/settings/components/ActivitySettings'
 import OutOfHoursSettings from '@/app/settings/components/OutOfHoursSettings'
 import TimeZoneSettings from '@/app/settings/components/TimeZoneSettings'
+import { withPageAuthRequired } from '@auth0/nextjs-auth0'
 import Link from 'next/link'
 import { useState } from 'react'
 
-export default function Page() {
+function Page() {
   const [hash, setHash] = useState('')
 
   const links = [
@@ -67,3 +68,5 @@ export default function Page() {
     </div>
   )
 }
+
+export default withPageAuthRequired(Page)

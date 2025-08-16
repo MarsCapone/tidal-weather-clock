@@ -1,4 +1,4 @@
-import CONSTANTS from '@/constants'
+import CONSTANTS from '@/lib/constants'
 import { expect, test } from '@playwright/test'
 
 test('homepage has expected title', async ({ page }) => {

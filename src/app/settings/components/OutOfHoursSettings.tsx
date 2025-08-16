@@ -4,7 +4,7 @@ import { useWorkingHours, WorkingHoursSetting } from '@/hooks/settings'
 import {
   fractionalUtcToLocalTimeString,
   localTimeStringToFractionalUtc,
-} from '@/utils/dates'
+} from '@/lib/utils/dates'
 import { shallowEqual } from 'fast-equals'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'

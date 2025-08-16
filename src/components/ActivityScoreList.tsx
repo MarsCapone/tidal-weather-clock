@@ -1,10 +1,10 @@
-import { TimeZoneContext } from '@/utils/contexts'
-import { formatInterval } from '@/utils/dates'
+import { TimeZoneContext } from '@/lib/utils/contexts'
+import { formatInterval } from '@/lib/utils/dates'
 import {
   DefaultActivityScore,
   EnrichedActivityScore,
   groupScores,
-} from '@/utils/suggestions'
+} from '@/lib/utils/suggestions'
 import {
   CheckCircleIcon,
   PencilIcon,

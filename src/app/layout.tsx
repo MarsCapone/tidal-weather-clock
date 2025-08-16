@@ -1,4 +1,4 @@
-import CONSTANTS from '@/constants'
+import CONSTANTS from '@/lib/constants'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import Providers from '@/components/Providers'

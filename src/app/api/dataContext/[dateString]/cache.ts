@@ -1,5 +1,5 @@
 import logger from '@/app/api/pinoLogger'
-import { GetCacheOptions, ICache } from '@/types/interfaces'
+import { GetCacheOptions, ICache } from '@/lib/types/interfaces'
 import { differenceInDays } from 'date-fns'
 
 type CacheValue<T> = {

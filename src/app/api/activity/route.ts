@@ -1,8 +1,6 @@
 import logger from '@/app/api/pinoLogger'
-import { db } from '@/db'
-import { activityTable, constraintTable } from '@/db/schemas/activity'
-import { Activity, Constraint } from '@/types/activity'
-import { eq, notInArray, sql } from 'drizzle-orm'
+import { getActivitiesByUserId, putActivities } from '@/lib/db/helpers/activity'
+import { Activity } from '@/lib/types/activity'
 import { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest): Promise<Response> {
@@ -10,28 +8,7 @@ export async function GET(request: NextRequest): Promise<Response> {
 
   const userId = searchParams.get('user_id') || 'demouser'
 
-  const activityResponses: Activity[] = await db
-    .select({
-      id: activityTable.id,
-      name: activityTable.name,
-      description: activityTable.description,
-      priority: activityTable.priority,
-      constraints: sql<Constraint[]>`jsonb_agg(
-        jsonb_set(${constraintTable.content}::jsonb, '{type}'::text[], to_jsonb(${constraintTable.type}))
-    )`,
-    })
-    .from(activityTable)
-    .leftJoin(
-      constraintTable,
-      eq(activityTable.id, constraintTable.activity_id),
-    )
-    .where(eq(activityTable.user_id, userId))
-    .groupBy(
-      activityTable.id,
-      activityTable.name,
-      activityTable.description,
-      activityTable.priority,
-    )
+  const activityResponses = await getActivitiesByUserId(userId)
 
   logger.info('fetched activities from db', {
     activityCount: activityResponses.length,
@@ -57,56 +34,8 @@ export async function PUT(request: NextRequest): Promise<Response> {
   const activities = data.activities
 
   // upsert all the activities
-  const inserts = activities.map((a) => {
-    const activityToInsert: typeof activityTable.$inferInsert = {
-      ...a,
-      user_id: userId,
-    }
-    return db
-      .insert(activityTable)
-      .values(activityToInsert)
-      .onConflictDoUpdate({
-        target: activityTable.id,
-        set: {
-          name: activityToInsert.name,
-          priority: activityToInsert.priority,
-          description: activityToInsert.description,
-          user_id: activityToInsert.user_id,
-        },
-      })
-      .returning({ id: activityTable.id })
-  })
+  await putActivities(activities, userId)
 
-  const activityIds = (await Promise.all(inserts)).flatMap((res) =>
-    res.map((r) => r.id),
-  )
-  logger.debug('updated activities', { activityIds })
-
-  // first delete all the constraints. we can delete the ones for the activities we have because we're about to add
-  // new constraints for them, and we can delete all the rest because we're going to delete any unlisted activities
-  await db.delete(constraintTable)
-  logger.debug('deleted all constraints')
-
-  // now we can delete all activities that weren't sent to this endpoint
-  const deletedIds = await db
-    .delete(activityTable)
-    .where(notInArray(activityTable.id, activityIds))
-    .returning({ id: activityTable.id })
-  logger.debug('deleted all unreferenced activities', {
-    deletedIds: deletedIds.map((d) => d.id),
-  })
-
-  // then re-add all the constraints
-  const constraintInsertions = activities.flatMap((activity, index) => {
-    return activity.constraints.map((constraint) => {
-      return db.insert(constraintTable).values({
-        activity_id: activityIds[index],
-        type: constraint.type,
-        content: constraint,
-      })
-    })
-  })
-  await Promise.all(constraintInsertions)
   logger.debug('added all constraints')
 
   return new Response('', { status: 201 })

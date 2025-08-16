@@ -4,12 +4,17 @@ import {
   describeWindDirection,
 } from '@/components/WeatherStatus'
 import { useWorkingHours, WorkingHoursSetting } from '@/hooks/settings'
-import { DataContext, Timestamp, WeatherInfo, WindInfo } from '@/types/context'
-import { TimeZoneContext } from '@/utils/contexts'
+import {
+  DataContext,
+  Timestamp,
+  WeatherInfo,
+  WindInfo,
+} from '@/lib/types/context'
+import { TimeZoneContext } from '@/lib/utils/contexts'
 import {
   utcDateStringToFractionalUtc,
   utcDateStringToLocalTimeString,
-} from '@/utils/dates'
+} from '@/lib/utils/dates'
 import {
   AccessorKeyColumnDef,
   createColumnHelper,

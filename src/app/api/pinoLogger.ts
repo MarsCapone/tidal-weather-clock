@@ -1,5 +1,5 @@
+import { ILogger, LogFn } from '@/lib/types/interfaces'
 import pino, { Logger } from 'pino'
-import { ILogger, LogFn } from '../../types/interfaces'
 
 class CustomPinoLogger implements ILogger {
   constructor(private readonly pinoLogger: Logger) {

@@ -1,5 +1,5 @@
-import { TimeZoneContext } from '@/utils/contexts'
-import { exampleDataContext } from '@/utils/test-data'
+import { TimeZoneContext } from '@/lib/utils/contexts'
+import { exampleDataContext } from '@/lib/utils/test-data'
 import { render, screen } from '@testing-library/react'
 import React from 'react'
 import WeatherStatus from './WeatherStatus'

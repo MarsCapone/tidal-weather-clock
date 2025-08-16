@@ -1,4 +1,4 @@
-import { Activity } from '@/types/activity'
+import { Activity } from '@/lib/types/activity'
 import { Dispatch, useEffect, useState } from 'react'
 
 export const useDataContextInfo = readonlyApiHookFactory<{

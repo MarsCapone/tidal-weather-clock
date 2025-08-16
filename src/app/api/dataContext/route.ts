@@ -1,5 +1,5 @@
 import db from '@/app/api/dataContext/[dateString]/db'
-import CONSTANTS from '@/constants'
+import CONSTANTS from '@/lib/constants'
 import { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest): Promise<Response> {

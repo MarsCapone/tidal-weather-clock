@@ -1,5 +1,5 @@
-import { db } from '@/db'
-import { settingsTable } from '@/db/schemas/settings'
+import { db } from '@/lib/db'
+import { settingsTable } from '@/lib/db/schemas/settings'
 import { eq } from 'drizzle-orm'
 
 type SettingName = string

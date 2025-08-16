@@ -1,4 +1,4 @@
-import { ILogger, LogFn } from '../types/interfaces'
+import { ILogger, LogFn } from '@/lib/types/interfaces'
 
 export class ConsoleLogger implements ILogger {
   private readonly context: Record<string, unknown>

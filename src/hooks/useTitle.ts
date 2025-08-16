@@ -1,5 +1,5 @@
-import CONSTANTS from '@/constants'
-import { capitalize } from '@/utils/string'
+import CONSTANTS from '@/lib/constants'
+import { capitalize } from '@/lib/utils/string'
 import { usePathname } from 'next/navigation'
 
 export default function useTitle(
