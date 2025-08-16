@@ -7,15 +7,23 @@ export default function TimeZoneSelector() {
   const { timeZone, setTimeZone } = useContext(TimeZoneContext)
 
   useEffect(() => {
-    localStorage.setItem('tz', timeZone)
-  }, [timeZone])
+    const current = localStorage.getItem('tz')
+    if (current) {
+      setTimeZone(current)
+    }
+  }, [setTimeZone])
+
+  const update = (val: string) => {
+    localStorage.setItem('tz', val)
+    setTimeZone(val)
+  }
 
   return (
     <div>
       <select
         value={timeZone}
         className="select select-ghost"
-        onChange={(e) => setTimeZone(e.target.value)}
+        onChange={(e) => update(e.target.value)}
       >
         <option>Etc/UTC</option>
         <option>Europe/London</option>
