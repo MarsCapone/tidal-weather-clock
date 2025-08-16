@@ -1,9 +1,6 @@
 import logger from '@/app/api/pinoLogger'
-import { db } from '@/lib/db'
 import { getActivitiesByUserId, putActivities } from '@/lib/db/helpers/activity'
-import { activityTable, constraintTable } from '@/lib/db/schemas/activity'
-import { Activity, Constraint } from '@/lib/types/activity'
-import { eq, notInArray, sql } from 'drizzle-orm'
+import { Activity } from '@/lib/types/activity'
 import { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest): Promise<Response> {

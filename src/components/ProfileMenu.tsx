@@ -6,7 +6,6 @@ import { SessionData } from '@auth0/nextjs-auth0/types'
 export default async function ProfileMenu() {
   const session = await auth0.getSession()
 
-  console.log(session)
   return <ProfileMenuInternal session={session} />
 }
 
