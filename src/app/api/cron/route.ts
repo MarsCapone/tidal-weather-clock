@@ -1,7 +1,7 @@
 import { deleteDebugData } from '@/app/api/dataContext/[dateString]/debug'
 import { OpenMeteoAndEasyTideDataFetcher } from '@/app/api/dataContext/[dateString]/opendatasources'
 import logger from '@/app/api/pinoLogger'
-import CONSTANTS from '@/constants'
+import CONSTANTS from '@/lib/constants'
 import { dateOptions } from '@/lib/utils/dates'
 import { formatISO, startOfToday } from 'date-fns'
 import db from '../dataContext/[dateString]/db'

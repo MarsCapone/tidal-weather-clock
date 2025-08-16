@@ -1,5 +1,5 @@
 import logger from '@/app/api/pinoLogger'
-import { DataContext } from '@/types/context'
+import { DataContext } from '@/lib/types/context'
 import { neon } from '@neondatabase/serverless'
 import { formatISO } from 'date-fns'
 

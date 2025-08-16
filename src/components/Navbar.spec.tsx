@@ -1,5 +1,5 @@
 import Navbar from '@/components/Navbar'
-import CONSTANTS from '@/constants'
+import CONSTANTS from '@/lib/constants'
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 

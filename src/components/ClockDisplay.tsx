@@ -4,6 +4,7 @@ import ClockChart, {
   TimeRange,
 } from '@/components/ClockChart'
 import { getActivityGroupInfo } from '@/components/SuggestedActivity'
+import { DataContext } from '@/lib/types/context'
 import { TimeZoneContext } from '@/lib/utils/contexts'
 import {
   formatInterval,
@@ -11,7 +12,6 @@ import {
   utcDateStringToUtc,
 } from '@/lib/utils/dates'
 import { EnrichedActivityScore } from '@/lib/utils/suggestions'
-import { DataContext } from '@/types/context'
 import { tz, TZDate } from '@date-fns/tz'
 import {
   Duration,

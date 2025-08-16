@@ -1,6 +1,6 @@
 import ColorschemeToggle from '@/components/Colorscheme'
 import ProfileMenu from '@/components/ProfileMenu'
-import CONSTANTS from '@/constants'
+import CONSTANTS from '@/lib/constants'
 import Link from 'next/link'
 import React, { Suspense } from 'react'
 

@@ -1,4 +1,4 @@
-import { DataContext } from '@/types/context'
+import { DataContext } from '@/lib/types/context'
 
 export const exampleDataContext: DataContext = {
   referenceDate: '2025-08-18T00:00:00Z',

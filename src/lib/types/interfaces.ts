@@ -1,5 +1,5 @@
-import { Activity, ActivityScore } from '@/types/activity'
-import { DataContext } from '@/types/context'
+import { Activity, ActivityScore } from '@/lib/types/activity'
+import { DataContext } from '@/lib/types/context'
 
 export type GetCacheOptions = {
   expiryHours: number

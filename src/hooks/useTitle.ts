@@ -1,4 +1,4 @@
-import CONSTANTS from '@/constants'
+import CONSTANTS from '@/lib/constants'
 import { capitalize } from '@/lib/utils/string'
 import { usePathname } from 'next/navigation'
 

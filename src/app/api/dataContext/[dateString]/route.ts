@@ -1,8 +1,8 @@
 import { OpenMeteoAndEasyTideDataFetcher } from '@/app/api/dataContext/[dateString]/opendatasources'
 import logger from '@/app/api/pinoLogger'
-import CONSTANTS from '@/constants'
+import CONSTANTS from '@/lib/constants'
+import { DataContext } from '@/lib/types/context'
 import { utcDateStringToUtc } from '@/lib/utils/dates'
-import { DataContext } from '@/types/context'
 import {
   addDays,
   differenceInHours,

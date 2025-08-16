@@ -1,5 +1,5 @@
 import MainContent from '@/components/MainContent'
-import CONSTANTS from '@/constants'
+import CONSTANTS from '@/lib/constants'
 import { dateOptions } from '@/lib/utils/dates'
 import { addDays, startOfToday } from 'date-fns'
 

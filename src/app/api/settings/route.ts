@@ -1,4 +1,4 @@
-import { getSetting, putSetting } from '@/db/helpers/settings'
+import { getSetting, putSetting } from '@/lib/db/helpers/settings'
 import { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {

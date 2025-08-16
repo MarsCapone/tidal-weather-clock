@@ -1,8 +1,8 @@
 'use client'
 
+import { GetCacheOptions, ICache } from '@/lib/types/interfaces'
 import { ConsoleLogger } from '@/lib/utils/logger'
 import { differenceInHours, formatISO, parseISO } from 'date-fns'
-import { GetCacheOptions, ICache } from '../../types/interfaces'
 
 type CacheValue<T> = {
   timestamp: string

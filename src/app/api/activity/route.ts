@@ -1,9 +1,9 @@
 import logger from '@/app/api/pinoLogger'
-import { db } from '@/db'
-import { activityTable, constraintTable } from '@/db/schemas/activity'
-import { Activity, Constraint } from '@/types/activity'
+import { activityTable, constraintTable } from '@/lib/db/schemas/activity'
+import { Activity, Constraint } from '@/lib/types/activity'
 import { eq, notInArray, sql } from 'drizzle-orm'
 import { NextRequest } from 'next/server'
+import { db } from '../../../lib/db'
 
 export async function GET(request: NextRequest): Promise<Response> {
   const searchParams = request.nextUrl.searchParams || {}
