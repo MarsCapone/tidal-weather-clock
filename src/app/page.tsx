@@ -1,5 +1,5 @@
 import MainContent from '@/components/MainContent'
-import { dateOptions } from '@/utils/dates'
+import { dateOptions } from '@/lib/utils/dates'
 import { startOfToday } from 'date-fns'
 import React from 'react'
 

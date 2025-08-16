@@ -1,7 +1,10 @@
+import { DarkModeContext } from '@/lib/utils/contexts'
+import { formatInterval } from '@/lib/utils/dates'
+import {
+  ActivityGroupInfo,
+  EnrichedActivityScore,
+} from '@/lib/utils/suggestions'
 import { Constraint } from '@/types/activity'
-import { DarkModeContext } from '@/utils/contexts'
-import { formatInterval } from '@/utils/dates'
-import { ActivityGroupInfo, EnrichedActivityScore } from '@/utils/suggestions'
 import MarkdownPreview from '@uiw/react-markdown-preview'
 import { addHours, compareAsc } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'

@@ -1,7 +1,7 @@
 'use client'
 
 import CONSTANTS from '@/constants'
-import { DarkModeContext, TimeZoneContext } from '@/utils/contexts'
+import { DarkModeContext, TimeZoneContext } from '@/lib/utils/contexts'
 import { LDProvider } from 'launchdarkly-react-client-sdk'
 import React from 'react'
 

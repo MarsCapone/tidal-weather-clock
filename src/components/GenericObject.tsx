@@ -1,4 +1,4 @@
-import { DarkModeContext } from '@/utils/contexts'
+import { DarkModeContext } from '@/lib/utils/contexts'
 import {
   githubDarkTheme,
   githubLightTheme,

@@ -1,6 +1,6 @@
 'use client'
 
-import { DarkModeContext } from '@/utils/contexts'
+import { DarkModeContext } from '@/lib/utils/contexts'
 import { MoonIcon, SunIcon } from 'lucide-react'
 import React, { useContext } from 'react'
 

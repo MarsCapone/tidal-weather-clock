@@ -1,4 +1,7 @@
 import { WorkingHoursSetting } from '@/hooks/settings'
+import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
+import logger from '@/lib/utils/logger'
+import { calcMean } from '@/lib/utils/math'
 import {
   Activity,
   ActivityScore,
@@ -11,9 +14,6 @@ import {
 } from '@/types/activity'
 import { DataContext, TideInfo, WeatherInfo, WindInfo } from '@/types/context'
 import { IActivityRecommender } from '@/types/interfaces'
-import { dateOptions, utcDateStringToUtc } from '@/utils/dates'
-import logger from '@/utils/logger'
-import { calcMean } from '@/utils/math'
 import { TZDate } from '@date-fns/tz'
 import {
   differenceInHours,

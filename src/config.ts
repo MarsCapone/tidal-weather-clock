@@ -1,8 +1,8 @@
+import { ServerActivityFetcher } from '@/lib/utils/activityFetcher'
+import { NullCache } from '@/lib/utils/cache'
+import { ServerDataFetcher } from '@/lib/utils/fetchData'
+import logger from '@/lib/utils/logger'
 import { DataContext } from '@/types/context'
-import { ServerActivityFetcher } from '@/utils/activityFetcher'
-import { NullCache } from '@/utils/cache'
-import { ServerDataFetcher } from '@/utils/fetchData'
-import logger from '@/utils/logger'
 
 export const APP_CONFIG = {
   activityFetcher: new ServerActivityFetcher(),

@@ -1,5 +1,5 @@
 import { SettingCard, SettingTitle } from '@/app/settings/components/common'
-import { TimeZoneContext } from '@/utils/contexts'
+import { TimeZoneContext } from '@/lib/utils/contexts'
 import { useContext, useEffect } from 'react'
 
 export default function TimeZoneSettings() {

@@ -1,13 +1,13 @@
 import { SunriseIcon, SunsetIcon } from '@/components/icons/SunStateIcon'
 import { HighWaterIcon, LowWaterIcon } from '@/components/icons/TideIcon'
-import { DataContext } from '@/types/context'
-import { TimeZoneContext } from '@/utils/contexts'
+import { TimeZoneContext } from '@/lib/utils/contexts'
 import {
   dateOptions,
   formatTime,
   utcDateStringAddFractional,
   utcDateStringToUtc,
-} from '@/utils/dates'
+} from '@/lib/utils/dates'
+import { DataContext } from '@/types/context'
 import { compareAsc, parseISO } from 'date-fns'
 import { useContext } from 'react'
 

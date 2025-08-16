@@ -1,6 +1,6 @@
+import logger from '@/lib/utils/logger'
 import { Activity } from '@/types/activity'
 import { IActivityFetcher } from '@/types/interfaces'
-import logger from '@/utils/logger'
 
 export class ServerActivityFetcher implements IActivityFetcher {
   async getActivities(userId: string | undefined): Promise<Activity[]> {

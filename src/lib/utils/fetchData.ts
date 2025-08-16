@@ -1,7 +1,7 @@
 import CONSTANTS from '@/constants'
+import { utcDateStringToUtc } from '@/lib/utils/dates'
 import { DataContext } from '@/types/context'
 import { ICache, IDataContextFetcher, ILogger } from '@/types/interfaces'
-import { utcDateStringToUtc } from '@/utils/dates'
 import { formatISO } from 'date-fns'
 
 export class ServerDataFetcher implements IDataContextFetcher {

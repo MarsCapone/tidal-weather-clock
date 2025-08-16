@@ -2,8 +2,8 @@ import {
   AggregatedDataPoint,
   WeatherDetailsInternal,
 } from '@/components/WeatherDetails'
-import { TimeZoneContext } from '@/utils/contexts'
-import { utcDateStringToLocalTimeString } from '@/utils/dates'
+import { TimeZoneContext } from '@/lib/utils/contexts'
+import { utcDateStringToLocalTimeString } from '@/lib/utils/dates'
 import { fireEvent, render, screen } from '@testing-library/react'
 
 const dateFnOptions = { tz: 'Europe/London' }

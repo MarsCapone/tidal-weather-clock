@@ -1,5 +1,5 @@
 import { useDataContextInfo } from '@/hooks/apiRequests'
-import { dateOptions } from '@/utils/dates'
+import { dateOptions } from '@/lib/utils/dates'
 import { format, formatISO, parseISO } from 'date-fns'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
