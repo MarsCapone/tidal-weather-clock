@@ -122,7 +122,10 @@ function MainContentWithoutDate({ date }: { date: Date }) {
               sunData={dataContext.sunData}
               tideData={dataContext.tideData}
             />
-            <WeatherOverview dataContext={dataContext} />
+            <WeatherOverview
+              dataContext={dataContext}
+              workingHours={workingHours}
+            />
             <ClockDisplay
               suggestedActivity={suggestedActivity}
               dataContext={dataContext}

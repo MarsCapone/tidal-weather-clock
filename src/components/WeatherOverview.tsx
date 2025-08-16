@@ -1,18 +1,23 @@
 import { DataContext } from '@/lib/types/context'
 import { mpsToKnots } from '@/lib/utils/units'
-import { ArrowBigUpIcon, WindIcon } from 'lucide-react'
-import { CelsiusIcon } from '@/components/icons/TemperatureIcon'
+import { ArrowBigUpIcon } from 'lucide-react'
 import { calcMean } from '@/lib/utils/math'
 import {
   describeCloudiness,
   describeWindDirection,
 } from '@/lib/utils/weather-descriptions'
+import { isInWorkingHours, WorkingHoursSetting } from '@/hooks/settings'
+import { utcDateStringToFractionalUtc } from '@/lib/utils/dates'
 
 export type WeatherOverviewProps = {
   dataContext: DataContext
+  workingHours: WorkingHoursSetting
 }
 
-export default function WeatherOverview({ dataContext }: WeatherOverviewProps) {
+export default function WeatherOverview({
+  dataContext,
+  workingHours,
+}: WeatherOverviewProps) {
   const dominantWindSpeed = dataContext.windData.dominantSpeed
     ? mpsToKnots(dataContext.windData.dominantSpeed).toFixed(1)
     : null
@@ -21,18 +26,31 @@ export default function WeatherOverview({ dataContext }: WeatherOverviewProps) {
     : null
   const dominantWindDirection = dataContext.windData.dominantDirection
 
-  const meanTemperature = calcMean(
+  const workingHoursPoints = dataContext.weatherData.points.filter((p) =>
+    isInWorkingHours(workingHours, utcDateStringToFractionalUtc(p.timestamp)),
+  )
+
+  const workingHoursTemperature = calcMean(
+    workingHoursPoints.map((p) => p.temperature),
+  )
+  const totalTemperature = calcMean(
     dataContext.weatherData.points.map((p) => p.temperature),
   )
-  const meanCloudiness = calcMean(
+
+  const workingHoursCloudiness = calcMean(
+    workingHoursPoints.map((p) => p.cloudCover),
+  )
+  const totalCloudiness = calcMean(
     dataContext.weatherData.points.map((p) => p.cloudCover),
   )
 
-  const divider = <div className={'m-2 text-sm'}>|</div>
+  const divider = <div className={'m-1 text-sm md:m-2'}>|</div>
 
   return (
     <div
-      className={'flex flex-col justify-center text-3xl font-thin md:flex-row'}
+      className={
+        'flex flex-col justify-center gap-2 text-3xl font-thin md:flex-row md:gap-8'
+      }
     >
       <div
         data-testid={'overview-wind'}
@@ -46,6 +64,14 @@ export default function WeatherOverview({ dataContext }: WeatherOverviewProps) {
             <div className={'text-sm'}>(gusting {dominantWindGusts} kts)</div>
           )}
         </div>
+      </div>
+      {divider}
+      <div
+        data-testid={'overview-wind-direction'}
+        className={'items-top flex flex-row justify-center gap-4'}
+      >
+        {/*  Dominant wind direction */}
+        {/*  <WindIcon className={"w-12 h-12 stroke-1 "} />*/}
         {dominantWindDirection && (
           <div className={'flex flex-row justify-center'}>
             <ArrowBigUpIcon
@@ -53,7 +79,8 @@ export default function WeatherOverview({ dataContext }: WeatherOverviewProps) {
               style={{ rotate: `${dominantWindDirection + 180}deg` }}
             />
             <div className={''}>
-              {describeWindDirection(dominantWindDirection, true)}
+              <div>{describeWindDirection(dominantWindDirection, false)}</div>
+              <div className={'text-sm'}>({dominantWindDirection}ºC)</div>
             </div>
           </div>
         )}
@@ -66,14 +93,32 @@ export default function WeatherOverview({ dataContext }: WeatherOverviewProps) {
         className={'items-top flex flex-row justify-around gap-4'}
       >
         {/*  Temperature */}
-        <div className={''}>{meanTemperature}ºC</div>
+        {workingHours.enabled ? (
+          <div>
+            <div>{workingHoursTemperature.toFixed(1)}ºC</div>
+            <div className={'text-sm'}>
+              {totalTemperature.toFixed(1)}ºC (24h)
+            </div>
+          </div>
+        ) : (
+          <div className={''}>{totalTemperature.toFixed(1)}ºC</div>
+        )}
       </div>
 
       {divider}
 
       <div data-testid={'overview-clouds'}>
         {/*  Clouds */}
-        <div className={''}>{describeCloudiness(meanCloudiness)}</div>
+        {workingHours.enabled ? (
+          <div>
+            <div>{describeCloudiness(workingHoursCloudiness)}</div>
+            <div className={'text-sm'}>
+              {describeCloudiness(totalCloudiness)} (24h)
+            </div>
+          </div>
+        ) : (
+          <div className={''}>{describeCloudiness(totalCloudiness)}</div>
+        )}
       </div>
     </div>
   )
