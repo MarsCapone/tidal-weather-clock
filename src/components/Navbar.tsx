@@ -1,5 +1,6 @@
 import ColorschemeToggle from '@/components/Colorscheme'
 import ProfileMenu from '@/components/ProfileMenu'
+import TimeZoneSelector from '@/components/TimeZoneSelector'
 import CONSTANTS from '@/constants'
 import Link from 'next/link'
 import React, { Suspense } from 'react'
@@ -24,9 +25,9 @@ export default function Navbar() {
               Settings
             </Link>
           </li>
-          {/*<li>*/}
-          {/*  <TimeZoneSelector timeZone={timeZone} setTimeZone={setTimeZone} />*/}
-          {/*</li>*/}
+          <li>
+            <TimeZoneSelector />
+          </li>
           <li>
             <ColorschemeToggle />
           </li>

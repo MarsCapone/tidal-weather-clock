@@ -4,18 +4,20 @@ import { CelsiusIcon } from '@/components/icons/TemperatureIcon'
 import { HighWaterIcon, LowWaterIcon } from '@/components/icons/TideIcon'
 import { WindIcon } from '@/components/icons/WindIcon'
 import { DataContext } from '@/types/context'
+import { TimeZoneContext } from '@/utils/contexts'
 import { utcDateStringToLocalTimeString } from '@/utils/dates'
 import { calcMean } from '@/utils/math'
 import { mpsToKnots } from '@/utils/units'
 import { ArrowBigUpIcon } from 'lucide-react'
-import React from 'react'
+import React, { useContext } from 'react'
 
 export default function WeatherStatus({
   dataContext,
 }: {
   dataContext: DataContext
 }) {
-  const dataTable = getDataTable(dataContext)
+  const { timeZone } = useContext(TimeZoneContext)
+  const dataTable = getDataTable(dataContext, timeZone)
 
   return (
     <div className="card card-lg shadow-sm">
@@ -66,11 +68,18 @@ type DataTableRow = {
   values: (string | undefined | React.ReactNode)[]
 }
 
-function getDataTable(dataContext: DataContext): DataTableRow[] {
+function getDataTable(
+  dataContext: DataContext,
+  timeZone: string,
+): DataTableRow[] {
+  const dateFnOptions = { tz: timeZone }
   const tides = dataContext.tideData.map((t) => ({
     ...t,
     display: () => {
-      const timeString = utcDateStringToLocalTimeString(t.timestamp)
+      const timeString = utcDateStringToLocalTimeString(
+        t.timestamp,
+        dateFnOptions,
+      )
       return (
         <div className={'flex flex-row items-center justify-between gap-x-2'}>
           <span>{timeString}</span>
@@ -136,7 +145,10 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       label: 'Sunrise',
       values: [
         dataContext.sunData.sunRise
-          ? utcDateStringToLocalTimeString(dataContext.sunData.sunRise)
+          ? utcDateStringToLocalTimeString(
+              dataContext.sunData.sunRise,
+              dateFnOptions,
+            )
           : undefined,
       ],
     },
@@ -145,7 +157,10 @@ function getDataTable(dataContext: DataContext): DataTableRow[] {
       label: 'Sunset',
       values: [
         dataContext.sunData.sunSet
-          ? utcDateStringToLocalTimeString(dataContext.sunData.sunSet)
+          ? utcDateStringToLocalTimeString(
+              dataContext.sunData.sunSet,
+              dateFnOptions,
+            )
           : undefined,
       ],
     },

@@ -1,14 +1,11 @@
-import { Dispatch, useEffect } from 'react'
+'use client'
 
-type TimeZoneSelectorProps = {
-  timeZone: string
-  setTimeZone: Dispatch<string>
-}
+import { TimeZoneContext } from '@/utils/contexts'
+import { useContext, useEffect } from 'react'
 
-export default function TimeZoneSelector({
-  timeZone,
-  setTimeZone,
-}: TimeZoneSelectorProps) {
+export default function TimeZoneSelector() {
+  const { timeZone, setTimeZone } = useContext(TimeZoneContext)
+
   useEffect(() => {
     localStorage.setItem('tz', timeZone)
   }, [timeZone])
