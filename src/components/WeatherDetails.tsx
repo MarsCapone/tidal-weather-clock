@@ -1,8 +1,3 @@
-import {
-  describeCloudiness,
-  describeUvIndex,
-  describeWindDirection,
-} from '@/components/WeatherStatus'
 import { useWorkingHours, WorkingHoursSetting } from '@/hooks/settings'
 import {
   DataContext,
@@ -25,6 +20,11 @@ import {
 } from '@tanstack/react-table'
 import { ArrowBigUpIcon } from 'lucide-react'
 import React, { useContext, useEffect } from 'react'
+import {
+  describeCloudiness,
+  describeUvIndex,
+  describeWindDirection,
+} from '@/lib/utils/weather-descriptions'
 
 export type WeatherDetailsProps = {
   dataContext: DataContext
@@ -103,7 +103,13 @@ export function WeatherDetailsInternal({
       },
     }),
     columnHelper.accessor('direction', {
-      header: () => '',
+      header: () => (
+        <span>
+          Wind
+          <br />
+          Direction
+        </span>
+      ),
       cell: (info) => {
         return (
           <div className="flex flex-row items-center gap-2">
@@ -117,11 +123,23 @@ export function WeatherDetailsInternal({
       },
     }),
     columnHelper.accessor('speed', {
-      header: () => <span>Wind Speed</span>,
+      header: () => (
+        <span>
+          Wind
+          <br />
+          Speed
+        </span>
+      ),
       cell: (info) => <div>{info.getValue().toFixed(1)} kts</div>,
     }),
     columnHelper.accessor('gustSpeed', {
-      header: () => <span>Gusts</span>,
+      header: () => (
+        <span>
+          Wind
+          <br />
+          Gusts
+        </span>
+      ),
       cell: (info) => <div>{info.getValue().toFixed(1)} kts</div>,
     }),
     columnHelper.accessor('temperature', {
@@ -136,7 +154,7 @@ export function WeatherDetailsInternal({
       header: () => 'UV Index',
       cell: (info) => {
         const val = info.getValue()
-        return describeUvIndex(val, true)
+        return renderUvIndex(val)
       },
     }),
   ]
@@ -179,7 +197,7 @@ export function WeatherDetailsInternal({
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id}>
+                  <th key={header.id} data-testid={`header-${header.id}`}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -244,4 +262,17 @@ function getAggregatedDatapoints(
     ...(weatherByTimestamp[t] || {}),
     ...(windByTimestamp[t] || {}),
   }))
+}
+
+function renderUvIndex(uvIndex: number): React.ReactNode {
+  const { description, styles } = describeUvIndex(uvIndex)
+
+  return (
+    <div className="flex flex-row items-center justify-between">
+      {description}
+      <div style={styles} className="w-9 p-2">
+        <span>{uvIndex.toFixed(1)} </span>
+      </div>
+    </div>
+  )
 }

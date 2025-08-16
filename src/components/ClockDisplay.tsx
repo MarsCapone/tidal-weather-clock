@@ -184,10 +184,8 @@ export function TimeToNext({
     <div className="flex flex-col items-center justify-center gap-1 p-10">
       {displayTime && currentTime && (
         <div className="mb-8">
-          <div className="text-md font-bold md:text-xl xl:text-3xl">
-            the time is
-          </div>
-          <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
+          <div className="text-xl font-bold xl:text-3xl">the time is</div>
+          <div className="text-3xl font-extrabold md:text-5xl">
             {format(currentTime, 'h:mm aaa', { in: tz(timeZone) })}
           </div>
         </div>

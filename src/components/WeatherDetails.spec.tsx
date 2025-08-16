@@ -5,6 +5,7 @@ import {
 import { TimeZoneContext } from '@/lib/utils/contexts'
 import { utcDateStringToLocalTimeString } from '@/lib/utils/dates'
 import { fireEvent, render, screen } from '@testing-library/react'
+import { describe, test, expect, beforeEach } from 'vitest'
 
 const dateFnOptions = { tz: 'Europe/London' }
 const exampleData: AggregatedDataPoint[] = [
@@ -108,16 +109,17 @@ describe('WeatherDetails', () => {
 
   test('expected columns are visible', () => {
     const columns = [
-      'Time',
-      'Wind Speed',
-      'Gusts',
-      'Temperature',
-      'Cloudiness',
-      'UV Index',
+      'timestamp',
+      'direction',
+      'speed',
+      'gustSpeed',
+      'temperature',
+      'cloudCover',
+      'uvIndex',
     ]
 
     for (const column of columns) {
-      expect(screen.getByText(column)).toBeVisible()
+      expect(screen.getByTestId(`header-${column}`)).toBeVisible()
     }
   })
 })
