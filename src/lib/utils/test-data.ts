@@ -1,4 +1,5 @@
 import { DataContext } from '@/lib/types/context'
+import { SessionData } from '@auth0/nextjs-auth0/types'
 
 export const exampleDataContext: DataContext = {
   referenceDate: '2025-08-18T00:00:00Z',
@@ -427,4 +428,30 @@ export const exampleDataContext: DataContext = {
     dominantSpeed: 6.94,
     dominantGustSpeed: 8,
   },
+}
+
+export const exampleSession: SessionData = {
+  user: {
+    given_name: 'Samson',
+    family_name: 'Ventura-Danziger',
+    nickname: 'samson',
+    name: 'Samson Ventura-Danziger',
+    picture:
+      'https://lh3.googleusercontent.com/a/ACg8ocI5e3B1wAXEbEGE88kI15YpPfhvyEyPmc7049Wn80Z8rnehz50=s96-c',
+    email: 'samson@danziger.uk',
+    email_verified: true,
+    sub: 'google-oauth2|101173613850515864911',
+  },
+  tokenSet: {
+    accessToken: 'abc123',
+    idToken: 'abc123',
+    scope: 'openid profile email offline_access',
+    refreshToken: 'abc123',
+    expiresAt: 1_755_397_306,
+  },
+  internal: {
+    sid: 'ubt3mTys2ba8zdb_-HK6Fc1QBEEKkq5s',
+    createdAt: 1_755_310_906,
+  },
+  exp: 1_755_915_713,
 }

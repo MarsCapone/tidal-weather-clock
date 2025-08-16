@@ -1,10 +1,20 @@
 import { auth0 } from '@/lib/auth0'
 import { LogInIcon, LogOutIcon } from 'lucide-react'
 import React from 'react'
+import { SessionData } from '@auth0/nextjs-auth0/types'
 
 export default async function ProfileMenu() {
   const session = await auth0.getSession()
 
+  console.log(session)
+  return <ProfileMenuInternal session={session} />
+}
+
+export function ProfileMenuInternal({
+  session,
+}: {
+  session: SessionData | null
+}) {
   if (!session) {
     return (
       <ProfileMenuWrapper buttonContent={<LogInIcon />}>
@@ -14,12 +24,12 @@ export default async function ProfileMenu() {
               href="/auth/login?screen_hint=signup"
               className={'btn btn-soft rounded-field'}
             >
-              <span>Sign up</span>
+              <span>Sign Up</span>
             </a>
           </li>
           <li className={'menu-item'}>
             <a href="/auth/login" className={'btn btn-soft rounded-field'}>
-              <span>Log in</span>
+              <span>Log In</span>
             </a>
           </li>
         </div>
@@ -32,6 +42,7 @@ export default async function ProfileMenu() {
         <div className="avatar">
           <div className="w-10 rounded-full">
             <img
+              data-testid={'profile-menu-avatar'}
               src={session.user.picture}
               alt={`Avatar for ${session.user.name}`}
             />
@@ -45,7 +56,7 @@ export default async function ProfileMenu() {
       <div className="menu w-full gap-2">
         <li className="menu-item">
           <a href="/auth/logout" className="btn btn-soft rounded-field">
-            <span>Sign out</span>
+            <span>Sign Out</span>
             <LogOutIcon className={'w-4'} />
           </a>
         </li>
@@ -64,7 +75,9 @@ function ProfileMenuWrapper({
   return (
     <div>
       <div className={'dropdown dropdown-end dropdown-hover'}>
-        <div tabIndex={0}>{buttonContent}</div>
+        <div data-testid="profile-menu-button" tabIndex={0}>
+          {buttonContent}
+        </div>
         <div
           tabIndex={0}
           className={
