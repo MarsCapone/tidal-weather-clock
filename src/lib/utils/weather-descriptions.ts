@@ -7,7 +7,6 @@ Broken: 5/8 to 7/8 (62.5% to 87.5%) cloud cover.
 Overcast: 8/8 (100%) cloud cover.
 In addition to these, terms like "mostly clear" and "mostly cloudy" are also used, typically corresponding to ranges like 10-30% and 70-80% cloud cover respectively, according to Spectrum News.
  */
-import React from 'react'
 
 export function describeCloudiness(cloudCover: number | undefined): string {
   if (cloudCover === undefined) {
