@@ -6,7 +6,6 @@ import DatePagination from '@/components/DatePagination'
 import DayTimeline from '@/components/DayTimeline'
 import SuggestedActivity from '@/components/SuggestedActivity'
 import { WeatherDetails } from '@/components/WeatherDetails'
-import WeatherStatus from '@/components/WeatherStatus'
 import { useActivities } from '@/hooks/apiRequests'
 import { useWorkingHours } from '@/hooks/settings'
 import { APP_CONFIG } from '@/lib/config'
@@ -19,6 +18,7 @@ import { formatISO, startOfDay } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
+import WeatherOverview from '@/components/WeatherOverview'
 
 type DateInfo = {
   date: Date
@@ -116,32 +116,18 @@ function MainContentWithoutDate({ date }: { date: Date }) {
           />
         )}
         <div className="flex flex-col items-start justify-center gap-6 md:flex-row">
-          <div className="w-full md:w-2/3">
+          <div className="w-full">
             <DayTimeline
               referenceDate={dataContext.referenceDate}
               sunData={dataContext.sunData}
               tideData={dataContext.tideData}
             />
+            <WeatherOverview dataContext={dataContext} />
             <ClockDisplay
               suggestedActivity={suggestedActivity}
               dataContext={dataContext}
             />
             <WeatherDetails dataContext={dataContext} />
-          </div>
-          <div className="w-full md:w-1/3">
-            {showSuggestedActivity && (
-              <SuggestedActivity
-                activityScore={suggestedActivity}
-                className="mb-4 hidden md:flex"
-                nextSuggestion={
-                  selectionIndex < filteredSuggestions.length - 1
-                    ? nextSuggestion
-                    : undefined
-                }
-                prevSuggestion={selectionIndex > 0 ? prevSuggestion : undefined}
-              />
-            )}
-            <WeatherStatus dataContext={dataContext} />
           </div>
         </div>
         {showActivityTable && showSuggestedActivity && (
