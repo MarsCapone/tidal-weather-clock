@@ -1,6 +1,5 @@
 import ColorschemeToggle from '@/components/Colorscheme'
 import ProfileMenu from '@/components/ProfileMenu'
-import TimeZoneSelector from '@/components/TimeZoneSelector'
 import CONSTANTS from '@/constants'
 import Link from 'next/link'
 import React, { Suspense } from 'react'
@@ -24,9 +23,6 @@ export default function Navbar() {
             <Link className="btn btn-ghost rounded-sm" href={'/settings'}>
               Settings
             </Link>
-          </li>
-          <li>
-            <TimeZoneSelector />
           </li>
           <li>
             <ColorschemeToggle />
