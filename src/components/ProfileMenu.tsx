@@ -1,5 +1,4 @@
 import { auth0 } from '@/lib/auth0'
-import { SessionData } from '@auth0/nextjs-auth0/types'
 import { LogInIcon, LogOutIcon, LucideProps } from 'lucide-react'
 import React, { ForwardRefExoticComponent, RefAttributes } from 'react'
 

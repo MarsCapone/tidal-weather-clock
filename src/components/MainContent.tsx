@@ -10,7 +10,6 @@ import WeatherStatus from '@/components/WeatherStatus'
 import { APP_CONFIG } from '@/config'
 import { useActivities } from '@/hooks/apiRequests'
 import { useWorkingHours } from '@/hooks/settings'
-import { DateInfo } from '@/hooks/useDateString'
 import { DataContext } from '@/types/context'
 import { dateOptions } from '@/utils/dates'
 import tryDataFetchersWithCache from '@/utils/fetchData'
@@ -20,6 +19,12 @@ import { formatISO, startOfDay } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
+
+type DateInfo = {
+  date: Date
+  nextPath: string | null
+  prevPath: string | null
+}
 
 export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
   return (

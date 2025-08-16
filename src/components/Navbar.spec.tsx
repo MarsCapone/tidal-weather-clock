@@ -5,7 +5,7 @@ import React from 'react'
 
 describe('Navbar', () => {
   beforeEach(() => {
-    render(<Navbar setIsDarkMode={(v) => null} />)
+    render(<Navbar />)
   })
 
   test('shows the title', () => {
@@ -27,7 +27,7 @@ describe('Navbar', () => {
   })
 
   test('colorscheme switcher works', () => {
-    const switcher = screen.getByRole('checkbox')
+    const switcher = screen.getByTestId('colorscheme-toggle')
 
     expect(switcher).not.toBeChecked()
     fireEvent.click(switcher)

@@ -2,7 +2,7 @@ import ColorschemeToggle from '@/components/Colorscheme'
 import ProfileMenu from '@/components/ProfileMenu'
 import CONSTANTS from '@/constants'
 import Link from 'next/link'
-import React from 'react'
+import React, { Suspense } from 'react'
 
 export default function Navbar() {
   return (
@@ -31,7 +31,9 @@ export default function Navbar() {
             <ColorschemeToggle />
           </li>
           <li>
-            <ProfileMenu />
+            <Suspense fallback={null}>
+              <ProfileMenu />
+            </Suspense>
           </li>
         </ul>
       </div>
