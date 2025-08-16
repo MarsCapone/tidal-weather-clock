@@ -5,4 +5,7 @@ export const DarkModeContext = createContext({
   setIsDarkMode: (v: boolean) => {},
 })
 
-export const TimeZoneContext = createContext<string>('Etc/UTC')
+export const TimeZoneContext = createContext({
+  timeZone: 'Etc/UTC',
+  setTimeZone: (tz: string) => {},
+})
