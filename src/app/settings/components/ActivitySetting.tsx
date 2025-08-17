@@ -11,7 +11,7 @@ export default async function ActivitySetting() {
 
   async function updateActivities(act: Activity[]) {
     'use server'
-    await putActivities(activities, userId)
+    await putActivities(act, userId)
   }
 
   return (

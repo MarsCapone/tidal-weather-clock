@@ -71,8 +71,8 @@ export default function ActivitySettingsForm({
   }
 
   // when we're ready, we can push our internal changes to the server
-  const commitChanges = async () => {
-    await setActivitiesAction(internalActivities)
+  const commitChanges = () => {
+    setActivitiesAction(internalActivities)
     logger.info('Pushing activities to server', {
       previousActivities: activities,
       newActivities: internalActivities,
