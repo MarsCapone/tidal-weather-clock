@@ -5,7 +5,7 @@ import { Activity } from '@/lib/types/activity'
 import { PlusIcon } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useFieldArray, useForm } from 'react-hook-form'
-import ActivityArray from '@/app/settings/components/activity-settings/SingleActivityForm'
+import ActivityArray from '@/app/settings/components/activity-settings/ActivityArray'
 import { InputActivities } from '@/app/settings/components/activity-settings/types'
 
 export type ActivitySettingsFormProps = {
@@ -26,6 +26,7 @@ export default function ActivitySettingsForm({
     register,
     handleSubmit,
     reset,
+    getValues,
     formState: { errors, isDirty },
   } = useForm<InputActivities>({
     defaultValues,
@@ -72,6 +73,7 @@ export default function ActivitySettingsForm({
           register={register}
           fields={fields}
           removeByIndex={remove}
+          getByIndex={(i) => getValues(`activities.${i}`)}
         />
       </form>
     </div>
