@@ -10,6 +10,7 @@ type ControlsProps = {
   register: UseFormRegister<InputActivities>
   activityIndex: number
   constraintIndex: number
+  disabled?: boolean
 }
 
 type RegisterParams = Parameters<ControlsProps['register']>
@@ -26,6 +27,7 @@ export function WindConstraintControls({
   register,
   activityIndex,
   constraintIndex,
+  disabled,
 }: ControlsProps) {
   function getTarget(key: ConstraintKey) {
     return makeRegisterTarget(key, activityIndex, constraintIndex)
@@ -38,19 +40,31 @@ export function WindConstraintControls({
           title={'Min wind speed'}
           suffix={'m/s'}
           className={'input input-sm'}
-          inputProps={{ ...register(getTarget('minSpeed')), type: 'float' }}
+          inputProps={{
+            ...register(getTarget('minSpeed')),
+            type: 'float',
+            disabled,
+          }}
         />
         <Input
           title={'Max wind speed'}
           suffix={'m/s'}
           className={'input input-sm'}
-          inputProps={{ ...register(getTarget('maxSpeed')), type: 'float' }}
+          inputProps={{
+            ...register(getTarget('maxSpeed')),
+            type: 'float',
+            disabled,
+          }}
         />
         <Input
           title={'Max gust speed'}
           suffix={'m/s'}
           className={'input input-sm'}
-          inputProps={{ ...register(getTarget('maxGustSpeed')), type: 'float' }}
+          inputProps={{
+            ...register(getTarget('maxGustSpeed')),
+            type: 'float',
+            disabled,
+          }}
         />
       </div>
       <div className={'grid grid-cols-2 gap-x-4'}>
@@ -60,13 +74,21 @@ export function WindConstraintControls({
             'Acceptable angle off the wind the match the preferred direction'
           }
           className={'input input-sm'}
-          inputProps={{ ...register(getTarget('maxGustSpeed')), type: 'float' }}
+          inputProps={{
+            ...register(getTarget('maxGustSpeed')),
+            type: 'float',
+            disabled,
+          }}
         />
         <Input
           title={'Preferred directions'}
           suffix={'List of preferred wind directions (origin) in degrees'}
           className={'input input-sm'}
-          inputProps={{ ...register(getTarget('maxGustSpeed')), type: 'float' }}
+          inputProps={{
+            ...register(getTarget('maxGustSpeed')),
+            type: 'float',
+            disabled,
+          }}
         />
       </div>
     </div>
@@ -76,6 +98,7 @@ export function WeatherConstraintControls({
   register,
   activityIndex,
   constraintIndex,
+  disabled,
 }: ControlsProps) {
   function getTarget(key: ConstraintKey) {
     return makeRegisterTarget(key, activityIndex, constraintIndex)
@@ -85,22 +108,38 @@ export function WeatherConstraintControls({
       <Input
         title={'Min temperature (ºC)'}
         className={'input input-sm'}
-        inputProps={{ ...register(getTarget('minTemperature')), type: 'float' }}
+        inputProps={{
+          ...register(getTarget('minTemperature')),
+          type: 'float',
+          disabled,
+        }}
       />
       <Input
         title={'Max temperature (ºC)'}
         className={'input input-sm'}
-        inputProps={{ ...register(getTarget('maxTemperature')), type: 'float' }}
+        inputProps={{
+          ...register(getTarget('maxTemperature')),
+          type: 'float',
+          disabled,
+        }}
       />
       <Input
         title={'Max UV Index'}
         className={'input input-sm'}
-        inputProps={{ ...register(getTarget('maxUvIndex')), type: 'float' }}
+        inputProps={{
+          ...register(getTarget('maxUvIndex')),
+          type: 'float',
+          disabled,
+        }}
       />
       <Input
         title={'Max cloud cover (%)'}
         className={'input input-sm'}
-        inputProps={{ ...register(getTarget('maxCloudCover')), type: 'float' }}
+        inputProps={{
+          ...register(getTarget('maxCloudCover')),
+          type: 'float',
+          disabled,
+        }}
       />
       <Input
         title={'Max likelihood of rain'}
@@ -108,6 +147,7 @@ export function WeatherConstraintControls({
         inputProps={{
           ...register(getTarget('maxPrecipitationProbability')),
           type: 'float',
+          disabled,
         }}
       />
     </div>
@@ -117,6 +157,7 @@ export function TideConstraintControls({
   register,
   activityIndex,
   constraintIndex,
+  disabled,
 }: ControlsProps) {
   function getTarget(key: ConstraintKey) {
     return makeRegisterTarget(key, activityIndex, constraintIndex)
@@ -127,12 +168,20 @@ export function TideConstraintControls({
         <Input
           title={'Min height (m)'}
           className={'input input-sm'}
-          inputProps={{ ...register(getTarget('minHeight')), type: 'float' }}
+          inputProps={{
+            ...register(getTarget('minHeight')),
+            type: 'float',
+            disabled,
+          }}
         />
         <Input
           title={'Max height (m)'}
           className={'input input-sm'}
-          inputProps={{ ...register(getTarget('maxHeight')), type: 'float' }}
+          inputProps={{
+            ...register(getTarget('maxHeight')),
+            type: 'float',
+            disabled,
+          }}
         />
       </div>
       <NamedFormComponent
@@ -146,6 +195,7 @@ export function TideConstraintControls({
               type="radio"
               value={'low'}
               className="radio radio-primary"
+              disabled={disabled}
               {...register(
                 `activities.${activityIndex}.constraints.${constraintIndex}.timeFromTideEvent.event`,
               )}
@@ -154,6 +204,7 @@ export function TideConstraintControls({
               type="radio"
               value={'high'}
               className="radio radio-primary"
+              disabled={disabled}
               {...register(
                 `activities.${activityIndex}.constraints.${constraintIndex}.timeFromTideEvent.event`,
               )}
@@ -171,6 +222,7 @@ export function TideConstraintControls({
             ...register(
               `activities.${activityIndex}.constraints.${constraintIndex}.timeFromTideEvent.maxHoursBefore`,
             ),
+            disabled,
           }}
         />
         <Input
@@ -183,6 +235,7 @@ export function TideConstraintControls({
             ...register(
               `activities.${activityIndex}.constraints.${constraintIndex}.timeFromTideEvent.maxHoursAfter`,
             ),
+            disabled,
           }}
         />
       </NamedFormComponent>
@@ -194,6 +247,7 @@ export function SunConstraintControls({
   register,
   activityIndex,
   constraintIndex,
+  disabled,
 }: ControlsProps) {
   function getTarget(key: ConstraintKey) {
     return makeRegisterTarget(key, activityIndex, constraintIndex)
@@ -207,6 +261,7 @@ export function SunConstraintControls({
         inputProps={{
           ...register(getTarget('requiresDaylight')),
           type: 'checkbox',
+          disabled,
         }}
       />
       <Input
@@ -215,6 +270,7 @@ export function SunConstraintControls({
         inputProps={{
           ...register(getTarget('requiresDarkness')),
           type: 'checkbox',
+          disabled,
         }}
       />
 
@@ -226,6 +282,7 @@ export function SunConstraintControls({
           type: 'float',
           min: 0,
           max: 12,
+          disabled,
         }}
       />
       <Input
@@ -236,6 +293,7 @@ export function SunConstraintControls({
           type: 'float',
           min: 0,
           max: 12,
+          disabled,
         }}
       />
     </div>
@@ -246,6 +304,7 @@ export function TimeConstraintControls({
   register,
   activityIndex,
   constraintIndex,
+  disabled,
 }: ControlsProps) {
   function getTarget(key: ConstraintKey) {
     return makeRegisterTarget(key, activityIndex, constraintIndex)
@@ -259,7 +318,8 @@ export function TimeConstraintControls({
           ...register(getTarget('earliestHour')),
           type: 'float',
           min: 0,
-          max: 23,
+          max: 24,
+          disabled,
         }}
       />
       <Input
@@ -270,6 +330,7 @@ export function TimeConstraintControls({
           type: 'float',
           min: 0,
           max: 24,
+          disabled,
         }}
       />
       <Input
@@ -278,6 +339,7 @@ export function TimeConstraintControls({
         inputProps={{
           ...register(getTarget('ignoreWorkingHours')),
           type: 'checkbox',
+          disabled,
         }}
       />
       <Input
@@ -289,6 +351,7 @@ export function TimeConstraintControls({
           type: 'float',
           min: 0,
           max: 24,
+          disabled,
         }}
       />
     </div>
@@ -298,6 +361,7 @@ export function DayConstraintControls({
   register,
   activityIndex,
   constraintIndex,
+  disabled,
 }: ControlsProps) {
   function getTarget(key: ConstraintKey) {
     return makeRegisterTarget(key, activityIndex, constraintIndex)
@@ -310,6 +374,7 @@ export function DayConstraintControls({
         inputProps={{
           ...register(getTarget('isWeekday')),
           type: 'checkbox',
+          disabled,
         }}
       />
       <Input
@@ -318,6 +383,7 @@ export function DayConstraintControls({
         inputProps={{
           ...register(getTarget('isWeekend')),
           type: 'checkbox',
+          disabled,
         }}
       />
 
@@ -327,6 +393,7 @@ export function DayConstraintControls({
         className={'input input-sm'}
         inputProps={{
           ...register(getTarget('dateRanges')),
+          disabled,
         }}
       />
     </div>

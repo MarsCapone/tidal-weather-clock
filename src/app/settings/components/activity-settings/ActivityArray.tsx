@@ -39,6 +39,7 @@ type ConstraintFormProps = {
   index: number
   control: Control<InputActivities>
   register: UseFormRegister<InputActivities>
+  disabled: boolean
 }
 
 export default function ActivityArray({
@@ -52,6 +53,7 @@ export default function ActivityArray({
     <ul>
       {fields.map((item, index) => {
         const activity = getByIndex(index)
+        const disabled = activity.scope === 'global'
 
         return (
           <li key={item.id}>
@@ -61,7 +63,10 @@ export default function ActivityArray({
                   title={'Activity Name'}
                   className={'input input-md w-full'}
                   outerClassName={'flex-none'}
-                  inputProps={{ ...register(`activities.${index}.name`) }}
+                  inputProps={{
+                    ...register(`activities.${index}.name`),
+                    disabled,
+                  }}
                 />
                 <Input
                   title={'Description'}
@@ -69,6 +74,7 @@ export default function ActivityArray({
                   outerClassName={'grow'}
                   inputProps={{
                     ...register(`activities.${index}.description`),
+                    disabled,
                   }}
                 />
                 <Input
@@ -77,19 +83,26 @@ export default function ActivityArray({
                   outerClassName={''}
                   inputProps={{
                     ...register(`activities.${index}.priority`),
+                    disabled,
                     type: 'number',
                     min: 1,
                     max: 10,
                   }}
                 />
-                <button className={'my-2'} onClick={() => removeByIndex(index)}>
-                  <Trash2Icon className={'h-6 w-6'} />
-                </button>
+                {!disabled && (
+                  <button
+                    className={`my-2`}
+                    onClick={() => removeByIndex(index)}
+                  >
+                    <Trash2Icon className={'h-6 w-6'} />
+                  </button>
+                )}
               </div>
               <ConstraintForm
                 index={index}
                 control={control}
                 register={register}
+                disabled={disabled}
               />
               <div
                 className={
@@ -142,7 +155,12 @@ const constraintTypes = [
   },
 ]
 
-function ConstraintForm({ index, control, register }: ConstraintFormProps) {
+function ConstraintForm({
+  index,
+  control,
+  register,
+  disabled,
+}: ConstraintFormProps) {
   const { fields, remove, prepend } = useFieldArray({
     control,
     name: `activities.${index}.constraints`,
@@ -152,12 +170,14 @@ function ConstraintForm({ index, control, register }: ConstraintFormProps) {
     <div>
       <div className={'mb-4 flex flex-row items-center justify-between gap-4'}>
         <div className={'text-md'}>Constraints</div>
-        <button
-          className={'btn btn-sm rounded-field'}
-          onClick={() => prepend({ type: 'tide' })}
-        >
-          Add Constraint <PlusIcon className="h-4 w-4" />
-        </button>
+        {!disabled && (
+          <button
+            className={'btn btn-sm rounded-field'}
+            onClick={() => prepend({ type: 'tide' })}
+          >
+            Add Constraint <PlusIcon className="h-4 w-4" />
+          </button>
+        )}
       </div>
       <div>
         {fields.map((item, k) => (
@@ -171,6 +191,7 @@ function ConstraintForm({ index, control, register }: ConstraintFormProps) {
                         type="radio"
                         className={''}
                         value={type}
+                        disabled={disabled}
                         {...register(
                           `activities.${index}.constraints.${k}.type`,
                         )}
@@ -187,6 +208,7 @@ function ConstraintForm({ index, control, register }: ConstraintFormProps) {
                         register={register}
                         activityIndex={index}
                         constraintIndex={k}
+                        disabled={disabled}
                       />
                     </div>
                   </React.Fragment>
@@ -194,9 +216,11 @@ function ConstraintForm({ index, control, register }: ConstraintFormProps) {
               })}
               <div className={'grow'}></div>
               <div className={'flex flex-row justify-end gap-2'}>
-                <button className={'px-2'} onClick={() => remove(k)}>
-                  <Trash2Icon className={'h-4 w-4'} />
-                </button>
+                {!disabled && (
+                  <button className={'px-2'} onClick={() => remove(k)}>
+                    <Trash2Icon className={'h-4 w-4'} />
+                  </button>
+                )}
               </div>
             </div>
           </div>
