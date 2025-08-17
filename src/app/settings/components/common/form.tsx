@@ -1,5 +1,4 @@
 import { HTMLProps } from 'react'
-import { ClassNames } from 'react-day-picker'
 
 export type NamedFormComponentProps = {
   title: string

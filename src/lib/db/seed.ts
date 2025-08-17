@@ -1,5 +1,4 @@
 import { putActivities } from '@/lib/db/helpers/activity'
-import { v4 as uuidv4 } from 'uuid'
 import { Activity, Constraint } from '@/lib/types/activity'
 import { kebabCase } from 'change-case'
 

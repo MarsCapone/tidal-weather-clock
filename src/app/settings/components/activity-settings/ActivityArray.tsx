@@ -17,6 +17,15 @@ import {
   WindIcon,
 } from 'lucide-react'
 import { Activity } from '@/lib/types/activity'
+import {
+  DayConstraintControls,
+  SunConstraintControls,
+  WindConstraintControls,
+  WeatherConstraintControls,
+  TimeConstraintControls,
+  TideConstraintControls,
+} from '@/app/settings/components/activity-settings/constraint-controls'
+import React from 'react'
 
 type ActivityArrayProps = {
   fields: FieldArrayWithId<InputActivities>[]
@@ -46,15 +55,17 @@ export default function ActivityArray({
 
         return (
           <li key={item.id}>
-            <div>
-              <div className={'flex flex-row items-center gap-4'}>
+            <div className={''}>
+              <div className={'mb-4 flex flex-row items-end gap-4'}>
                 <Input
                   title={'Activity Name'}
+                  className={'input input-md w-full'}
                   outerClassName={'flex-none'}
                   inputProps={{ ...register(`activities.${index}.name`) }}
                 />
                 <Input
                   title={'Description'}
+                  className={'input input-md w-full'}
                   outerClassName={'grow'}
                   inputProps={{
                     ...register(`activities.${index}.description`),
@@ -62,10 +73,16 @@ export default function ActivityArray({
                 />
                 <Input
                   title={'Priority'}
+                  className={'input input-md'}
                   outerClassName={''}
-                  inputProps={{ type: 'number', min: 1, max: 10 }}
+                  inputProps={{
+                    ...register(`activities.${index}.priority`),
+                    type: 'number',
+                    min: 1,
+                    max: 10,
+                  }}
                 />
-                <button onClick={() => removeByIndex(index)}>
+                <button className={'my-2'} onClick={() => removeByIndex(index)}>
                   <Trash2Icon className={'h-6 w-6'} />
                 </button>
               </div>
@@ -83,6 +100,7 @@ export default function ActivityArray({
                 <span>scope:{activity.scope}</span>
               </div>
             </div>
+            <div className={'divider'}></div>
           </li>
         )
       })}
@@ -91,36 +109,36 @@ export default function ActivityArray({
 }
 
 const constraintTypes = [
-  { type: 'sun', label: 'Sun', Icon: SunIcon, content: <div>sun inputs</div> },
+  { type: 'sun', label: 'Sun', Icon: SunIcon, Controls: SunConstraintControls },
   {
     type: 'time',
     label: 'Time',
     Icon: ClockIcon,
-    content: <div>sun inputs</div>,
+    Controls: SunConstraintControls,
   },
   {
     type: 'day',
     label: 'Day',
     Icon: Calendar1Icon,
-    content: <div>sun inputs</div>,
+    Controls: DayConstraintControls,
   },
   {
     type: 'wind',
     label: 'Wind',
     Icon: WindIcon,
-    content: <div>sun inputs</div>,
+    Controls: WindConstraintControls,
   },
   {
     type: 'weather',
     label: 'Weather',
     Icon: CloudIcon,
-    content: <div>sun inputs</div>,
+    Controls: WeatherConstraintControls,
   },
   {
     type: 'tide',
     label: 'Tide',
     Icon: GlassWaterIcon,
-    content: <div>sun inputs</div>,
+    Controls: TideConstraintControls,
   },
 ]
 
@@ -149,29 +167,33 @@ function ConstraintForm({ index, control, register }: ConstraintFormProps) {
         {fields.map((item, k) => (
           <div key={item.id} className={'mb-4'}>
             <div className={'tabs tabs-sm tabs-box w-full'}>
-              {constraintTypes.map((c, ci) => {
+              {constraintTypes.map(({ type, label, Icon, Controls }, ci) => {
                 return (
-                  <>
-                    <label key={ci} className={'tab mb-1 px-2'}>
+                  <React.Fragment key={ci}>
+                    <label className={'tab mb-1 px-2'}>
                       <input
                         type="radio"
                         className={''}
-                        value={c.type}
+                        value={type}
                         {...register(
                           `activities.${index}.constraints.${k}.type`,
                         )}
                       />
-                      <c.Icon className={'mr-1'} />
-                      {c.label}
+                      <Icon className={'mr-1'} />
+                      {label}
                     </label>
                     <div
                       className={
                         'tab-content rounded-field bg-base-100 border-base-300 p-4'
                       }
                     >
-                      {c.content}
+                      <Controls
+                        register={register}
+                        activityIndex={index}
+                        constraintIndex={k}
+                      />
                     </div>
-                  </>
+                  </React.Fragment>
                 )
               })}
               <div className={'grow'}></div>
