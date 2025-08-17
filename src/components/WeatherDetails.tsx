@@ -5,7 +5,7 @@ import {
   WeatherInfo,
   WindInfo,
 } from '@/lib/types/context'
-import { SessionContext, TimeZoneContext } from '@/lib/utils/contexts'
+import { TimeZoneContext } from '@/lib/utils/contexts'
 import {
   utcDateStringToFractionalUtc,
   utcDateStringToLocalTimeString,
@@ -26,6 +26,7 @@ import {
   describeWindDirection,
 } from '@/lib/utils/weather-descriptions'
 import { WorkingHoursSetting } from '@/lib/types/settings'
+import { useUser } from '@auth0/nextjs-auth0'
 
 export type WeatherDetailsProps = {
   dataContext: DataContext
@@ -37,8 +38,8 @@ const columnHelper = createColumnHelper<AggregatedDataPoint>()
 const DEFAULT_SHOW_OUT_OF_HOURS = false
 
 export function WeatherDetails({ dataContext }: WeatherDetailsProps) {
-  const session = useContext(SessionContext)
-  const [workingHours] = useWorkingHours(session?.user?.email || 'global')
+  const sessionUser = useUser()
+  const [workingHours] = useWorkingHours(sessionUser?.user?.email || 'global')
 
   return (
     <WeatherDetailsInternal

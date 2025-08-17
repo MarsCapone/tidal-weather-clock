@@ -17,9 +17,9 @@ import { ActivityRecommender, groupScores } from '@/lib/utils/suggestions'
 import { formatISO, startOfDay } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import Link from 'next/link'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import WeatherOverview from '@/components/WeatherOverview'
-import { SessionContext } from '@/lib/utils/contexts'
+import { useUser } from '@auth0/nextjs-auth0'
 
 type DateInfo = {
   date: Date
@@ -37,9 +37,9 @@ export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
 }
 
 function MainContentWithoutDate({ date }: { date: Date }) {
-  const session = useContext(SessionContext)
+  const sessionUser = useUser()
   const [activities] = useActivities([])
-  const [workingHours] = useWorkingHours(session?.user?.email || 'global')
+  const [workingHours] = useWorkingHours(sessionUser.user?.email || 'global')
   const { showSuggestedActivity, showActivityTable } = useFlags()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
