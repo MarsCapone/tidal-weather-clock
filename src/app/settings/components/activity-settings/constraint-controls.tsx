@@ -81,7 +81,7 @@ export function WeatherConstraintControls({
     return makeRegisterTarget(key, activityIndex, constraintIndex)
   }
   return (
-    <div className={'grid grid-cols-2'}>
+    <div className={'grid grid-cols-2 gap-x-4'}>
       <Input
         title={'Min temperature (ºC)'}
         className={'input input-sm'}
@@ -123,7 +123,7 @@ export function TideConstraintControls({
   }
   return (
     <div>
-      <div className={'grid grid-cols-2'}>
+      <div className={'grid grid-cols-2 gap-x-4'}>
         <Input
           title={'Min height (m)'}
           className={'input input-sm'}
