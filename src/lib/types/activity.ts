@@ -41,12 +41,21 @@ export type TimeConstraint = {
   type: 'time'
 }
 
+export type DayConstraint = {
+  isWeekday?: boolean
+  isWeekend?: boolean
+  dates?: string[]
+  dateRanges?: { start: string; end: string }[]
+  type: 'day'
+}
+
 export type Constraint =
   | WindConstraint
   | WeatherConstraint
   | TideConstraint
   | SunConstraint
   | TimeConstraint
+  | DayConstraint
 
 export type Activity = {
   constraints: Constraint[]
