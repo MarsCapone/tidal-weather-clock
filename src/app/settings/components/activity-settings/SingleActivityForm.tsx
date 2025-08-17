@@ -1,5 +1,6 @@
 import {
   Control,
+  FieldArrayWithId,
   useFieldArray,
   UseFormGetValues,
   UseFormRegister,
@@ -7,47 +8,53 @@ import {
 import { Input } from '@/app/settings/components/common/form'
 import { InputActivities } from '@/app/settings/components/activity-settings/types'
 
-type FieldArrayProps = {
+type ActivityArrayProps = {
+  fields: FieldArrayWithId<InputActivities>[]
+  control: Control<InputActivities>
+  register: UseFormRegister<InputActivities>
+  removeByIndex: (i: number) => void
+}
+
+type ConstraintFormProps = {
   index: number
   control: Control<InputActivities>
   register: UseFormRegister<InputActivities>
-  getValues: UseFormGetValues<InputActivities>
 }
 
-type SingleActivityFormProps = FieldArrayProps & {
-  remove: () => void
-}
-
-export default function SingleActivityForm({
-  index,
+export default function ActivityArray({
+  fields,
   control,
   register,
-  getValues,
-  remove,
-}: SingleActivityFormProps) {
+  removeByIndex,
+}: ActivityArrayProps) {
   return (
-    <div>
-      <Input
-        title={'Activity Name'}
-        className={''}
-        inputProps={{ ...register(`activities.${index}.name`) }}
-      />
-      <Input
-        title={'Description'}
-        className={''}
-        inputProps={{ ...register(`activities.${index}.description`) }}
-      />
-      <ConstraintForm
-        index={index}
-        control={control}
-        register={register}
-        getValues={getValues}
-      />
-    </div>
+    <ul>
+      {fields.map((item, index) => {
+        return (
+          <li key={item.id}>
+            <div>
+              <Input
+                title={'Activity Name'}
+                className={''}
+                inputProps={{ ...register(`activities.${index}.name`) }}
+              />
+              <Input
+                title={'Description'}
+                className={''}
+                inputProps={{ ...register(`activities.${index}.description`) }}
+              />
+              <ConstraintForm
+                index={index}
+                control={control}
+                register={register}
+              />
+            </div>
+          </li>
+        )
+      })}
+    </ul>
   )
 }
-
-type ConstraintFormProps = FieldArrayProps
 
 function ConstraintForm({ index, control, register }: ConstraintFormProps) {
   const { fields, remove, append } = useFieldArray({
