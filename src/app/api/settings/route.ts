@@ -1,3 +1,4 @@
+import { auth0 } from '@/lib/auth0'
 import { getSetting, putSetting } from '@/lib/db/helpers/settings'
 import { NextRequest } from 'next/server'
 
@@ -21,26 +22,28 @@ export async function GET(request: NextRequest) {
   return Response.json({ value: setting })
 }
 
-export async function PUT(request: NextRequest) {
-  const {
-    name,
-    value,
-    userId,
-  }: Partial<{ name: string; value: any; userId: string }> =
-    await request.json()
-  if (!name) {
-    return Response.json(
-      { error: 'Missing name "name" in body' },
-      { status: 400 },
-    )
-  }
-  if (!value) {
-    return Response.json(
-      { error: 'Missing value "value" in body' },
-      { status: 400 },
-    )
-  }
+export const PUT = auth0.withApiAuthRequired(
+  async (request: NextRequest): Promise<Response> => {
+    const {
+      name,
+      value,
+      userId,
+    }: Partial<{ name: string; value: any; userId: string }> =
+      await request.json()
+    if (!name) {
+      return Response.json(
+        { error: 'Missing name "name" in body' },
+        { status: 400 },
+      )
+    }
+    if (!value) {
+      return Response.json(
+        { error: 'Missing value "value" in body' },
+        { status: 400 },
+      )
+    }
 
-  await putSetting<typeof value>(name, value, 'global')
-  return Response.json({}, { status: 201 })
-}
+    await putSetting<typeof value>(name, value, userId || 'global')
+    return Response.json({}, { status: 201 })
+  },
+)
