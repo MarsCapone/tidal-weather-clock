@@ -266,7 +266,7 @@ function generateTimeSlots(
     end: endOfDay(refDate),
     start: refDate,
   }).filter((date) => {
-    if (!workingHours.enabled) {
+    if (workingHours === null || !workingHours.enabled) {
       // don't filter at all
       return true
     }
