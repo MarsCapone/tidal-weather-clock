@@ -5,7 +5,7 @@ import {
   WeatherInfo,
   WindInfo,
 } from '@/lib/types/context'
-import { TimeZoneContext } from '@/lib/utils/contexts'
+import { SessionContext, TimeZoneContext } from '@/lib/utils/contexts'
 import {
   utcDateStringToFractionalUtc,
   utcDateStringToLocalTimeString,
@@ -37,7 +37,8 @@ const columnHelper = createColumnHelper<AggregatedDataPoint>()
 const DEFAULT_SHOW_OUT_OF_HOURS = false
 
 export function WeatherDetails({ dataContext }: WeatherDetailsProps) {
-  const [workingHours] = useWorkingHours()
+  const session = useContext(SessionContext)
+  const [workingHours] = useWorkingHours(session?.user?.email || 'global')
 
   return (
     <WeatherDetailsInternal

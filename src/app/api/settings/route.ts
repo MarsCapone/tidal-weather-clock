@@ -9,7 +9,12 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: 'Missing setting "name"' }, { status: 400 })
   }
 
-  const setting = await getSetting<unknown>(settingName)
+  const userId = searchParams.get('userId')
+  if (!userId) {
+    return Response.json({ error: 'Missing setting "userId"' }, { status: 400 })
+  }
+
+  const setting = await getSetting<unknown>(settingName, userId)
   if (setting === undefined || setting === null) {
     return Response.json({ value: null })
   }
@@ -17,7 +22,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  const { name, value }: Partial<{ name: string; value: any }> =
+  const {
+    name,
+    value,
+    userId,
+  }: Partial<{ name: string; value: any; userId: string }> =
     await request.json()
   if (!name) {
     return Response.json(
@@ -32,6 +41,6 @@ export async function PUT(request: NextRequest) {
     )
   }
 
-  await putSetting<typeof value>(name, value)
+  await putSetting<typeof value>(name, value, 'global')
   return Response.json({}, { status: 201 })
 }

@@ -433,13 +433,6 @@ function scoreTideConstraint(
 
   let score = 1
 
-  if (
-    constraint.preferredStates &&
-    !constraint.preferredStates.includes(tideState.state)
-  ) {
-    score *= 0.3
-  }
-
   if (constraint.timeFromTideEvent && tideState.current) {
     const hoursSinceTide = slot.hour - tideState.current.time
     const {

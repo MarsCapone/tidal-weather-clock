@@ -3,8 +3,11 @@ import './globals.css'
 import Navbar from '@/components/Navbar'
 import Providers from '@/components/Providers'
 import React from 'react'
+import { auth0 } from '@/lib/auth0'
 
-export default function Layout({ children }: React.PropsWithChildren) {
+export default async function Layout({ children }: React.PropsWithChildren) {
+  const session = await auth0.getSession()
+
   return (
     <html lang="en">
       <head>
@@ -14,7 +17,7 @@ export default function Layout({ children }: React.PropsWithChildren) {
       </head>
       <body>
         <div id="root">
-          <Providers>
+          <Providers session={session}>
             <Navbar />
             <div className="mx-auto flex min-w-full flex-col justify-center gap-10 p-10 text-center md:min-w-0">
               {children}

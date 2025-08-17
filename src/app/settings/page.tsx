@@ -48,6 +48,8 @@ async function Page() {
   )
 }
 
+// export default Page
+
 export default auth0.withPageAuthRequired(Page, {
   returnTo: '/settings',
 })
