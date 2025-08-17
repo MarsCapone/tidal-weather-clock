@@ -22,7 +22,9 @@ export async function getActivitiesByUserId(
       constraints: sql<Constraint[]>`jsonb_agg(
         jsonb_set(${constraintTable.content}::jsonb, '{type}'::text[], to_jsonb(${constraintTable.type}))
         )`,
-      userId: activityTable.user_id,
+      scope: sql<
+        'global' | 'user'
+      >`CASE WHEN ${activityTable.user_id} = 'global' THEN 'global' ELSE 'user' END`,
     })
     .from(activityTable)
     .leftJoin(
@@ -44,7 +46,7 @@ export async function getActivitiesByUserId(
 
 export async function putActivities(activities: Activity[], userId: string) {
   // we do not want to overwrite global activities
-  const filteredActivities = activities.filter((a) => a.userId !== 'global')
+  const filteredActivities = activities.filter((a) => a.scope !== 'global')
 
   const inserts = filteredActivities.map((a) => {
     const activityToInsert: typeof activityTable.$inferInsert = {

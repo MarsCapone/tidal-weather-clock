@@ -54,7 +54,7 @@ export type Activity = {
   id: string
   name: string
   priority: number // 1-10, higher is more important
-  userId: string
+  scope: 'global' | 'user'
 }
 
 export type ActivityScore<DebugType = never> = {

@@ -56,7 +56,7 @@ export default function ActivitySettingsForm({
         description: 'Sample description',
         priority: 0,
         constraints: [],
-        userId,
+        scope: 'user',
       },
       ...internalActivities,
     ])
@@ -136,7 +136,7 @@ const restrictChanges = ({ key }: { key: string }) => {
 
 function ActivityCard({ activity, setActivity, onDelete }: ActivityCardProps) {
   const { isDarkMode } = useContext(DarkModeContext)
-  const isGlobal = activity.userId === 'global'
+  const isGlobal = activity.scope === 'global'
 
   const buttons = (
     <div
