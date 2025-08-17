@@ -114,7 +114,7 @@ const constraintTypes = [
     type: 'time',
     label: 'Time',
     Icon: ClockIcon,
-    Controls: SunConstraintControls,
+    Controls: TimeConstraintControls,
   },
   {
     type: 'day',
