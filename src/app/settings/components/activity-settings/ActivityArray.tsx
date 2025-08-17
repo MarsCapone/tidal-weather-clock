@@ -154,11 +154,7 @@ function ConstraintForm({ index, control, register }: ConstraintFormProps) {
         <div className={'text-md'}>Constraints</div>
         <button
           className={'btn btn-sm rounded-field'}
-          onClick={() =>
-            prepend({
-              type: 'sun',
-            })
-          }
+          onClick={() => prepend({ type: 'tide' })}
         >
           Add Constraint <PlusIcon className="h-4 w-4" />
         </button>
