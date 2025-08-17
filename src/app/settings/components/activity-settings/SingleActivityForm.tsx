@@ -14,13 +14,16 @@ type FieldArrayProps = {
   getValues: UseFormGetValues<InputActivities>
 }
 
-type SingleActivityFormProps = FieldArrayProps
+type SingleActivityFormProps = FieldArrayProps & {
+  remove: () => void
+}
 
 export default function SingleActivityForm({
   index,
   control,
   register,
   getValues,
+  remove,
 }: SingleActivityFormProps) {
   return (
     <div>
