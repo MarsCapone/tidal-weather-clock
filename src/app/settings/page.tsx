@@ -1,10 +1,10 @@
-'use server'
 import ActivitySettings from '@/app/settings/components/activity-settings/ActivitySetting'
 import OutOfHoursSettings from '@/app/settings/components/out-of-hours-settings/OutOfHoursSettings'
 import TimeZoneSettings from '@/app/settings/components/TimeZoneSettings'
 import SettingsMenu from '@/app/settings/components/common/SettingsMenu'
 import React from 'react'
 import { auth0 } from '@/lib/auth0'
+import { AppRouterPageRoute } from '@auth0/nextjs-auth0/server'
 
 type SettingLink = {
   Component: () => React.ReactNode
@@ -12,7 +12,7 @@ type SettingLink = {
   label: string
 }
 
-async function Page() {
+function PageContent() {
   const links: SettingLink[] = [
     {
       Component: TimeZoneSettings,
@@ -48,8 +48,7 @@ async function Page() {
   )
 }
 
-// export default Page
-
-export default auth0.withPageAuthRequired(Page, {
+// @ts-ignore
+export default auth0.withPageAuthRequired(PageContent, {
   returnTo: '/settings',
-})
+}) as AppRouterPageRoute
