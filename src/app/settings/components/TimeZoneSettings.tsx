@@ -1,3 +1,4 @@
+'use client'
 import { SettingCard, SettingTitle } from '@/app/settings/components/common'
 import { TimeZoneContext } from '@/lib/utils/contexts'
 import { useContext, useEffect } from 'react'

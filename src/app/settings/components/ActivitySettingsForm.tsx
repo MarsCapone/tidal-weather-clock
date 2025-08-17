@@ -6,7 +6,6 @@ import {
   Input,
   PrefixSuffixInput,
 } from '@/components/forms/FormComponents'
-import { useActivities } from '@/hooks/apiRequests'
 import {
   Activity,
   Constraint,
@@ -32,14 +31,16 @@ import { PlusIcon, TrashIcon } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
-export default function ActivitySettings() {
-  const [activities, updateActivities] = useActivities([])
-  const [internalActivities, setInternalActivities] = useState<Activity[]>([])
-
-  // most operations will operate on internal activities, so we first reflect them here
-  useEffect(() => {
-    setInternalActivities(activities)
-  }, [activities])
+export type ActivitySettingsFormProps = {
+  activities: Activity[]
+  setActivitiesAction: (activities: Activity[]) => void
+}
+export default function ActivitySettingsForm({
+  activities,
+  setActivitiesAction,
+}: ActivitySettingsFormProps) {
+  const [internalActivities, setInternalActivities] =
+    useState<Activity[]>(activities)
 
   const onDeleteActivity = (id: string) => {
     setInternalActivities(internalActivities.filter((item) => item.id !== id))
@@ -68,7 +69,7 @@ export default function ActivitySettings() {
 
   // when we're ready, we can push our internal changes to the server
   const commitChanges = () => {
-    updateActivities(internalActivities)
+    setActivitiesAction(internalActivities)
     logger.info('Pushing activities to server', {
       previousActivities: activities,
       newActivities: internalActivities,

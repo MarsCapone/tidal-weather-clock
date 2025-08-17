@@ -1,4 +1,4 @@
-import { useWorkingHours, WorkingHoursSetting } from '@/hooks/settings'
+import { useWorkingHours } from '@/hooks/settings'
 import {
   DataContext,
   Timestamp,
@@ -25,6 +25,7 @@ import {
   describeUvIndex,
   describeWindDirection,
 } from '@/lib/utils/weather-descriptions'
+import { WorkingHoursSetting } from '@/lib/types/settings'
 
 export type WeatherDetailsProps = {
   dataContext: DataContext

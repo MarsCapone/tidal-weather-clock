@@ -1,8 +1,12 @@
-import { json, pgTable, text } from 'drizzle-orm/pg-core'
+import { json, pgTable, primaryKey, text } from 'drizzle-orm/pg-core'
 
-export const settingsTable = pgTable('settings', {
-  name: text().primaryKey(),
-  value: json(),
-  // if we want to have different settings for different people, we can do something like scope=user_id
-  // scope: text().default('global'),
-})
+export const settingsTable = pgTable(
+  'settings',
+  {
+    name: text(),
+    value: json(),
+    // we will set user:{userid}
+    scope: text().default('global'),
+  },
+  (table) => [primaryKey({ columns: [table.name, table.scope] })],
+)

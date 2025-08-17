@@ -1,4 +1,3 @@
-import { WorkingHoursSetting } from '@/hooks/settings'
 import {
   Activity,
   ActivityScore,
@@ -31,6 +30,7 @@ import {
   parseISO,
   startOfDay,
 } from 'date-fns'
+import { WorkingHoursSetting } from '@/lib/types/settings'
 
 type TimeSlot = {
   hour: number

@@ -1,146 +1,28 @@
-import { SettingCard, SettingTitle } from '@/app/settings/components/common'
-import { Input } from '@/app/settings/components/form'
-import { useWorkingHours, WorkingHoursSetting } from '@/hooks/settings'
-import {
-  fractionalUtcToLocalTimeString,
-  localTimeStringToFractionalUtc,
-} from '@/lib/utils/dates'
-import { shallowEqual } from 'fast-equals'
-import { useEffect } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { getSetting, putSetting } from '@/lib/db/helpers/settings'
+import { auth0 } from '@/lib/auth0'
+import OutOfHoursSettingForm from '@/app/settings/components/OutOfOursSettingForm'
+import { defaultWorkingHours, WorkingHoursSetting } from '@/lib/types/settings'
 
-type WorkingHoursForm = {
-  startHour: string
-  endHour: string
-  enabled: boolean
-}
-
-export default function OutOfHoursSettings() {
-  const [workingHours, updateWorkingHours, setWorkingHours] = useWorkingHours()
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-    setValue,
-  } = useForm<WorkingHoursForm>()
-  useEffect(() => {
-    setValue(
-      'startHour',
-      fractionalUtcToLocalTimeString(workingHours.startHour),
-    )
-    setValue('endHour', fractionalUtcToLocalTimeString(workingHours.endHour))
-    setValue('enabled', workingHours.enabled)
-  }, [
-    workingHours.startHour,
-    workingHours.endHour,
-    workingHours.enabled,
-    setValue,
-  ])
-  const current = watch()
-
-  const getNewWorkingHoursSetting = (
-    data: WorkingHoursForm,
-  ): WorkingHoursSetting => {
-    const startHour =
-      data.startHour !== undefined
-        ? localTimeStringToFractionalUtc(data.startHour)
-        : workingHours.startHour
-    const endHour =
-      data.endHour !== undefined
-        ? localTimeStringToFractionalUtc(data.endHour)
-        : workingHours.endHour
-    const enabled =
-      data.enabled !== undefined ? data.enabled : workingHours.enabled
-    return {
-      startHour,
-      endHour,
-      enabled,
-    }
-  }
-
-  const isDifferent = !shallowEqual(
-    getNewWorkingHoursSetting(current),
-    workingHours,
+export default async function OutOfHoursSettings() {
+  const session = await auth0.getSession()
+  const workingHours = await getSetting<WorkingHoursSetting>(
+    'working_hours',
+    session!.user.email!,
   )
 
-  const onSubmit: SubmitHandler<WorkingHoursForm> = (data) => {
-    const newVal = getNewWorkingHoursSetting(data)
-    updateWorkingHours(newVal)
+  async function updateWorkingHours(wh: WorkingHoursSetting) {
+    'use server'
+    await putSetting<WorkingHoursSetting>(
+      'working_hours',
+      wh,
+      session!.user.email!,
+    )
   }
 
   return (
-    <div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="mb-4 flex flex-row items-center justify-between">
-          <SettingTitle title={'Out of Hours'} />
-          <button
-            type="submit"
-            className={`btn rounded-field ${isDifferent ? 'btn-primary' : 'btn-disabled'}`}
-          >
-            Save Changes
-          </button>
-        </div>
-        <div>Do not suggest activities outside of these hours.</div>
-        <SettingCard>
-          <div className="flex flex-row gap-4">
-            <Input
-              title={'Start time'}
-              className="input w-36"
-              inputProps={{
-                type: 'time',
-                defaultValue: fractionalUtcToLocalTimeString(
-                  workingHours.startHour,
-                ),
-                ...register('startHour'),
-              }}
-              suffix={
-                <span>
-                  Optional
-                  {errors.startHour && (
-                    <span className="text-error">
-                      {errors.startHour.message}
-                    </span>
-                  )}
-                </span>
-              }
-            />
-            <Input
-              title={'End time'}
-              className="input w-36"
-              inputProps={{
-                type: 'time',
-                defaultValue: fractionalUtcToLocalTimeString(
-                  workingHours.endHour,
-                ),
-                ...register('endHour'),
-              }}
-              suffix={
-                <span>
-                  Optional
-                  {errors.endHour && (
-                    <span className="text-error">{errors.endHour.message}</span>
-                  )}
-                </span>
-              }
-            />
-            <Input
-              title={'Enable?'}
-              className="toggle"
-              inputProps={{
-                type: 'checkbox',
-                defaultChecked: workingHours.enabled,
-                ...register('enabled'),
-              }}
-              suffix={
-                errors.enabled && (
-                  <span className="text-error">{errors.enabled.message}</span>
-                )
-              }
-            />
-          </div>
-        </SettingCard>
-      </form>
-    </div>
+    <OutOfHoursSettingForm
+      workingHours={workingHours || defaultWorkingHours}
+      setWorkingHoursAction={updateWorkingHours}
+    />
   )
 }

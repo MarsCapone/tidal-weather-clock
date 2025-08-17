@@ -1,10 +1,18 @@
 import { Activity, Constraint } from '@/lib/types/activity'
 import { db } from '@/lib/db'
 import { activityTable, constraintTable } from '@/lib/db/schemas/activity'
-import { eq, notInArray, sql } from 'drizzle-orm'
+import { eq, notInArray, sql, inArray } from 'drizzle-orm'
 import logger from '@/app/api/pinoLogger'
 
-export async function getActivitiesByUserId(userId: string) {
+export async function getActivitiesByUserId(
+  userId: string,
+  includeGlobal: boolean = false,
+) {
+  const userIds = [userId]
+  if (includeGlobal) {
+    userIds.push('global')
+  }
+
   const activityResponses: Activity[] = await db
     .select({
       id: activityTable.id,
@@ -20,7 +28,7 @@ export async function getActivitiesByUserId(userId: string) {
       constraintTable,
       eq(activityTable.id, constraintTable.activity_id),
     )
-    .where(eq(activityTable.user_id, userId))
+    .where(inArray(activityTable.user_id, userIds))
     .groupBy(
       activityTable.id,
       activityTable.name,
