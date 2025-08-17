@@ -180,7 +180,7 @@ function ConstraintForm({ index, control, register }: ConstraintFormProps) {
                         )}
                       />
                       <Icon className={'mr-1'} />
-                      {label}
+                      <span className={'hidden md:block'}>{label}</span>
                     </label>
                     <div
                       className={
