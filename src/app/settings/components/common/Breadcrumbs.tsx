@@ -17,7 +17,7 @@ export default function Breadcrumbs() {
     <div className="breadcrumbs text-sm">
       <ul>
         <li className="link link-hover">
-          <Link href="/">
+          <Link href="/src/app/static">
             <CogIcon className="h-4 w-4" />
             Settings
           </Link>

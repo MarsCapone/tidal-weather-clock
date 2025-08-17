@@ -1,8 +1,8 @@
 'use server'
-import ActivitySettings from '@/app/settings/components/ActivitySetting'
-import OutOfHoursSettings from '@/app/settings/components/OutOfHoursSettings'
+import ActivitySettings from '@/app/settings/components/activity-settings/ActivitySetting'
+import OutOfHoursSettings from '@/app/settings/components/out-of-hours-settings/OutOfHoursSettings'
 import TimeZoneSettings from '@/app/settings/components/TimeZoneSettings'
-import SettingsMenu from '@/app/settings/components/SettingsMenu'
+import SettingsMenu from '@/app/settings/components/common/SettingsMenu'
 import { auth0 } from '@/lib/auth0'
 import React from 'react'
 

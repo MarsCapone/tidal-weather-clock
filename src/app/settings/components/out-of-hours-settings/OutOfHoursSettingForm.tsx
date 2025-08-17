@@ -7,7 +7,7 @@ import {
 } from '@/lib/utils/dates'
 import { shallowEqual } from 'fast-equals'
 import { SettingCard, SettingTitle } from '@/app/settings/components/common'
-import { Input } from '@/app/settings/components/form'
+import { Input } from '@/app/settings/components/common/form'
 import { WorkingHoursSetting } from '@/lib/types/settings'
 
 type WorkingHoursForm = {

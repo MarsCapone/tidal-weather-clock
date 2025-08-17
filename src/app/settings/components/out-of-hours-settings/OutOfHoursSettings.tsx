@@ -1,6 +1,6 @@
 import { getSetting, putSetting } from '@/lib/db/helpers/settings'
 import { auth0 } from '@/lib/auth0'
-import OutOfHoursSettingForm from '@/app/settings/components/OutOfOursSettingForm'
+import OutOfHoursSettingForm from '@/app/settings/components/out-of-hours-settings/OutOfHoursSettingForm'
 import { defaultWorkingHours, WorkingHoursSetting } from '@/lib/types/settings'
 
 export default async function OutOfHoursSettings() {

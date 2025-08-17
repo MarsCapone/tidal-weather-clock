@@ -1,7 +1,7 @@
 import { auth0 } from '@/lib/auth0'
 import { getActivitiesByUserId, putActivities } from '@/lib/db/helpers/activity'
 import { Activity } from '@/lib/types/activity'
-import ActivitySettingsForm from '@/app/settings/components/ActivitySettingsForm'
+import ActivitySettingsForm from '@/app/settings/components/activity-settings/ActivitySettingsForm'
 
 export default async function ActivitySetting() {
   const session = await auth0.getSession()
