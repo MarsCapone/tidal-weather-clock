@@ -8,7 +8,7 @@ export const activityTable = pgTable('activity', {
   name: text().notNull(),
   description: text().notNull(),
   priority: integer().notNull(),
-  user_id: text(),
+  user_id: text().notNull(),
 })
 
 export const constraintTable = pgTable('constraint', {

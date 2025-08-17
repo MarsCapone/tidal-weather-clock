@@ -1,7 +1,7 @@
 import { Activity, Constraint } from '@/lib/types/activity'
 import { db } from '@/lib/db'
 import { activityTable, constraintTable } from '@/lib/db/schemas/activity'
-import { eq, notInArray, sql, inArray } from 'drizzle-orm'
+import { eq, notInArray, sql, inArray, and } from 'drizzle-orm'
 import logger from '@/app/api/pinoLogger'
 
 export async function getActivitiesByUserId(
@@ -21,7 +21,8 @@ export async function getActivitiesByUserId(
       priority: activityTable.priority,
       constraints: sql<Constraint[]>`jsonb_agg(
         jsonb_set(${constraintTable.content}::jsonb, '{type}'::text[], to_jsonb(${constraintTable.type}))
-    )`,
+        )`,
+      userId: activityTable.user_id,
     })
     .from(activityTable)
     .leftJoin(
@@ -39,8 +40,13 @@ export async function getActivitiesByUserId(
   return activityResponses
 }
 
+//  TODO: rethink how activities are stored so that it's easier to manage them
+
 export async function putActivities(activities: Activity[], userId: string) {
-  const inserts = activities.map((a) => {
+  // we do not want to overwrite global activities
+  const filteredActivities = activities.filter((a) => a.userId !== 'global')
+
+  const inserts = filteredActivities.map((a) => {
     const activityToInsert: typeof activityTable.$inferInsert = {
       ...a,
       user_id: userId,
@@ -65,22 +71,33 @@ export async function putActivities(activities: Activity[], userId: string) {
   )
   logger.debug('updated activities', { activityIds })
 
+  const activityIdsForUser = (await getActivitiesByUserId(userId)).map(
+    (a) => a.id,
+  )
+
   // first delete all the constraints. we can delete the ones for the activities we have because we're about to add
   // new constraints for them, and we can delete all the rest because we're going to delete any unlisted activities
-  await db.delete(constraintTable)
+  await db
+    .delete(constraintTable)
+    .where(inArray(constraintTable.activity_id, activityIdsForUser))
   logger.debug('deleted all constraints')
 
   // now we can delete all activities that weren't sent to this endpoint
   const deletedIds = await db
     .delete(activityTable)
-    .where(notInArray(activityTable.id, activityIds))
+    .where(
+      and(
+        notInArray(activityTable.id, activityIds),
+        eq(activityTable.user_id, userId),
+      ),
+    )
     .returning({ id: activityTable.id })
   logger.debug('deleted all unreferenced activities', {
     deletedIds: deletedIds.map((d) => d.id),
   })
 
   // then re-add all the constraints
-  const constraintInsertions = activities.flatMap((activity, index) => {
+  const constraintInsertions = filteredActivities.flatMap((activity, index) => {
     return activity.constraints.map((constraint) => {
       return db.insert(constraintTable).values({
         activity_id: activityIds[index],

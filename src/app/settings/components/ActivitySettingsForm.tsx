@@ -28,14 +28,16 @@ import {
   JsonEditorProps,
 } from 'json-edit-react'
 import { PlusIcon, TrashIcon } from 'lucide-react'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 export type ActivitySettingsFormProps = {
+  userId: string
   activities: Activity[]
   setActivitiesAction: (activities: Activity[]) => void
 }
 export default function ActivitySettingsForm({
+  userId,
   activities,
   setActivitiesAction,
 }: ActivitySettingsFormProps) {
@@ -54,6 +56,7 @@ export default function ActivitySettingsForm({
         description: 'Sample description',
         priority: 0,
         constraints: [],
+        userId,
       },
       ...internalActivities,
     ])
@@ -68,8 +71,8 @@ export default function ActivitySettingsForm({
   }
 
   // when we're ready, we can push our internal changes to the server
-  const commitChanges = () => {
-    setActivitiesAction(internalActivities)
+  const commitChanges = async () => {
+    await setActivitiesAction(internalActivities)
     logger.info('Pushing activities to server', {
       previousActivities: activities,
       newActivities: internalActivities,
@@ -133,12 +136,16 @@ const restrictChanges = ({ key }: { key: string }) => {
 
 function ActivityCard({ activity, setActivity, onDelete }: ActivityCardProps) {
   const { isDarkMode } = useContext(DarkModeContext)
+  const isGlobal = activity.userId === 'global'
 
   const buttons = (
-    <div className="tooltip tooltip-bottom" data-tip="Delete activity">
+    <div
+      className="tooltip tooltip-bottom"
+      data-tip={isGlobal ? 'Cannot delete global activity' : 'Delete activity'}
+    >
       <button
-        className="btn btn-ghost hover:btn-error rounded-field aspect-square p-1"
-        onClick={onDelete}
+        className={`btn btn-ghost hover:btn-error rounded-field aspect-square p-1 ${isGlobal ? 'btn-disabled' : ''}`}
+        onClick={isGlobal ? undefined : onDelete}
       >
         <TrashIcon className="h-4 w-4" />
       </button>

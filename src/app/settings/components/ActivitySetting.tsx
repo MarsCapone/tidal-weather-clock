@@ -5,10 +5,9 @@ import ActivitySettingsForm from '@/app/settings/components/ActivitySettingsForm
 
 export default async function ActivitySetting() {
   const session = await auth0.getSession()
-  const userId = session!.user.id!
+  const userId = session!.user.email!
 
   const activities = await getActivitiesByUserId(userId, true)
-  console.log(activities)
 
   async function updateActivities(act: Activity[]) {
     'use server'
@@ -17,6 +16,7 @@ export default async function ActivitySetting() {
 
   return (
     <ActivitySettingsForm
+      userId={userId}
       activities={activities}
       setActivitiesAction={updateActivities}
     />
