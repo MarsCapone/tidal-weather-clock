@@ -2,6 +2,7 @@ import {
   Control,
   FieldArrayWithId,
   useFieldArray,
+  useFormContext,
   UseFormRegister,
 } from 'react-hook-form'
 import { Input } from '@/app/settings/components/common/form'
@@ -16,7 +17,6 @@ import {
   Trash2Icon,
   WindIcon,
 } from 'lucide-react'
-import { Activity } from '@/lib/types/activity'
 import {
   DayConstraintControls,
   SunConstraintControls,
@@ -29,38 +29,29 @@ import React from 'react'
 
 type ActivityArrayProps = {
   fields: FieldArrayWithId<InputActivities>[]
-  control: Control<InputActivities>
-  register: UseFormRegister<InputActivities>
   removeByIndex: (i: number) => void
-  getByIndex: (i: number) => Activity
 }
 
 type ConstraintFormProps = {
   index: number
-  control: Control<InputActivities>
-  register: UseFormRegister<InputActivities>
   disabled: boolean
+}
+
+type SingleActivityProps = {
+  index: number
+  removeByIndex: (i: number) => void
 }
 
 export default function ActivityArray({
   fields,
-  control,
-  register,
   removeByIndex,
-  getByIndex,
 }: ActivityArrayProps) {
   return (
     <ul>
       {fields.map((item, index) => {
         return (
           <li key={`activity-${item.id}`}>
-            <SingleActivity
-              index={index}
-              control={control}
-              register={register}
-              removeByIndex={removeByIndex}
-              getByIndex={getByIndex}
-            />
+            <SingleActivity index={index} removeByIndex={removeByIndex} />
             <div className={'divider'}></div>
           </li>
         )
@@ -69,14 +60,9 @@ export default function ActivityArray({
   )
 }
 
-function SingleActivity({
-  control,
-  register,
-  removeByIndex,
-  getByIndex,
-  index,
-}: Omit<ActivityArrayProps, 'fields'> & { index: number }) {
-  const activity = getByIndex(index)
+function SingleActivity({ removeByIndex, index }: SingleActivityProps) {
+  const { register, getValues } = useFormContext<InputActivities>()
+  const activity = getValues(`activities.${index}`)
   const disabled = activity.scope === 'global'
   return (
     <div className={''}>
@@ -117,12 +103,7 @@ function SingleActivity({
           </button>
         )}
       </div>
-      <ConstraintForm
-        index={index}
-        control={control}
-        register={register}
-        disabled={disabled}
-      />
+      <ConstraintArray index={index} disabled={disabled} />
       <div
         className={
           'flex flex-row justify-end gap-2 font-mono text-xs font-thin'
@@ -169,12 +150,8 @@ const constraintTypes = [
   },
 ]
 
-function ConstraintForm({
-  index,
-  control,
-  register,
-  disabled,
-}: ConstraintFormProps) {
+function ConstraintArray({ index, disabled }: ConstraintFormProps) {
+  const { control, register } = useFormContext<InputActivities>()
   const { fields, remove, prepend } = useFieldArray({
     control,
     name: `activities.${index}.constraints`,
