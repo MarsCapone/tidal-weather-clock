@@ -52,72 +52,86 @@ export default function ActivityArray({
   return (
     <ul>
       {fields.map((item, index) => {
-        const activity = getByIndex(index)
-        const disabled = activity.scope === 'global'
-
         return (
-          <li key={item.id}>
-            <div className={''}>
-              <div className={'mb-4 flex flex-row items-end gap-4'}>
-                <Input
-                  title={'Activity Name'}
-                  className={'input input-md w-full'}
-                  outerClassName={'flex-none'}
-                  inputProps={{
-                    ...register(`activities.${index}.name`),
-                    disabled,
-                  }}
-                />
-                <Input
-                  title={'Description'}
-                  className={'input input-md w-full'}
-                  outerClassName={'grow'}
-                  inputProps={{
-                    ...register(`activities.${index}.description`),
-                    disabled,
-                  }}
-                />
-                <Input
-                  title={'Priority'}
-                  className={'input input-md'}
-                  outerClassName={''}
-                  inputProps={{
-                    ...register(`activities.${index}.priority`),
-                    disabled,
-                    type: 'number',
-                    min: 1,
-                    max: 10,
-                  }}
-                />
-                {!disabled && (
-                  <button
-                    className={`my-2`}
-                    onClick={() => removeByIndex(index)}
-                  >
-                    <Trash2Icon className={'h-6 w-6'} />
-                  </button>
-                )}
-              </div>
-              <ConstraintForm
-                index={index}
-                control={control}
-                register={register}
-                disabled={disabled}
-              />
-              <div
-                className={
-                  'flex flex-row justify-end gap-2 font-mono text-xs font-thin'
-                }
-              >
-                <span>id:{activity.id}</span>
-                <span>scope:{activity.scope}</span>
-              </div>
-            </div>
+          <li key={`activity-${item.id}`}>
+            <SingleActivity
+              index={index}
+              control={control}
+              register={register}
+              removeByIndex={removeByIndex}
+              getByIndex={getByIndex}
+            />
             <div className={'divider'}></div>
           </li>
         )
       })}
     </ul>
+  )
+}
+
+function SingleActivity({
+  control,
+  register,
+  removeByIndex,
+  getByIndex,
+  index,
+}: Omit<ActivityArrayProps, 'fields'> & { index: number }) {
+  const activity = getByIndex(index)
+  const disabled = activity.scope === 'global'
+  return (
+    <div className={''}>
+      <div className={'mb-4 flex flex-row items-end gap-4'}>
+        <Input
+          title={'Activity Name'}
+          className={'input input-md w-full'}
+          outerClassName={'flex-none'}
+          inputProps={{
+            ...register(`activities.${index}.name`),
+            disabled,
+          }}
+        />
+        <Input
+          title={'Description'}
+          className={'input input-md w-full'}
+          outerClassName={'grow'}
+          inputProps={{
+            ...register(`activities.${index}.description`),
+            disabled,
+          }}
+        />
+        <Input
+          title={'Priority'}
+          className={'input input-md'}
+          outerClassName={''}
+          inputProps={{
+            ...register(`activities.${index}.priority`),
+            disabled,
+            type: 'number',
+            min: 1,
+            max: 10,
+          }}
+        />
+        {!disabled && (
+          <button className={`my-2`} onClick={() => removeByIndex(index)}>
+            <Trash2Icon className={'h-6 w-6'} />
+          </button>
+        )}
+      </div>
+      <ConstraintForm
+        index={index}
+        control={control}
+        register={register}
+        disabled={disabled}
+      />
+      <div
+        className={
+          'flex flex-row justify-end gap-2 font-mono text-xs font-thin'
+        }
+      >
+        <span>id:{activity.id}</span>
+        <span>scope:{activity.scope}</span>
+      </div>
+    </div>
   )
 }
 
