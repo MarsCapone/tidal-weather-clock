@@ -1,22 +1,23 @@
 'use client'
-import React from 'react'
-import { useRouter } from 'next/navigation'
-import { useDataContextInfo } from '@/hooks/apiRequests'
-import { formatISO, parseISO } from 'date-fns'
+
 import { dateOptions } from '@/lib/utils/dates'
+import { formatISO, parseISO } from 'date-fns'
+import { useRouter } from 'next/navigation'
+import React from 'react'
 import { DayPicker } from 'react-day-picker'
 
 type CalendarDateSelectorProps = {
   popoverId: string
   date: Date
+  dataContextRange: { earliest: string; latest: string }
 }
 
 export function CalendarDateSelector({
   popoverId,
   date,
+  dataContextRange: { earliest, latest },
 }: CalendarDateSelectorProps) {
   const router = useRouter()
-  const response = useDataContextInfo(null)
 
   const updateDate = (newDate: Date | undefined) => {
     const newDateISO = newDate
@@ -40,14 +41,10 @@ export function CalendarDateSelector({
         selected={date}
         onSelect={updateDate}
         timeZone={'UTC'}
-        disabled={
-          response !== null
-            ? [
-                { before: parseISO(response.earliest, dateOptions) },
-                { after: parseISO(response.latest, dateOptions) },
-              ]
-            : undefined
-        }
+        disabled={[
+          { before: parseISO(earliest, dateOptions) },
+          { after: parseISO(latest, dateOptions) },
+        ]}
       />
     </div>
   )

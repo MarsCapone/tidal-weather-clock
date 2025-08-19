@@ -1,15 +1,16 @@
-import MainContent from '@/components/MainContent'
-import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
-import { addDays, startOfToday } from 'date-fns'
-import React from 'react'
-import { getActivitiesByUserId } from '@/lib/db/helpers/activity'
-import { auth0 } from '@/lib/auth0'
-import MainContentWithoutDate from '@/components/MainContent'
 import DateProvider from '@/components/date-management/DateProvider'
-import { notFound } from 'next/navigation'
-import { TZDate } from '@date-fns/tz'
-import { getDataContextRange } from '@/lib/db/helpers/datacontext'
+import MainContentWithoutDate from '@/components/MainContent'
+import { getUserId } from '@/lib/auth0'
 import CONSTANTS from '@/lib/constants'
+import { getActivitiesByUserId } from '@/lib/db/helpers/activity'
+import { getDataContextRange } from '@/lib/db/helpers/datacontext'
+import { getSetting } from '@/lib/db/helpers/settings'
+import { defaultWorkingHours, WorkingHoursSetting } from '@/lib/types/settings'
+import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
+import { TZDate } from '@date-fns/tz'
+import { addDays, startOfToday } from 'date-fns'
+import { notFound } from 'next/navigation'
+import React from 'react'
 
 export default async function Page({
   params,
@@ -48,16 +49,21 @@ export default async function Page({
 }
 
 async function PageContent({ initialDate }: { initialDate: TZDate }) {
-  const session = await auth0.getSession()
-  const activities = await getActivitiesByUserId(
-    session === null ? 'global' : session!.user!.email!,
-    true,
-  )
+  const userId = await getUserId()
+
+  const activities = await getActivitiesByUserId(userId || 'global', true)
   const dataContextRange = await getDataContextRange(CONSTANTS.LOCATION_COORDS)
+  const workingHours = await getSetting<WorkingHoursSetting>(
+    'working_hours',
+    userId || 'global',
+  )
 
   return (
     <DateProvider initialDate={initialDate} dataContextRange={dataContextRange}>
-      <MainContentWithoutDate activities={activities} />
+      <MainContentWithoutDate
+        activities={activities}
+        workingHours={workingHours || defaultWorkingHours}
+      />
     </DateProvider>
   )
 }

@@ -2,13 +2,15 @@
 
 import ActivityScoreList from '@/components/ActivityScoreList'
 import ClockDisplay from '@/components/ClockDisplay'
-import DatePagination from '@/components/date-management/DatePagination'
 import DayTimeline from '@/components/DayTimeline'
 import SuggestedActivity from '@/components/SuggestedActivity'
 import { WeatherDetails } from '@/components/WeatherDetails'
-import { useWorkingHours } from '@/hooks/settings'
+import WeatherOverview from '@/components/WeatherOverview'
 import { APP_CONFIG } from '@/lib/config'
+import { Activity } from '@/lib/types/activity'
 import { DataContext } from '@/lib/types/context'
+import { defaultWorkingHours, WorkingHoursSetting } from '@/lib/types/settings'
+import { DateContext } from '@/lib/utils/contexts'
 import { dateOptions } from '@/lib/utils/dates'
 import tryDataFetchersWithCache from '@/lib/utils/fetchData'
 import logger from '@/lib/utils/logger'
@@ -17,19 +19,14 @@ import { formatISO, startOfDay } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import Link from 'next/link'
 import React, { useContext, useEffect, useState } from 'react'
-import WeatherOverview from '@/components/WeatherOverview'
-import { useUser } from '@auth0/nextjs-auth0'
-import { defaultWorkingHours } from '@/lib/types/settings'
-import { Activity } from '@/lib/types/activity'
-import { DateContext } from '@/lib/utils/contexts'
 
 export default function MainContentWithoutDate({
   activities,
+  workingHours,
 }: {
   activities: Activity[]
+  workingHours: WorkingHoursSetting
 }) {
-  const { user } = useUser()
-  const [workingHours] = useWorkingHours(user?.email || 'global')
   const { showSuggestedActivity, showActivityTable } = useFlags()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -123,7 +120,10 @@ export default function MainContentWithoutDate({
               suggestedActivity={suggestedActivity}
               dataContext={dataContext}
             />
-            <WeatherDetails dataContext={dataContext} />
+            <WeatherDetails
+              dataContext={dataContext}
+              workingHours={workingHours}
+            />
           </div>
         </div>
         {showActivityTable && showSuggestedActivity && (

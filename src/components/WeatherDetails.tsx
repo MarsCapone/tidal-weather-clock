@@ -1,15 +1,20 @@
-import { useWorkingHours } from '@/hooks/settings'
 import {
   DataContext,
   Timestamp,
   WeatherInfo,
   WindInfo,
 } from '@/lib/types/context'
+import { WorkingHoursSetting } from '@/lib/types/settings'
 import { TimeZoneContext } from '@/lib/utils/contexts'
 import {
   utcDateStringToFractionalUtc,
   utcDateStringToLocalTimeString,
 } from '@/lib/utils/dates'
+import {
+  describeCloudiness,
+  describeUvIndex,
+  describeWindDirection,
+} from '@/lib/utils/weather-descriptions'
 import {
   AccessorKeyColumnDef,
   createColumnHelper,
@@ -20,16 +25,10 @@ import {
 } from '@tanstack/react-table'
 import { ArrowBigUpIcon } from 'lucide-react'
 import React, { useContext, useEffect } from 'react'
-import {
-  describeCloudiness,
-  describeUvIndex,
-  describeWindDirection,
-} from '@/lib/utils/weather-descriptions'
-import { WorkingHoursSetting } from '@/lib/types/settings'
-import { useUser } from '@auth0/nextjs-auth0'
 
 export type WeatherDetailsProps = {
   dataContext: DataContext
+  workingHours: WorkingHoursSetting
 }
 
 export type AggregatedDataPoint = WindInfo & WeatherInfo
@@ -37,10 +36,10 @@ export type AggregatedDataPoint = WindInfo & WeatherInfo
 const columnHelper = createColumnHelper<AggregatedDataPoint>()
 const DEFAULT_SHOW_OUT_OF_HOURS = false
 
-export function WeatherDetails({ dataContext }: WeatherDetailsProps) {
-  const sessionUser = useUser()
-  const [workingHours] = useWorkingHours(sessionUser?.user?.email || 'global')
-
+export function WeatherDetails({
+  dataContext,
+  workingHours,
+}: WeatherDetailsProps) {
   return (
     <WeatherDetailsInternal
       aggregatedDataPoints={getAggregatedDatapoints(dataContext)}

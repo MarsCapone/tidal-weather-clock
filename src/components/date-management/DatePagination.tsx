@@ -1,9 +1,9 @@
+import { CalendarDateSelector } from '@/components/date-management/CalendarDateSelector'
+import { utcDateStringToUtc } from '@/lib/utils/dates'
+import { TZDate } from '@date-fns/tz'
 import { addDays, format, isAfter, isBefore } from 'date-fns'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import React from 'react'
-import { CalendarDateSelector } from '@/components/date-management/CalendarDateSelector'
-import { TZDate } from '@date-fns/tz'
-import { utcDateStringToUtc } from '@/lib/utils/dates'
 
 export type DatePaginationProps = {
   date: TZDate
@@ -57,7 +57,11 @@ export default function DatePagination({
           <ChevronRightIcon height={20} width={20} />
         </LinkWrapper>
       </div>
-      <CalendarDateSelector popoverId={popoverId} date={date} />
+      <CalendarDateSelector
+        popoverId={popoverId}
+        date={date}
+        dataContextRange={{ earliest, latest }}
+      />
     </div>
   )
 }
