@@ -8,6 +8,7 @@ import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import ActivityArray from '@/app/settings/components/activity-settings/ActivityArray'
 import { InputActivities } from '@/app/settings/components/activity-settings/types'
 import { mpsToKnots } from '@/lib/utils/units'
+import logger from '@/lib/utils/logger'
 
 export type ActivitySettingsFormProps = {
   userId: string
@@ -58,7 +59,7 @@ export default function ActivitySettingsForm({
   })
 
   const onSubmit = (data: InputActivities) => {
-    console.log(data)
+    logger.info('setting activities', data)
     setActivitiesAction(data.activities)
   }
 

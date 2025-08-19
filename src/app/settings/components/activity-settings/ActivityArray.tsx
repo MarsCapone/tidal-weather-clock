@@ -1,9 +1,7 @@
 import {
-  Control,
   FieldArrayWithId,
   useFieldArray,
   useFormContext,
-  UseFormRegister,
 } from 'react-hook-form'
 import { Input } from '@/app/settings/components/common/form'
 import { InputActivities } from '@/app/settings/components/activity-settings/types'

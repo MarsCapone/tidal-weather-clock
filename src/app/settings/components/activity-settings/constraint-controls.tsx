@@ -5,7 +5,7 @@ import {
   NamedFormComponent,
 } from '@/app/settings/components/common/form'
 import { Constraint } from '@/lib/types/activity'
-import { knotsToMps, mpsToKnots } from '@/lib/utils/units'
+import { knotsToMps } from '@/lib/utils/units'
 
 type ControlsProps = {
   register: UseFormRegister<InputActivities>
