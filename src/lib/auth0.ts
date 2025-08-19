@@ -1,4 +1,6 @@
 import { Auth0Client } from '@auth0/nextjs-auth0/server'
+import { blake3 } from '@noble/hashes/blake3'
+import { bytesToHex } from '@noble/hashes/utils'
 import { secondsInDay } from 'date-fns/constants'
 
 export const auth0 = new Auth0Client({
@@ -10,3 +12,19 @@ export const auth0 = new Auth0Client({
     inactivityDuration: secondsInDay * 7,
   },
 })
+
+export const getUserId = async () => {
+  const session = await auth0.getSession()
+
+  if (session === null) {
+    return 'global'
+  }
+
+  const email = session.user.email
+  if (email) {
+    const data = new TextEncoder().encode(email)
+    return bytesToHex(blake3(data))
+  }
+
+  throw new Error('Unable to get user')
+}

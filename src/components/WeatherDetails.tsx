@@ -1,15 +1,24 @@
-import { useWorkingHours } from '@/hooks/settings'
+'use client'
+
 import {
   DataContext,
   Timestamp,
   WeatherInfo,
   WindInfo,
 } from '@/lib/types/context'
+import { WorkingHoursSetting } from '@/lib/types/settings'
 import { TimeZoneContext } from '@/lib/utils/contexts'
 import {
   utcDateStringToFractionalUtc,
   utcDateStringToLocalTimeString,
 } from '@/lib/utils/dates'
+import logger from '@/lib/utils/logger'
+import { mpsToKnots } from '@/lib/utils/units'
+import {
+  describeCloudiness,
+  describeUvIndex,
+  describeWindDirection,
+} from '@/lib/utils/weather-descriptions'
 import {
   AccessorKeyColumnDef,
   createColumnHelper,
@@ -20,16 +29,10 @@ import {
 } from '@tanstack/react-table'
 import { ArrowBigUpIcon } from 'lucide-react'
 import React, { useContext, useEffect } from 'react'
-import {
-  describeCloudiness,
-  describeUvIndex,
-  describeWindDirection,
-} from '@/lib/utils/weather-descriptions'
-import { WorkingHoursSetting } from '@/lib/types/settings'
-import { useUser } from '@auth0/nextjs-auth0'
 
 export type WeatherDetailsProps = {
   dataContext: DataContext
+  workingHours: WorkingHoursSetting
 }
 
 export type AggregatedDataPoint = WindInfo & WeatherInfo
@@ -37,13 +40,14 @@ export type AggregatedDataPoint = WindInfo & WeatherInfo
 const columnHelper = createColumnHelper<AggregatedDataPoint>()
 const DEFAULT_SHOW_OUT_OF_HOURS = false
 
-export function WeatherDetails({ dataContext }: WeatherDetailsProps) {
-  const sessionUser = useUser()
-  const [workingHours] = useWorkingHours(sessionUser?.user?.email || 'global')
-
+export function WeatherDetails({
+  dataContext,
+  workingHours,
+}: WeatherDetailsProps) {
+  const aggregatedDataPoints = getAggregatedDatapoints(dataContext)
   return (
     <WeatherDetailsInternal
-      aggregatedDataPoints={getAggregatedDatapoints(dataContext)}
+      aggregatedDataPoints={aggregatedDataPoints}
       workingHours={workingHours}
     />
   )
@@ -59,6 +63,9 @@ export function WeatherDetailsInternal({
   workingHours,
 }: WeatherDetailsInternalProps) {
   const [data, setData] = React.useState(() => [...aggregatedDataPoints])
+  useEffect(() => {
+    setData([...aggregatedDataPoints])
+  }, [aggregatedDataPoints])
   const [showOutOfHours, setShowOutOfHours] = React.useState(
     DEFAULT_SHOW_OUT_OF_HOURS,
   )
@@ -133,7 +140,7 @@ export function WeatherDetailsInternal({
           Speed
         </span>
       ),
-      cell: (info) => <div>{info.getValue().toFixed(1)} kts</div>,
+      cell: (info) => <div>{mpsToKnots(info.getValue()).toFixed(1)} kts</div>,
     }),
     columnHelper.accessor('gustSpeed', {
       header: () => (
@@ -143,7 +150,7 @@ export function WeatherDetailsInternal({
           Gusts
         </span>
       ),
-      cell: (info) => <div>{info.getValue().toFixed(1)} kts</div>,
+      cell: (info) => <div>{mpsToKnots(info.getValue()).toFixed(1)} kts</div>,
     }),
     columnHelper.accessor('temperature', {
       header: () => <span>Temperature</span>,
@@ -252,6 +259,9 @@ function byTimestamp<T extends Timestamp>(points: T[]): Record<string, T> {
 function getAggregatedDatapoints(
   dataContext: DataContext,
 ): AggregatedDataPoint[] {
+  logger.debug('getAggregatedDatapoints', {
+    referenceDate: dataContext.referenceDate,
+  })
   const timestamps = dataContext.weatherData.points.map(
     (point) => point.timestamp,
   )
@@ -261,10 +271,11 @@ function getAggregatedDatapoints(
   )
   const windByTimestamp = byTimestamp<WindInfo>(dataContext.windData.points)
 
-  return timestamps.map((t) => ({
+  const result = timestamps.map((t) => ({
     ...(weatherByTimestamp[t] || {}),
     ...(windByTimestamp[t] || {}),
   }))
+  return result
 }
 
 function renderUvIndex(uvIndex: number): React.ReactNode {

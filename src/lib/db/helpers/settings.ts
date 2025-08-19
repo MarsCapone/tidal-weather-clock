@@ -1,6 +1,7 @@
+import logger from '@/app/api/pinoLogger'
 import { db } from '@/lib/db'
 import { settingsTable } from '@/lib/db/schemas/settings'
-import { eq, and } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 
 type SettingName = string
 
@@ -24,12 +25,6 @@ export async function getSetting<T>(
   return undefined
 }
 
-export async function getGlobalSetting<T>(
-  name: SettingName,
-): Promise<T | undefined> {
-  return await getSetting(name, 'global')
-}
-
 export async function putSetting<T>(
   name: SettingName,
   value: T,
@@ -44,4 +39,22 @@ export async function putSetting<T>(
         value,
       },
     })
+}
+
+export async function getOrPutSetting<T>(
+  name: SettingName,
+  userId: string,
+  fallback: T,
+): Promise<T> {
+  logger.debug('Getting setting with fallback', {
+    name,
+    userId,
+    fallback,
+  })
+  const value = await getSetting<T>(name, userId)
+  if (value === undefined) {
+    await putSetting<T>(name, fallback, userId)
+    return fallback
+  }
+  return value
 }

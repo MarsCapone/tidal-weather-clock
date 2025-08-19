@@ -4,7 +4,7 @@ export type WorkingHoursSetting = {
   enabled: boolean
 }
 export const defaultWorkingHours: WorkingHoursSetting = {
-  startHour: 0,
-  endHour: 0,
-  enabled: false,
+  startHour: 8,
+  endHour: 18,
+  enabled: true,
 }

@@ -2,14 +2,15 @@
 
 import ActivityScoreList from '@/components/ActivityScoreList'
 import ClockDisplay from '@/components/ClockDisplay'
-import DatePagination from '@/components/DatePagination'
 import DayTimeline from '@/components/DayTimeline'
 import SuggestedActivity from '@/components/SuggestedActivity'
 import { WeatherDetails } from '@/components/WeatherDetails'
-import { useActivities } from '@/hooks/apiRequests'
-import { useWorkingHours } from '@/hooks/settings'
+import WeatherOverview from '@/components/WeatherOverview'
 import { APP_CONFIG } from '@/lib/config'
+import { Activity } from '@/lib/types/activity'
 import { DataContext } from '@/lib/types/context'
+import { WorkingHoursSetting } from '@/lib/types/settings'
+import { DateContext } from '@/lib/utils/contexts'
 import { dateOptions } from '@/lib/utils/dates'
 import tryDataFetchersWithCache from '@/lib/utils/fetchData'
 import logger from '@/lib/utils/logger'
@@ -17,34 +18,20 @@ import { ActivityRecommender, groupScores } from '@/lib/utils/suggestions'
 import { formatISO, startOfDay } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
-import WeatherOverview from '@/components/WeatherOverview'
-import { useUser } from '@auth0/nextjs-auth0'
-import { defaultWorkingHours } from '@/lib/types/settings'
+import React, { useContext, useEffect, useState } from 'react'
 
-type DateInfo = {
-  date: Date
-  nextPath: string | null
-  prevPath: string | null
-}
-
-export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
-  return (
-    <div>
-      <DatePagination date={date} nextPath={nextPath} prevPath={prevPath} />
-      <MainContentWithoutDate date={date} />
-    </div>
-  )
-}
-
-function MainContentWithoutDate({ date }: { date: Date }) {
-  const { user } = useUser()
-  const [activities] = useActivities([])
-  const [workingHours] = useWorkingHours(user?.email || 'global')
+export default function MainContentWithoutDate({
+  activities,
+  workingHours,
+}: {
+  activities: Activity[]
+  workingHours: WorkingHoursSetting
+}) {
   const { showSuggestedActivity, showActivityTable } = useFlags()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [selectionIndex, setSelectionIndex] = useState(0)
+  const { date } = useContext(DateContext)
 
   useEffect(() => {
     tryDataFetchersWithCache(
@@ -127,13 +114,16 @@ function MainContentWithoutDate({ date }: { date: Date }) {
             />
             <WeatherOverview
               dataContext={dataContext}
-              workingHours={workingHours || defaultWorkingHours}
+              workingHours={workingHours}
             />
             <ClockDisplay
               suggestedActivity={suggestedActivity}
               dataContext={dataContext}
             />
-            <WeatherDetails dataContext={dataContext} />
+            <WeatherDetails
+              dataContext={dataContext}
+              workingHours={workingHours}
+            />
           </div>
         </div>
         {showActivityTable && showSuggestedActivity && (

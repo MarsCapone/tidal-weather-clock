@@ -81,7 +81,7 @@ export default function WeatherOverview({
             />
             <div className={''}>
               <div>{describeWindDirection(dominantWindDirection, false)}</div>
-              <div className={'text-sm'}>({dominantWindDirection}ºC)</div>
+              <div className={'text-sm'}>({dominantWindDirection}º)</div>
             </div>
           </div>
         )}

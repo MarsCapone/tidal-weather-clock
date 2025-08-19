@@ -158,7 +158,8 @@ export class OpenMeteoAndEasyTideDataFetcher implements IDataContextFetcher {
       latitude: CONSTANTS.LOCATION_COORDS[0],
       longitude: CONSTANTS.LOCATION_COORDS[1],
       models: 'gfs_seamless',
-      past_days: 0,
+      past_days: 1,
+      past_hours: 24,
       wind_speed_unit: 'ms',
     }
     const url = new URL('https://api.open-meteo.com/v1/forecast')

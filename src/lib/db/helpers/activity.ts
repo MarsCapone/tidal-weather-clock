@@ -12,6 +12,7 @@ export async function getActivitiesByUserId(
   if (includeGlobal) {
     userIds.push('global')
   }
+  logger.debug('getActivitiesByUserId', { userIds, includeGlobal })
 
   const activityResponses: Activity[] = (
     await db
