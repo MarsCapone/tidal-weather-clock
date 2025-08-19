@@ -2,7 +2,7 @@
 
 import ActivityScoreList from '@/components/ActivityScoreList'
 import ClockDisplay from '@/components/ClockDisplay'
-import DatePagination from '@/components/data-management/DatePagination'
+import DatePagination from '@/components/date-management/DatePagination'
 import DayTimeline from '@/components/DayTimeline'
 import SuggestedActivity from '@/components/SuggestedActivity'
 import { WeatherDetails } from '@/components/WeatherDetails'
@@ -16,41 +16,16 @@ import { ActivityRecommender, groupScores } from '@/lib/utils/suggestions'
 import { formatISO, startOfDay } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import WeatherOverview from '@/components/WeatherOverview'
 import { useUser } from '@auth0/nextjs-auth0'
 import { defaultWorkingHours } from '@/lib/types/settings'
 import { Activity } from '@/lib/types/activity'
+import { DateContext } from '@/lib/utils/contexts'
 
-type DateInfo = {
-  date: Date
-  nextPath: string | null
-  prevPath: string | null
-}
-
-type MainContentProps = DateInfo & {
-  activities: Activity[]
-}
-
-export default function MainContent({
-  date,
-  nextPath,
-  prevPath,
-  activities,
-}: MainContentProps) {
-  return (
-    <div>
-      <DatePagination date={date} nextPath={nextPath} prevPath={prevPath} />
-      <MainContentWithoutDate date={date} activities={activities} />
-    </div>
-  )
-}
-
-function MainContentWithoutDate({
-  date,
+export default function MainContentWithoutDate({
   activities,
 }: {
-  date: Date
   activities: Activity[]
 }) {
   const { user } = useUser()
@@ -59,6 +34,7 @@ function MainContentWithoutDate({
   const [dataContext, setDataContext] = useState<DataContext | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [selectionIndex, setSelectionIndex] = useState(0)
+  const { date } = useContext(DateContext)
 
   useEffect(() => {
     tryDataFetchersWithCache(
