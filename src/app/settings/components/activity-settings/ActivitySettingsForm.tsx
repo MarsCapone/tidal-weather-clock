@@ -68,7 +68,12 @@ export default function ActivitySettingsForm({
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="bg-base-100 mb-4 flex flex-row items-center justify-between">
-            <SettingTitle title={'Activity Settings'} />
+            <div>
+              <SettingTitle title={'Activity Settings'} />
+              <div className="text-md px-4 italic">
+                You cannot edit global activities
+              </div>
+            </div>
             <div className="flex gap-2">
               <button
                 className="btn btn-primary rounded-field"
