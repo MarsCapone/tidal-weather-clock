@@ -6,7 +6,6 @@ import DatePagination from '@/components/DatePagination'
 import DayTimeline from '@/components/DayTimeline'
 import SuggestedActivity from '@/components/SuggestedActivity'
 import { WeatherDetails } from '@/components/WeatherDetails'
-import { useActivities } from '@/hooks/apiRequests'
 import { useWorkingHours } from '@/hooks/settings'
 import { APP_CONFIG } from '@/lib/config'
 import { DataContext } from '@/lib/types/context'
@@ -21,6 +20,7 @@ import React, { useEffect, useState } from 'react'
 import WeatherOverview from '@/components/WeatherOverview'
 import { useUser } from '@auth0/nextjs-auth0'
 import { defaultWorkingHours } from '@/lib/types/settings'
+import { Activity } from '@/lib/types/activity'
 
 type DateInfo = {
   date: Date
@@ -28,18 +28,32 @@ type DateInfo = {
   prevPath: string | null
 }
 
-export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
+type MainContentProps = DateInfo & {
+  activities: Activity[]
+}
+
+export default function MainContent({
+  date,
+  nextPath,
+  prevPath,
+  activities,
+}: MainContentProps) {
   return (
     <div>
       <DatePagination date={date} nextPath={nextPath} prevPath={prevPath} />
-      <MainContentWithoutDate date={date} />
+      <MainContentWithoutDate date={date} activities={activities} />
     </div>
   )
 }
 
-function MainContentWithoutDate({ date }: { date: Date }) {
+function MainContentWithoutDate({
+  date,
+  activities,
+}: {
+  date: Date
+  activities: Activity[]
+}) {
   const { user } = useUser()
-  const [activities] = useActivities([])
   const [workingHours] = useWorkingHours(user?.email || 'global')
   const { showSuggestedActivity, showActivityTable } = useFlags()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)

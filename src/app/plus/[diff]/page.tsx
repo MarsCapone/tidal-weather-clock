@@ -2,6 +2,8 @@ import MainContent from '@/components/MainContent'
 import CONSTANTS from '@/lib/constants'
 import { dateOptions } from '@/lib/utils/dates'
 import { addDays, startOfToday } from 'date-fns'
+import { auth0 } from '@/lib/auth0'
+import { getActivitiesByUserId } from '@/lib/db/helpers/activity'
 
 export default async function Page({
   params,
@@ -30,5 +32,18 @@ export default async function Page({
         : diffDays,
   )
 
-  return <MainContent date={date} nextPath={nextPath} prevPath={prevPath} />
+  const session = await auth0.getSession()
+  // if there's a logged in user, return their activities, otherwise just return global ones
+  const activities = await getActivitiesByUserId(
+    session === null ? 'global' : session!.user!.email!,
+  )
+
+  return (
+    <MainContent
+      date={date}
+      nextPath={nextPath}
+      prevPath={prevPath}
+      activities={activities}
+    />
+  )
 }

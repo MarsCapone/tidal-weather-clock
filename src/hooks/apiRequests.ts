@@ -1,4 +1,3 @@
-import { Activity } from '@/lib/types/activity'
 import { Dispatch, useEffect, useState } from 'react'
 
 export const useDataContextInfo = readonlyApiHookFactory<{
@@ -7,26 +6,6 @@ export const useDataContextInfo = readonlyApiHookFactory<{
   all: string[]
 } | null>({
   endpoint: '/api/dataContext',
-})
-
-export const useActivities = apiHookFactory<Activity[], { userId: string }>({
-  fetchEndpointInfo: {
-    method: 'GET',
-    endpoint: (params) =>
-      (params || {}).userId === undefined
-        ? '/api/activity'
-        : `/api/activity?user_id=${params!.userId}`,
-    getBody: (body) => body,
-    dependencies: (params) => [(params || {}).userId],
-  },
-  updateEndpointInfo: {
-    method: 'PUT',
-    endpoint: () => '/api/activity',
-    makeBody: (arg, params) => ({
-      userId: (params || {}).userId,
-      activities: arg,
-    }),
-  },
 })
 
 type PersistUpdate<T = void> = (arg?: T) => void
