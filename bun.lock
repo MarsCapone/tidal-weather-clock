@@ -8,13 +8,13 @@
         "@auth0/nextjs-auth0": "^4.9.0",
         "@date-fns/tz": "^1.2.0",
         "@neondatabase/serverless": "^1.0.1",
+        "@noble/hashes": "^1.8.0",
         "@tanstack/react-table": "^8.21.3",
         "@uiw/react-markdown-preview": "^5.1.5",
         "@vercel/blob": "^1.1.1",
         "@vercel/edge-config": "^1.4.0",
         "ai": "^5.0.0",
         "array-equal": "^2.0.0",
-        "bcrypt-ts": "^7.1.0",
         "bun-plugin-tailwind": "^0.0.14",
         "change-case": "^5.4.4",
         "cookies-next": "^6.1.0",
@@ -354,6 +354,8 @@
     "@nkzw/eslint-config": ["@nkzw/eslint-config@3.0.2", "", { "dependencies": { "@eslint/js": "^9.31.0", "@nkzw/eslint-plugin": "^2.0.0", "@typescript-eslint/parser": "^8.38.0", "eslint-import-resolver-typescript": "^4.4.4", "eslint-plugin-import-x": "^4.16.1", "eslint-plugin-no-only-tests": "^3.3.0", "eslint-plugin-perfectionist": "^4.15.0", "eslint-plugin-react": "^7.37.5", "eslint-plugin-react-hooks": "6.1.0-canary-914319ae-20250423", "eslint-plugin-unicorn": "^60.0.0", "eslint-plugin-unused-imports": "~4.1.4", "globals": "^16.3.0", "typescript-eslint": "^8.38.0" }, "peerDependencies": { "eslint": ">= 9" } }, "sha512-9Vd3woCj14vD+76MDtREnoWVMSfE2tk2W/niZJvrou6hIqBi9k4a5heexw65wRcnzggYddnhtaP8VRvpNZWqLQ=="],
 
     "@nkzw/eslint-plugin": ["@nkzw/eslint-plugin@2.0.0", "", { "peerDependencies": { "eslint": ">= 9" } }, "sha512-IoU8kOqHfnf7se2dGxMD/7RPm6WVjzjOjWSo7FulRx3lJzuZvXioSkT5Nd82l66DH3Pl2whw74lPT1di3KMwFA=="],
+
+    "@noble/hashes": ["@noble/hashes@1.8.0", "", {}, "sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A=="],
 
     "@nodelib/fs.scandir": ["@nodelib/fs.scandir@2.1.5", "", { "dependencies": { "@nodelib/fs.stat": "2.0.5", "run-parallel": "^1.1.9" } }, "sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g=="],
 
@@ -762,8 +764,6 @@
     "basic-auth": ["basic-auth@2.0.1", "", { "dependencies": { "safe-buffer": "5.1.2" } }, "sha512-NF+epuEdnUYVlGuhaxbbq+dvJttwLnGY+YixlXlME5KpQ5W3CnXA5cVTneY3SPbPDRkcjMbifrwmFYcClgOZeg=="],
 
     "bcp-47-match": ["bcp-47-match@2.0.3", "", {}, "sha512-JtTezzbAibu8G0R9op9zb3vcWZd9JF6M0xOYGPn0fNCd7wOpRB1mU2mH9T8gaBGbAAyIIVgB2G7xG0GP98zMAQ=="],
-
-    "bcrypt-ts": ["bcrypt-ts@7.1.0", "", {}, "sha512-t/Dqr9YzYmn/+oPQBgotBPUuezpZD5CPBwapM5Ep1p3zsLmEycMdXOfZpWbztSBWJ41DlB7EluJBUDsAGSiUeQ=="],
 
     "blueimp-md5": ["blueimp-md5@2.19.0", "", {}, "sha512-DRQrD6gJyy8FbiE4s+bDoXS9hiW3Vbx5uCdwvcCf3zLHL+Iv7LtGHLpr+GZV8rHG8tK766FGYBwRbu8pELTt+w=="],
 

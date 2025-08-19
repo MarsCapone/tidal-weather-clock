@@ -40,6 +40,7 @@ export function WeatherDetails({
   dataContext,
   workingHours,
 }: WeatherDetailsProps) {
+  console.log('workingHours from WeatherDetails', workingHours)
   return (
     <WeatherDetailsInternal
       aggregatedDataPoints={getAggregatedDatapoints(dataContext)}
