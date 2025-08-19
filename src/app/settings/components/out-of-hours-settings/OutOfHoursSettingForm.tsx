@@ -32,6 +32,7 @@ export default function OutOfHoursSettingForm({
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isDirty },
   } = useForm<WorkingHoursForm>({
     defaultValues: workingHoursDisplay,
@@ -43,6 +44,7 @@ export default function OutOfHoursSettingForm({
       endHour: localTimeStringToFractionalUtc(data.endHour),
       enabled: data.enabled,
     })
+    reset(data)
   }
 
   return (
