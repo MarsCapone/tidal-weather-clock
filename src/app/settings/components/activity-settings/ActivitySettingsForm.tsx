@@ -93,6 +93,11 @@ export default function ActivitySettingsForm({
             </div>
           </div>
           <SettingCard>
+            {errors && (
+              <div className="alert alert-error">
+                <span>{JSON.stringify(errors)}</span>
+              </div>
+            )}
             <ActivityArray fields={fields} removeByIndex={remove} />
           </SettingCard>
         </form>

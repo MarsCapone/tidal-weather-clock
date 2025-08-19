@@ -402,8 +402,7 @@ function WindSpeedInput({
 }) {
   return (
     <Input
-      title={title}
-      suffix={'knots'}
+      title={`${title} (knots)`}
       className={'input input-sm'}
       inputProps={{
         ...register(target, {
