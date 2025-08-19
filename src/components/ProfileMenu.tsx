@@ -18,14 +18,14 @@ export function ProfileMenuInternal({
     return (
       <ProfileMenuWrapper buttonContent={<LogInIcon />}>
         <div className={'menu w-full gap-2'}>
-          <li className={'menu-item'}>
+          <div className={'menu-item'}>
             <a
               href="/auth/login?screen_hint=signup"
               className={'btn btn-soft rounded-field'}
             >
               <span>Sign Up</span>
             </a>
-          </li>
+          </div>
           <li className={'menu-item'}>
             <a href="/auth/login" className={'btn btn-soft rounded-field'}>
               <span>Log In</span>
@@ -53,12 +53,12 @@ export function ProfileMenuInternal({
       <h1 className="text-md pl-4 font-bold">{session.user.name}</h1>
       <h4 className="pl-4 font-mono text-xs">{session.user.email}</h4>
       <div className="menu w-full gap-2">
-        <li className="menu-item">
+        <div className="menu-item">
           <a href="/auth/logout" className="btn btn-soft rounded-field">
             <span>Sign Out</span>
             <LogOutIcon className={'w-4'} />
           </a>
-        </li>
+        </div>
       </div>
     </ProfileMenuWrapper>
   )

@@ -19,6 +19,8 @@ import { useFlags } from 'launchdarkly-react-client-sdk'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import WeatherOverview from '@/components/WeatherOverview'
+import { useUser } from '@auth0/nextjs-auth0'
+import { defaultWorkingHours } from '@/lib/types/settings'
 
 type DateInfo = {
   date: Date
@@ -36,8 +38,9 @@ export default function MainContent({ date, nextPath, prevPath }: DateInfo) {
 }
 
 function MainContentWithoutDate({ date }: { date: Date }) {
+  const { user } = useUser()
   const [activities] = useActivities([])
-  const [workingHours] = useWorkingHours()
+  const [workingHours] = useWorkingHours(user?.email || 'global')
   const { showSuggestedActivity, showActivityTable } = useFlags()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -124,7 +127,7 @@ function MainContentWithoutDate({ date }: { date: Date }) {
             />
             <WeatherOverview
               dataContext={dataContext}
-              workingHours={workingHours}
+              workingHours={workingHours || defaultWorkingHours}
             />
             <ClockDisplay
               suggestedActivity={suggestedActivity}

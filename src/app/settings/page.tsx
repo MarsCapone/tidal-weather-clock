@@ -1,16 +1,19 @@
-'use client'
-
-import ActivitySettings from '@/app/settings/components/ActivitySettings'
-import OutOfHoursSettings from '@/app/settings/components/OutOfHoursSettings'
+import ActivitySettings from '@/app/settings/components/activity-settings/ActivitySetting'
+import OutOfHoursSettings from '@/app/settings/components/out-of-hours-settings/OutOfHoursSettings'
 import TimeZoneSettings from '@/app/settings/components/TimeZoneSettings'
-import { withPageAuthRequired } from '@auth0/nextjs-auth0'
-import Link from 'next/link'
-import { useState } from 'react'
+import SettingsMenu from '@/app/settings/components/common/SettingsMenu'
+import React from 'react'
+import { auth0 } from '@/lib/auth0'
+import { AppRouterPageRoute } from '@auth0/nextjs-auth0/server'
 
-function Page() {
-  const [hash, setHash] = useState('')
+type SettingLink = {
+  Component: () => React.ReactNode
+  id: string
+  label: string
+}
 
-  const links = [
+function PageContent() {
+  const links: SettingLink[] = [
     {
       Component: TimeZoneSettings,
       id: 'timezone',
@@ -27,31 +30,7 @@ function Page() {
   return (
     <div className="flex flex-row justify-center gap-8 text-start">
       <div className="hidden w-1/6 lg:block">
-        <div className="sticky top-10 flex w-full flex-col gap-4">
-          <ul className="menu bg-base-200 rounded-box w-full">
-            <li className="menu-title">Settings</li>
-            {links.map((link) => {
-              const linkHash = `#${link.id}`
-
-              return (
-                <li
-                  className={
-                    link.Component === undefined ? 'menu-disabled' : ''
-                  }
-                  key={`link-${link.id}`}
-                >
-                  <Link
-                    className={hash === linkHash ? 'menu-active' : ''}
-                    href={linkHash}
-                    onClick={() => setHash(linkHash)}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
+        <SettingsMenu links={links.map(({ id, label }) => ({ id, label }))} />
       </div>
       <div className="w-full lg:w-1/2">
         {links.map(({ Component, id }) => {
@@ -69,4 +48,7 @@ function Page() {
   )
 }
 
-export default withPageAuthRequired(Page)
+// @ts-ignore
+export default auth0.withPageAuthRequired(PageContent, {
+  returnTo: '/settings',
+}) as AppRouterPageRoute

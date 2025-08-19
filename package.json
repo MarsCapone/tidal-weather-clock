@@ -6,6 +6,8 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev --turbopack",
+    "drizzle:push": "drizzle-kit push --verbose",
+    "drizzle:seed": "bun run ./src/lib/db/seed.ts",
     "e2e": "playwright test",
     "e2e:debug": "playwright test --debug",
     "e2e:headed": "playwright test --headed",

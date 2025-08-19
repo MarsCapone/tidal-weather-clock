@@ -11,13 +11,14 @@ export type WeatherConstraint = {
   maxCloudCover?: number
   maxTemperature?: number
   minTemperature?: number
+  maxUvIndex?: number
+  maxPrecipitationProbability?: number
   type: 'weather'
 }
 
 export type TideConstraint = {
   maxHeight?: number
   minHeight?: number
-  preferredStates?: ('high' | 'low' | 'rising' | 'falling')[]
   timeFromTideEvent?: {
     event: 'high' | 'low'
     maxHoursAfter?: number
@@ -38,7 +39,15 @@ export type TimeConstraint = {
   earliestHour?: number // 24hr format
   latestHour?: number
   preferredHours?: number[]
+  ignoreWorkingHours?: boolean
   type: 'time'
+}
+
+export type DayConstraint = {
+  isWeekday?: boolean
+  isWeekend?: boolean
+  dateRanges?: { start: string; end: string }[]
+  type: 'day'
 }
 
 export type Constraint =
@@ -47,6 +56,7 @@ export type Constraint =
   | TideConstraint
   | SunConstraint
   | TimeConstraint
+  | DayConstraint
 
 export type Activity = {
   constraints: Constraint[]
@@ -54,6 +64,7 @@ export type Activity = {
   id: string
   name: string
   priority: number // 1-10, higher is more important
+  scope: 'global' | 'user'
 }
 
 export type ActivityScore<DebugType = never> = {

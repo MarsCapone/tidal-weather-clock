@@ -1,40 +1,62 @@
-import { Activity, Constraint } from '@/lib/types/activity'
+import { Activity } from '@/lib/types/activity'
 import { db } from '@/lib/db'
-import { activityTable, constraintTable } from '@/lib/db/schemas/activity'
-import { eq, notInArray, sql } from 'drizzle-orm'
+import { activityTable } from '@/lib/db/schemas/activity'
+import { eq, notInArray, sql, inArray, and } from 'drizzle-orm'
 import logger from '@/app/api/pinoLogger'
 
-export async function getActivitiesByUserId(userId: string) {
-  const activityResponses: Activity[] = await db
-    .select({
-      id: activityTable.id,
-      name: activityTable.name,
-      description: activityTable.description,
-      priority: activityTable.priority,
-      constraints: sql<Constraint[]>`jsonb_agg(
-        jsonb_set(${constraintTable.content}::jsonb, '{type}'::text[], to_jsonb(${constraintTable.type}))
-    )`,
-    })
-    .from(activityTable)
-    .leftJoin(
-      constraintTable,
-      eq(activityTable.id, constraintTable.activity_id),
-    )
-    .where(eq(activityTable.user_id, userId))
-    .groupBy(
-      activityTable.id,
-      activityTable.name,
-      activityTable.description,
-      activityTable.priority,
-    )
+export async function getActivitiesByUserId(
+  userId: string,
+  includeGlobal: boolean = false,
+) {
+  const userIds = [userId]
+  if (includeGlobal) {
+    userIds.push('global')
+  }
+
+  const activityResponses: Activity[] = (
+    await db
+      .select({
+        id: activityTable.id,
+        name: activityTable.name,
+        description: activityTable.description,
+        priority: activityTable.priority,
+        content: activityTable.content,
+        scope: sql<
+          'global' | 'user'
+        >`CASE WHEN ${activityTable.user_id} = 'global' THEN 'global' ELSE 'user' END`,
+      })
+      .from(activityTable)
+      .where(inArray(activityTable.user_id, userIds))
+      .groupBy(
+        activityTable.id,
+        activityTable.name,
+        activityTable.description,
+        activityTable.priority,
+      )
+  ).map(({ id, name, description, priority, scope, content }) => ({
+    id,
+    name,
+    description,
+    priority,
+    scope,
+    constraints: content['constraints'],
+  }))
 
   return activityResponses
 }
 
+//  TODO: rethink how activities are stored so that it's easier to manage them
+
 export async function putActivities(activities: Activity[], userId: string) {
-  const inserts = activities.map((a) => {
+  // we do not want to overwrite global activities, unless we are setting them for the global user
+  const filteredActivities = activities.filter((a) =>
+    userId === 'global' ? a.scope === 'global' : a.scope === 'user',
+  )
+
+  const inserts = filteredActivities.map((a) => {
     const activityToInsert: typeof activityTable.$inferInsert = {
       ...a,
+      content: { constraints: a.constraints },
       user_id: userId,
     }
     return db
@@ -47,6 +69,7 @@ export async function putActivities(activities: Activity[], userId: string) {
           priority: activityToInsert.priority,
           description: activityToInsert.description,
           user_id: activityToInsert.user_id,
+          content: activityToInsert.content,
         },
       })
       .returning({ id: activityTable.id })
@@ -57,29 +80,17 @@ export async function putActivities(activities: Activity[], userId: string) {
   )
   logger.debug('updated activities', { activityIds })
 
-  // first delete all the constraints. we can delete the ones for the activities we have because we're about to add
-  // new constraints for them, and we can delete all the rest because we're going to delete any unlisted activities
-  await db.delete(constraintTable)
-  logger.debug('deleted all constraints')
-
-  // now we can delete all activities that weren't sent to this endpoint
+  // now we can delete all activities that weren't updated but are for this user
   const deletedIds = await db
     .delete(activityTable)
-    .where(notInArray(activityTable.id, activityIds))
+    .where(
+      and(
+        notInArray(activityTable.id, activityIds),
+        eq(activityTable.user_id, userId),
+      ),
+    )
     .returning({ id: activityTable.id })
   logger.debug('deleted all unreferenced activities', {
     deletedIds: deletedIds.map((d) => d.id),
   })
-
-  // then re-add all the constraints
-  const constraintInsertions = activities.flatMap((activity, index) => {
-    return activity.constraints.map((constraint) => {
-      return db.insert(constraintTable).values({
-        activity_id: activityIds[index],
-        type: constraint.type,
-        content: constraint,
-      })
-    })
-  })
-  await Promise.all(constraintInsertions)
 }

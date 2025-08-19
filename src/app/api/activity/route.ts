@@ -24,7 +24,7 @@ export async function GET(request: NextRequest): Promise<Response> {
   )
 }
 
-export async function PUT(request: NextRequest): Promise<Response> {
+export const PUT = async (request: NextRequest): Promise<Response> => {
   const data: { userId?: string; activities: Activity[] } = await request.json()
   if (!data.activities) {
     return Response.json({ error: 'Invalid request body' }, { status: 400 })

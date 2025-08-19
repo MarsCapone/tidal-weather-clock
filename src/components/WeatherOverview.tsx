@@ -6,8 +6,9 @@ import {
   describeCloudiness,
   describeWindDirection,
 } from '@/lib/utils/weather-descriptions'
-import { isInWorkingHours, WorkingHoursSetting } from '@/hooks/settings'
 import { utcDateStringToFractionalUtc } from '@/lib/utils/dates'
+import { WorkingHoursSetting } from '@/lib/types/settings'
+import { isInWorkingHours } from '@/lib/utils/settings'
 
 export type WeatherOverviewProps = {
   dataContext: DataContext

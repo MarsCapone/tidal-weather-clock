@@ -1,13 +1,14 @@
-import { SettingCard, SettingTitle } from '@/app/settings/components/common'
-import { Input } from '@/app/settings/components/form'
-import { useWorkingHours, WorkingHoursSetting } from '@/hooks/settings'
+'use client'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { useEffect } from 'react'
 import {
   fractionalUtcToLocalTimeString,
   localTimeStringToFractionalUtc,
 } from '@/lib/utils/dates'
 import { shallowEqual } from 'fast-equals'
-import { useEffect } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SettingCard, SettingTitle } from '@/app/settings/components/common'
+import { Input } from '@/app/settings/components/common/form'
+import { WorkingHoursSetting } from '@/lib/types/settings'
 
 type WorkingHoursForm = {
   startHour: string
@@ -15,8 +16,15 @@ type WorkingHoursForm = {
   enabled: boolean
 }
 
-export default function OutOfHoursSettings() {
-  const [workingHours, updateWorkingHours, setWorkingHours] = useWorkingHours()
+export type OutOfHoursSettingFormProps = {
+  workingHours: WorkingHoursSetting
+  setWorkingHoursAction: (workingHours: WorkingHoursSetting) => void
+}
+
+export default function OutOfHoursSettingForm({
+  workingHours,
+  setWorkingHoursAction,
+}: OutOfHoursSettingFormProps) {
   const {
     register,
     handleSubmit,
@@ -66,7 +74,7 @@ export default function OutOfHoursSettings() {
 
   const onSubmit: SubmitHandler<WorkingHoursForm> = (data) => {
     const newVal = getNewWorkingHoursSetting(data)
-    updateWorkingHours(newVal)
+    setWorkingHoursAction(newVal)
   }
 
   return (

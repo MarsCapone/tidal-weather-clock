@@ -1,4 +1,3 @@
-import { WorkingHoursSetting } from '@/hooks/settings'
 import {
   Activity,
   ActivityScore,
@@ -31,6 +30,7 @@ import {
   parseISO,
   startOfDay,
 } from 'date-fns'
+import { WorkingHoursSetting } from '@/lib/types/settings'
 
 type TimeSlot = {
   hour: number
@@ -266,7 +266,7 @@ function generateTimeSlots(
     end: endOfDay(refDate),
     start: refDate,
   }).filter((date) => {
-    if (!workingHours.enabled) {
+    if (workingHours === null || !workingHours.enabled) {
       // don't filter at all
       return true
     }
@@ -432,13 +432,6 @@ function scoreTideConstraint(
   }
 
   let score = 1
-
-  if (
-    constraint.preferredStates &&
-    !constraint.preferredStates.includes(tideState.state)
-  ) {
-    score *= 0.3
-  }
 
   if (constraint.timeFromTideEvent && tideState.current) {
     const hoursSinceTide = slot.hour - tideState.current.time
