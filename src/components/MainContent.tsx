@@ -2,7 +2,7 @@
 
 import ActivityScoreList from '@/components/ActivityScoreList'
 import ClockDisplay from '@/components/ClockDisplay'
-import DatePagination from '@/components/DatePagination'
+import DatePagination from '@/components/data-management/DatePagination'
 import DayTimeline from '@/components/DayTimeline'
 import SuggestedActivity from '@/components/SuggestedActivity'
 import { WeatherDetails } from '@/components/WeatherDetails'
