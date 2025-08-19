@@ -1,14 +1,14 @@
 'use client'
 
-import { SettingCard, SettingTitle } from '@/app/settings/components/common'
-import { Activity } from '@/lib/types/activity'
-import { PlusIcon } from 'lucide-react'
-import { v4 as uuidv4 } from 'uuid'
-import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import ActivityArray from '@/app/settings/components/activity-settings/ActivityArray'
 import { InputActivities } from '@/app/settings/components/activity-settings/types'
-import { mpsToKnots } from '@/lib/utils/units'
+import { SettingCard, SettingTitle } from '@/app/settings/components/common'
+import { Activity } from '@/lib/types/activity'
 import logger from '@/lib/utils/logger'
+import { mpsToKnots } from '@/lib/utils/units'
+import { PlusIcon } from 'lucide-react'
+import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
+import { v4 as uuidv4 } from 'uuid'
 
 export type ActivitySettingsFormProps = {
   userId: string
@@ -94,7 +94,7 @@ export default function ActivitySettingsForm({
             </div>
           </div>
           <SettingCard>
-            {errors && (
+            {errors.activities && (
               <div className="alert alert-error">
                 <span>{JSON.stringify(errors)}</span>
               </div>
