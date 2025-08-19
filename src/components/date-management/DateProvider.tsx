@@ -6,10 +6,12 @@ import DatePagination from '@/components/date-management/DatePagination'
 
 type DateProviderProps = {
   initialDate: TZDate
+  dataContextRange: { earliest: string; latest: string }
 } & React.PropsWithChildren
 
 export default function DateProvider({
   initialDate,
+  dataContextRange,
   children,
 }: DateProviderProps) {
   const [date, setDate] = useState<TZDate>(initialDate)
@@ -19,8 +21,7 @@ export default function DateProvider({
       <DatePagination
         date={date}
         setDate={setDate}
-        nextPath={'/plus/1'}
-        prevPath={'/plus/-1'}
+        dataContextRange={dataContextRange}
       />
       {children}
     </DateContext>

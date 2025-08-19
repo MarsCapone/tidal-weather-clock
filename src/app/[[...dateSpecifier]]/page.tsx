@@ -4,11 +4,12 @@ import { addDays, startOfToday } from 'date-fns'
 import React from 'react'
 import { getActivitiesByUserId } from '@/lib/db/helpers/activity'
 import { auth0 } from '@/lib/auth0'
-import App from '@/components/App'
 import MainContentWithoutDate from '@/components/MainContent'
 import DateProvider from '@/components/date-management/DateProvider'
 import { notFound } from 'next/navigation'
 import { TZDate } from '@date-fns/tz'
+import { getDataContextRange } from '@/lib/db/helpers/datacontext'
+import CONSTANTS from '@/lib/constants'
 
 export default async function Page({
   params,
@@ -52,9 +53,10 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
     session === null ? 'global' : session!.user!.email!,
     true,
   )
+  const dataContextRange = await getDataContextRange(CONSTANTS.LOCATION_COORDS)
 
   return (
-    <DateProvider initialDate={initialDate}>
+    <DateProvider initialDate={initialDate} dataContextRange={dataContextRange}>
       <MainContentWithoutDate activities={activities} />
     </DateProvider>
   )

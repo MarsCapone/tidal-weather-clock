@@ -1,30 +1,42 @@
-import { addDays, format } from 'date-fns'
+import { addDays, format, isAfter, isBefore } from 'date-fns'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
-import Link from 'next/link'
 import React from 'react'
 import { CalendarDateSelector } from '@/components/date-management/CalendarDateSelector'
 import { TZDate } from '@date-fns/tz'
+import { utcDateStringToUtc } from '@/lib/utils/dates'
 
 export type DatePaginationProps = {
   date: TZDate
-  nextPath: string | null
-  prevPath: string | null
   setDate: (d: TZDate) => void
+  dataContextRange: { earliest: string; latest: string }
 }
 
 export default function DatePagination({
   date,
-  nextPath,
-  prevPath,
   setDate,
+  dataContextRange: { earliest, latest },
 }: DatePaginationProps) {
   const LinkWrapper = ({
     children,
     diff,
   }: {
-    children: React.ReactNode
     diff: number
-  }) => <div onClick={() => setDate(addDays(date, diff))}>{children}</div>
+  } & React.PropsWithChildren) => {
+    const nextDay = addDays(date, diff)
+
+    if (
+      isBefore(nextDay, utcDateStringToUtc(earliest)) ||
+      isAfter(nextDay, utcDateStringToUtc(latest))
+    ) {
+      return <div className={'join-item btn btn-disabled'}>{children}</div>
+    }
+
+    return (
+      <div className={'join-item btn'} onClick={() => setDate(nextDay)}>
+        {children}
+      </div>
+    )
+  }
 
   const popoverId = 'date-pagination-calendar-popover'
 
@@ -32,9 +44,7 @@ export default function DatePagination({
     <div>
       <div className="join">
         <LinkWrapper diff={-1}>
-          <div className={`join-item btn ${!prevPath ? 'btn-disabled' : ''}`}>
-            <ChevronLeftIcon height={20} width={20} />
-          </div>
+          <ChevronLeftIcon height={20} width={20} />
         </LinkWrapper>
         <button
           popoverTarget={popoverId}
@@ -44,12 +54,10 @@ export default function DatePagination({
           {format(date, 'PPPP')}
         </button>
         <LinkWrapper diff={1}>
-          <div className={`join-item btn ${!nextPath ? 'btn-disabled' : ''}`}>
-            <ChevronRightIcon height={20} width={20} />
-          </div>
+          <ChevronRightIcon height={20} width={20} />
         </LinkWrapper>
       </div>
-      <CalendarDateSelector popoverId={popoverId} />
+      <CalendarDateSelector popoverId={popoverId} date={date} />
     </div>
   )
 }

@@ -6,13 +6,19 @@ import { formatISO, parseISO } from 'date-fns'
 import { dateOptions } from '@/lib/utils/dates'
 import { DayPicker } from 'react-day-picker'
 
-export function CalendarDateSelector({ popoverId }: { popoverId: string }) {
-  const [date, setDate] = React.useState<Date | undefined>(undefined)
+type CalendarDateSelectorProps = {
+  popoverId: string
+  date: Date
+}
+
+export function CalendarDateSelector({
+  popoverId,
+  date,
+}: CalendarDateSelectorProps) {
   const router = useRouter()
   const response = useDataContextInfo(null)
 
   const updateDate = (newDate: Date | undefined) => {
-    setDate(newDate)
     const newDateISO = newDate
       ? formatISO(newDate, { ...dateOptions, representation: 'date' })
       : undefined
