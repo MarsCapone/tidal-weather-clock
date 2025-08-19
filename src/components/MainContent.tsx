@@ -114,7 +114,7 @@ export default function MainContentWithoutDate({
             />
             <WeatherOverview
               dataContext={dataContext}
-              workingHours={workingHours || defaultWorkingHours}
+              workingHours={workingHours}
             />
             <ClockDisplay
               suggestedActivity={suggestedActivity}

@@ -1,3 +1,5 @@
+'use client'
+
 import {
   DataContext,
   Timestamp,
@@ -10,6 +12,8 @@ import {
   utcDateStringToFractionalUtc,
   utcDateStringToLocalTimeString,
 } from '@/lib/utils/dates'
+import logger from '@/lib/utils/logger'
+import { mpsToKnots } from '@/lib/utils/units'
 import {
   describeCloudiness,
   describeUvIndex,
@@ -40,10 +44,10 @@ export function WeatherDetails({
   dataContext,
   workingHours,
 }: WeatherDetailsProps) {
-  console.log('workingHours from WeatherDetails', workingHours)
+  const aggregatedDataPoints = getAggregatedDatapoints(dataContext)
   return (
     <WeatherDetailsInternal
-      aggregatedDataPoints={getAggregatedDatapoints(dataContext)}
+      aggregatedDataPoints={aggregatedDataPoints}
       workingHours={workingHours}
     />
   )
@@ -59,6 +63,9 @@ export function WeatherDetailsInternal({
   workingHours,
 }: WeatherDetailsInternalProps) {
   const [data, setData] = React.useState(() => [...aggregatedDataPoints])
+  useEffect(() => {
+    setData([...aggregatedDataPoints])
+  }, [aggregatedDataPoints])
   const [showOutOfHours, setShowOutOfHours] = React.useState(
     DEFAULT_SHOW_OUT_OF_HOURS,
   )
@@ -133,7 +140,7 @@ export function WeatherDetailsInternal({
           Speed
         </span>
       ),
-      cell: (info) => <div>{info.getValue().toFixed(1)} kts</div>,
+      cell: (info) => <div>{mpsToKnots(info.getValue()).toFixed(1)} kts</div>,
     }),
     columnHelper.accessor('gustSpeed', {
       header: () => (
@@ -143,7 +150,7 @@ export function WeatherDetailsInternal({
           Gusts
         </span>
       ),
-      cell: (info) => <div>{info.getValue().toFixed(1)} kts</div>,
+      cell: (info) => <div>{mpsToKnots(info.getValue()).toFixed(1)} kts</div>,
     }),
     columnHelper.accessor('temperature', {
       header: () => <span>Temperature</span>,
@@ -252,6 +259,9 @@ function byTimestamp<T extends Timestamp>(points: T[]): Record<string, T> {
 function getAggregatedDatapoints(
   dataContext: DataContext,
 ): AggregatedDataPoint[] {
+  logger.debug('getAggregatedDatapoints', {
+    referenceDate: dataContext.referenceDate,
+  })
   const timestamps = dataContext.weatherData.points.map(
     (point) => point.timestamp,
   )
@@ -261,10 +271,12 @@ function getAggregatedDatapoints(
   )
   const windByTimestamp = byTimestamp<WindInfo>(dataContext.windData.points)
 
-  return timestamps.map((t) => ({
+  const result = timestamps.map((t) => ({
     ...(weatherByTimestamp[t] || {}),
     ...(windByTimestamp[t] || {}),
   }))
+  console.log(Object.entries(result)[0])
+  return result
 }
 
 function renderUvIndex(uvIndex: number): React.ReactNode {
