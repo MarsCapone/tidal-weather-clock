@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import ActivityArray from '@/app/settings/components/activity-settings/ActivityArray'
 import { InputActivities } from '@/app/settings/components/activity-settings/types'
+import { mpsToKnots } from '@/lib/utils/units'
 
 export type ActivitySettingsFormProps = {
   userId: string
@@ -18,17 +19,36 @@ export default function ActivitySettingsForm({
   setActivitiesAction,
 }: ActivitySettingsFormProps) {
   const defaultValues = {
-    activities,
+    // when items are saved, they are converted to the correct unit, but we need to represent them
+    // in the display unit first
+    activities: activities.map((activity) => ({
+      ...activity,
+      constraints: activity.constraints.map((constraint) => {
+        if (constraint.type === 'wind') {
+          return {
+            ...constraint,
+            // convert wind speeds to knots
+            minSpeed: constraint.minSpeed
+              ? mpsToKnots(constraint.minSpeed)
+              : undefined,
+            maxSpeed: constraint.maxSpeed
+              ? mpsToKnots(constraint.maxSpeed)
+              : undefined,
+            maxGustSpeed: constraint.maxGustSpeed
+              ? mpsToKnots(constraint.maxGustSpeed)
+              : undefined,
+          }
+        }
+        return constraint
+      }),
+    })),
   }
   const methods = useForm<InputActivities>({
     defaultValues,
   })
   const {
     control,
-    register,
     handleSubmit,
-    reset,
-    getValues,
     formState: { errors, isDirty },
   } = methods
 
@@ -37,8 +57,10 @@ export default function ActivitySettingsForm({
     name: 'activities',
   })
 
-  const onSubmit = (data: InputActivities) =>
+  const onSubmit = (data: InputActivities) => {
+    console.log(data)
     setActivitiesAction(data.activities)
+  }
 
   return (
     <div>

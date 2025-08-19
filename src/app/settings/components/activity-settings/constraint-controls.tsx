@@ -5,12 +5,13 @@ import {
   NamedFormComponent,
 } from '@/app/settings/components/common/form'
 import { Constraint } from '@/lib/types/activity'
+import { knotsToMps, mpsToKnots } from '@/lib/utils/units'
 
 type ControlsProps = {
   register: UseFormRegister<InputActivities>
   activityIndex: number
   constraintIndex: number
-  disabled?: boolean
+  disabled: boolean
 }
 
 type RegisterParams = Parameters<ControlsProps['register']>
@@ -36,35 +37,23 @@ export function WindConstraintControls({
   return (
     <div>
       <div className={'grid grid-cols-3 gap-x-4'}>
-        <Input
+        <WindSpeedInput
           title={'Min wind speed'}
-          suffix={'m/s'}
-          className={'input input-sm'}
-          inputProps={{
-            ...register(getTarget('minSpeed')),
-            type: 'float',
-            disabled,
-          }}
+          register={register}
+          target={getTarget('minSpeed')}
+          disabled={disabled}
         />
-        <Input
+        <WindSpeedInput
           title={'Max wind speed'}
-          suffix={'m/s'}
-          className={'input input-sm'}
-          inputProps={{
-            ...register(getTarget('maxSpeed')),
-            type: 'float',
-            disabled,
-          }}
+          register={register}
+          target={getTarget('maxSpeed')}
+          disabled={disabled}
         />
-        <Input
+        <WindSpeedInput
           title={'Max gust speed'}
-          suffix={'m/s'}
-          className={'input input-sm'}
-          inputProps={{
-            ...register(getTarget('maxGustSpeed')),
-            type: 'float',
-            disabled,
-          }}
+          register={register}
+          target={getTarget('maxGustSpeed')}
+          disabled={disabled}
         />
       </div>
       <div className={'grid grid-cols-2 gap-x-4'}>
@@ -397,5 +386,32 @@ export function DayConstraintControls({
         }}
       />
     </div>
+  )
+}
+
+function WindSpeedInput({
+  title,
+  register,
+  target,
+  disabled,
+}: {
+  title: string
+  register: UseFormRegister<InputActivities>
+  target: RegisterParams[0]
+  disabled: boolean
+}) {
+  return (
+    <Input
+      title={title}
+      suffix={'knots'}
+      className={'input input-sm'}
+      inputProps={{
+        ...register(target, {
+          setValueAs: (value) => knotsToMps(value),
+        }),
+        type: 'float',
+        disabled,
+      }}
+    />
   )
 }
