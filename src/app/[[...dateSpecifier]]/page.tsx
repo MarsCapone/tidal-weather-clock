@@ -4,11 +4,7 @@ import { getUserId } from '@/lib/auth0'
 import CONSTANTS from '@/lib/constants'
 import { getActivitiesByUserId } from '@/lib/db/helpers/activity'
 import { getDataContextRange } from '@/lib/db/helpers/datacontext'
-import {
-  getOrPutSetting,
-  getSetting,
-  putSetting,
-} from '@/lib/db/helpers/settings'
+import { getOrPutSetting } from '@/lib/db/helpers/settings'
 import { defaultWorkingHours, WorkingHoursSetting } from '@/lib/types/settings'
 import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
 import { TZDate } from '@date-fns/tz'
@@ -62,8 +58,6 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
     userId,
     defaultWorkingHours,
   )
-
-  console.log('Working hours from page', workingHours)
 
   return (
     <DateProvider initialDate={initialDate} dataContextRange={dataContextRange}>

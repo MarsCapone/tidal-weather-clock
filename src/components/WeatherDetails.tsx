@@ -275,7 +275,6 @@ function getAggregatedDatapoints(
     ...(weatherByTimestamp[t] || {}),
     ...(windByTimestamp[t] || {}),
   }))
-  console.log(Object.entries(result)[0])
   return result
 }
 
