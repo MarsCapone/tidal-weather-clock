@@ -1,7 +1,10 @@
 import { OpenMeteoAndEasyTideDataFetcher } from '@/app/api/dataContext/[dateString]/opendatasources'
 import logger from '@/app/api/pinoLogger'
 import CONSTANTS from '@/lib/constants'
-import { getDataContextByDate } from '@/lib/db/helpers/datacontext'
+import {
+  addDataContext,
+  getDataContextByDate,
+} from '@/lib/db/helpers/datacontext'
 import { DataContext } from '@/lib/types/context'
 import { utcDateStringToUtc } from '@/lib/utils/dates'
 import {
@@ -13,7 +16,6 @@ import {
   startOfToday,
 } from 'date-fns'
 import { NextRequest } from 'next/server'
-import db from './db'
 
 export async function GET(
   request: NextRequest,
@@ -81,9 +83,7 @@ async function getDataContextForDateString(
   const dcs = await dataFetcher.getDataContexts(today)
 
   // then whatever we find, we put in the db
-  for (const dc of dcs) {
-    await db.addDataContext(location, dc)
-  }
+  await Promise.all(dcs.map((dc) => addDataContext(dc, location)))
 
   // finally return whatever was requested
   return (await getDataContextByDate(date, location))?.dataContext || null

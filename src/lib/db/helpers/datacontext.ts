@@ -2,6 +2,7 @@ import logger from '@/app/api/pinoLogger'
 import { db } from '@/lib/db'
 import { datacontextTable } from '@/lib/db/schemas/datacontext'
 import { DataContext } from '@/lib/types/context'
+import { LatLong } from '@/lib/types/settings'
 import { formatISO } from 'date-fns'
 import { and, eq, sql } from 'drizzle-orm'
 
@@ -82,4 +83,38 @@ export async function getDataContextByDate(
     dataContext: DataContext
     lastUpdated: Date
   }
+}
+
+export async function addDataContext(
+  dataContext: DataContext,
+  location: LatLong,
+): Promise<void> {
+  const [latitude, longitude] = location
+
+  const [{ id }] = await db
+    .insert(datacontextTable)
+    .values({
+      date: dataContext.referenceDate,
+      latitude,
+      longitude,
+      data: dataContext,
+      last_updated: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: [
+        datacontextTable.date,
+        datacontextTable.latitude,
+        datacontextTable.longitude,
+      ],
+      set: {
+        data: dataContext,
+        last_updated: new Date(),
+      },
+    })
+    .returning({ id: datacontextTable.id })
+  logger.info('saved data context to db', {
+    id,
+    location,
+    date: dataContext.referenceDate,
+  })
 }

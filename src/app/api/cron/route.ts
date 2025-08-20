@@ -2,9 +2,9 @@ import { deleteDebugData } from '@/app/api/dataContext/[dateString]/debug'
 import { OpenMeteoAndEasyTideDataFetcher } from '@/app/api/dataContext/[dateString]/opendatasources'
 import logger from '@/app/api/pinoLogger'
 import CONSTANTS from '@/lib/constants'
+import { addDataContext } from '@/lib/db/helpers/datacontext'
 import { dateOptions } from '@/lib/utils/dates'
 import { formatISO, startOfToday } from 'date-fns'
-import db from '../dataContext/[dateString]/db'
 
 export async function GET(request: Request): Promise<Response> {
   /* This handler will be called when the cron job runs.
@@ -22,7 +22,7 @@ export async function GET(request: Request): Promise<Response> {
   const dataContexts = await dataFetcher.getDataContexts(today)
 
   await Promise.all(
-    dataContexts.map((dc) => db.addDataContext(CONSTANTS.LOCATION_COORDS, dc)),
+    dataContexts.map((dc) => addDataContext(dc, CONSTANTS.LOCATION_COORDS)),
   )
 
   logger.info('Cron job completed successfully', {
