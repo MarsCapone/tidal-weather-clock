@@ -4,18 +4,19 @@ import {
   index,
   json,
   pgTable,
+  real,
   serial,
   timestamp,
   uniqueIndex,
 } from 'drizzle-orm/pg-core'
 
-export const datacontext = pgTable(
+export const datacontextTable = pgTable(
   'datacontext',
   {
     id: serial().primaryKey(),
     date: date().notNull(),
-    latitude: decimal(),
-    longitude: decimal(),
+    latitude: real(),
+    longitude: real(),
     data: json(),
     last_updated: timestamp().defaultNow(),
   },

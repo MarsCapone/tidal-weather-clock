@@ -1,28 +1,38 @@
-import { neon } from '@neondatabase/serverless'
-
-const sql = neon(process.env.DATABASE_URL!)
+import { db } from '@/lib/db'
+import { datacontextTable } from '@/lib/db/schemas/datacontext'
+import { and, eq, sql } from 'drizzle-orm'
 
 export async function getDataContextRange(
   location: [number, number],
 ): Promise<{ earliest: string; latest: string; all: string[] }> {
-  const [result] = await sql`
-    SELECT MIN(date)::text AS earliest, MAX(date)::text AS latest
-    FROM datacontext
-    WHERE latitude = ${location[0]} AND longitude = ${location[1]}
-  `
+  const [latitude, longitude] = location
 
-  const dates = await sql`
-  SELECT date::text FROM datacontext
-  WHERE latitude = ${location[0]} AND longitude = ${location[1]}
-  ORDER BY date DESC`
+  const [{ earliest, latest }] = await db
+    .select({
+      earliest: sql<string>`MIN(${datacontextTable.date})::text`.as('earliest'),
+      latest: sql<string>`MAX(${datacontextTable.date})::text`.as('latest'),
+    })
+    .from(datacontextTable)
+    .where(
+      and(
+        eq(datacontextTable.latitude, latitude),
+        eq(datacontextTable.longitude, longitude),
+      ),
+    )
 
-  if (!result) {
-    throw new Error('No data context found for the given location')
-  }
+  const dates = await db
+    .select({ date: datacontextTable.date })
+    .from(datacontextTable)
+    .where(
+      and(
+        eq(datacontextTable.latitude, latitude),
+        eq(datacontextTable.longitude, longitude),
+      ),
+    )
 
   return {
-    earliest: result.earliest,
-    latest: result.latest,
+    earliest,
+    latest,
     all: dates.map((d) => d.date),
   }
 }
