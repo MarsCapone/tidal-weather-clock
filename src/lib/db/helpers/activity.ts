@@ -1,8 +1,8 @@
-import { Activity } from '@/lib/types/activity'
+import logger from '@/app/api/pinoLogger'
 import { db } from '@/lib/db'
 import { activityTable } from '@/lib/db/schemas/activity'
-import { eq, notInArray, sql, inArray, and } from 'drizzle-orm'
-import logger from '@/app/api/pinoLogger'
+import { Activity } from '@/lib/types/activity'
+import { and, desc, inArray, sql } from 'drizzle-orm'
 
 export async function getActivitiesByUserId(
   userId: string,
@@ -16,8 +16,9 @@ export async function getActivitiesByUserId(
 
   const activityResponses: Activity[] = (
     await db
-      .select({
+      .selectDistinctOn([activityTable.id], {
         id: activityTable.id,
+        version: activityTable.version,
         name: activityTable.name,
         description: activityTable.description,
         priority: activityTable.priority,
@@ -27,19 +28,22 @@ export async function getActivitiesByUserId(
         >`CASE WHEN ${activityTable.user_id} = 'global' THEN 'global' ELSE 'user' END`,
       })
       .from(activityTable)
-      .where(inArray(activityTable.user_id, userIds))
+      .where(and(inArray(activityTable.user_id, userIds)))
       .groupBy(
         activityTable.id,
         activityTable.name,
         activityTable.description,
         activityTable.priority,
+        activityTable.version,
       )
-  ).map(({ id, name, description, priority, scope, content }) => ({
+      .orderBy(activityTable.id, desc(activityTable.version))
+  ).map(({ id, name, description, priority, scope, content, version }) => ({
     id,
     name,
     description,
     priority,
     scope,
+    version,
     constraints: content['constraints'],
   }))
 
@@ -55,43 +59,32 @@ export async function putActivities(activities: Activity[], userId: string) {
   )
 
   const inserts = filteredActivities.map((a) => {
-    const activityToInsert: typeof activityTable.$inferInsert = {
-      ...a,
-      content: { constraints: a.constraints },
-      user_id: userId,
+    const q = async () => {
+      const nextVersion = await db
+        .select({
+          v: sql<number>`(SELECT COALESCE(MAX(${activityTable.version}), 0) + 1
+                        FROM ${activityTable}
+                        WHERE ${activityTable.id} = ${a.id})`.as('v'),
+        })
+        .from(activityTable)
+
+      const activityToInsert: typeof activityTable.$inferInsert = {
+        ...a,
+        content: { constraints: a.constraints },
+        user_id: userId,
+        version: nextVersion[0]?.v || 1,
+      }
+
+      const query = await db
+        .insert(activityTable)
+        .values(activityToInsert)
+        .returning({ id: activityTable.id, version: activityTable.version })
+
+      return query
     }
-    return db
-      .insert(activityTable)
-      .values(activityToInsert)
-      .onConflictDoUpdate({
-        target: activityTable.id,
-        set: {
-          name: activityToInsert.name,
-          priority: activityToInsert.priority,
-          description: activityToInsert.description,
-          user_id: activityToInsert.user_id,
-          content: activityToInsert.content,
-        },
-      })
-      .returning({ id: activityTable.id })
+    return q()
   })
 
-  const activityIds = (await Promise.all(inserts)).flatMap((res) =>
-    res.map((r) => r.id),
-  )
+  const activityIds = (await Promise.all(inserts)).flat()
   logger.debug('updated activities', { activityIds })
-
-  // now we can delete all activities that weren't updated but are for this user
-  const deletedIds = await db
-    .delete(activityTable)
-    .where(
-      and(
-        notInArray(activityTable.id, activityIds),
-        eq(activityTable.user_id, userId),
-      ),
-    )
-    .returning({ id: activityTable.id })
-  logger.debug('deleted all unreferenced activities', {
-    deletedIds: deletedIds.map((d) => d.id),
-  })
 }
