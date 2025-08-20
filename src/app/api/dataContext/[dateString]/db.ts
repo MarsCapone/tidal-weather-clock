@@ -1,4 +1,5 @@
 import logger from '@/app/api/pinoLogger'
+import { getDataContextByDate } from '@/lib/db/helpers/datacontext'
 import { DataContext } from '@/lib/types/context'
 import { neon } from '@neondatabase/serverless'
 import { formatISO } from 'date-fns'
@@ -7,8 +8,6 @@ const sql = neon(process.env.DATABASE_URL!)
 
 export default {
   addDataContext,
-  getDataContextForDate,
-  getDataContextRange,
 }
 
 export async function addDataContext(
@@ -35,59 +34,4 @@ export async function addDataContext(
     contextId: id,
     date: dataContext.referenceDate,
   })
-}
-
-export async function getDataContextForDate(
-  date: Date,
-  location: [number, number],
-): Promise<{ dataContext: DataContext; lastUpdated: Date } | null> {
-  const [dc] = await sql`
-  SELECT data, last_updated FROM datacontext
-  WHERE
-    date = ${formatISO(date, { representation: 'date' })}
-    AND latitude = ${location[0]}
-    AND longitude = ${location[1]}
-  `
-
-  if (!dc) {
-    return null
-  }
-
-  const { data: dataContext, last_updated: lastUpdated } = dc
-
-  logger.debug('fetched data context from db', {
-    date,
-    lastUpdated,
-    location,
-  })
-
-  return {
-    dataContext,
-    lastUpdated,
-  }
-}
-
-export async function getDataContextRange(
-  location: [number, number],
-): Promise<{ earliest: string; latest: string; all: string[] }> {
-  const [result] = await sql`
-    SELECT MIN(date)::text AS earliest, MAX(date)::text AS latest
-    FROM datacontext
-    WHERE latitude = ${location[0]} AND longitude = ${location[1]}
-  `
-
-  const dates = await sql`
-  SELECT date::text FROM datacontext
-  WHERE latitude = ${location[0]} AND longitude = ${location[1]}
-  ORDER BY date DESC`
-
-  if (!result) {
-    throw new Error('No data context found for the given location')
-  }
-
-  return {
-    earliest: result.earliest,
-    latest: result.latest,
-    all: dates.map((d) => d.date),
-  }
 }

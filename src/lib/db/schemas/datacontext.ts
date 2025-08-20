@@ -15,10 +15,10 @@ export const datacontextTable = pgTable(
   {
     id: serial().primaryKey(),
     date: date().notNull(),
-    latitude: real(),
-    longitude: real(),
-    data: json(),
-    last_updated: timestamp().defaultNow(),
+    latitude: real().notNull(),
+    longitude: real().notNull(),
+    data: json().notNull(),
+    last_updated: timestamp().defaultNow().notNull(),
   },
   (table) => [
     index('idx_datacontext_date_location').on(

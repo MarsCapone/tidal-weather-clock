@@ -1,6 +1,7 @@
 import { OpenMeteoAndEasyTideDataFetcher } from '@/app/api/dataContext/[dateString]/opendatasources'
 import logger from '@/app/api/pinoLogger'
 import CONSTANTS from '@/lib/constants'
+import { getDataContextByDate } from '@/lib/db/helpers/datacontext'
 import { DataContext } from '@/lib/types/context'
 import { utcDateStringToUtc } from '@/lib/utils/dates'
 import {
@@ -50,7 +51,7 @@ async function getDataContextForDateString(
 ): Promise<DataContext | null> {
   const today = startOfToday()
 
-  const res = await db.getDataContextForDate(date, location)
+  const res = await getDataContextByDate(date, location)
   if (res) {
     const { dataContext, lastUpdated } = res
     if (
@@ -85,5 +86,5 @@ async function getDataContextForDateString(
   }
 
   // finally return whatever was requested
-  return (await db.getDataContextForDate(date, location))?.dataContext || null
+  return (await getDataContextByDate(date, location))?.dataContext || null
 }

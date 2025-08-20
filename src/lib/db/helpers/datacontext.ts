@@ -1,5 +1,8 @@
+import logger from '@/app/api/pinoLogger'
 import { db } from '@/lib/db'
 import { datacontextTable } from '@/lib/db/schemas/datacontext'
+import { DataContext } from '@/lib/types/context'
+import { formatISO } from 'date-fns'
 import { and, eq, sql } from 'drizzle-orm'
 
 export async function getDataContextRange(
@@ -34,5 +37,49 @@ export async function getDataContextRange(
     earliest,
     latest,
     all: dates.map((d) => d.date),
+  }
+}
+
+export async function getDataContextByDate(
+  date: Date,
+  location: [number, number],
+): Promise<{ id: number; dataContext: DataContext; lastUpdated: Date } | null> {
+  const [latitude, longitude] = location
+  const [result] = await db
+    .select({
+      id: datacontextTable.id,
+      dataContext: datacontextTable.data,
+      lastUpdated: datacontextTable.last_updated,
+    })
+    .from(datacontextTable)
+    .where(
+      and(
+        eq(datacontextTable.date, formatISO(date, { representation: 'date' })),
+        eq(datacontextTable.latitude, latitude),
+        eq(datacontextTable.longitude, longitude),
+      ),
+    )
+
+  if (!result) {
+    return null
+  }
+
+  const { id, dataContext, lastUpdated } = result
+
+  logger.debug('fetched data context from db', {
+    date,
+    lastUpdated,
+    location,
+    id,
+  })
+
+  return {
+    id,
+    dataContext,
+    lastUpdated,
+  } as {
+    id: number
+    dataContext: DataContext
+    lastUpdated: Date
   }
 }
