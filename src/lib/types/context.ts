@@ -49,3 +49,5 @@ export type DataContext = {
   weatherData: WeatherDataPoints
   windData: WindDataPoints
 }
+
+export type DataContextWithId = WithId<DataContext>
