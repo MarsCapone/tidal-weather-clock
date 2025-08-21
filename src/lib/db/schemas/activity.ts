@@ -36,7 +36,7 @@ export const activityTable = pgTable(
 )
 
 export const activityScoresTable = pgTable(
-  'suggestions',
+  'activity_score',
   {
     id: text()
       .primaryKey()
