@@ -2,6 +2,7 @@ import { datacontextTable } from '@/lib/db/schemas/datacontext'
 import { Constraint } from '@/lib/types/activity'
 import {
   decimal,
+  foreignKey,
   index,
   integer,
   json,
@@ -29,10 +30,7 @@ export const activityTable = pgTable(
     description: text().notNull(),
     priority: integer().notNull(),
     user_id: text().notNull(),
-    content: json()
-      .default('{"constraints": []}')
-      .$type<ActivityContent>()
-      .notNull(),
+    content: json().$type<ActivityContent>().notNull(),
   },
   (table) => [primaryKey({ columns: [table.id, table.version] })],
 )
@@ -45,17 +43,20 @@ export const activityScoresTable = pgTable(
       .notNull()
       .$default(() => uuidv4()),
     datacontext_id: integer().references(() => datacontextTable.id),
-    activity_id: text().references(() => activityTable.id),
-    activity_version: integer().references(() => activityTable.version),
+    activity_id: text(),
+    activity_version: integer(),
     score: real().notNull().default(0),
     debug: json().notNull().default('{}'),
   },
   (table) => [
+    foreignKey({
+      columns: [table.activity_id, table.activity_version],
+      foreignColumns: [activityTable.id, activityTable.version],
+    }),
     uniqueIndex('fks_uniq_idx').on(
       table.activity_id,
       table.activity_version,
       table.datacontext_id,
     ),
-    index('activity_idx').on(table.activity_id, table.activity_version),
   ],
 )

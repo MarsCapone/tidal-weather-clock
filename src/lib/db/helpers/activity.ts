@@ -44,7 +44,7 @@ export async function getActivitiesByUserId(
     priority,
     scope,
     version,
-    constraints: content['constraints'],
+    constraints: content['constraints'] || [],
   }))
 
   return activityResponses
@@ -70,7 +70,7 @@ export async function putActivities(activities: Activity[], userId: string) {
 
       const activityToInsert: typeof activityTable.$inferInsert = {
         ...a,
-        content: { constraints: a.constraints },
+        content: { constraints: a.constraints || [] },
         user_id: userId,
         version: nextVersion[0]?.v || 1,
       }
