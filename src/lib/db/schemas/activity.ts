@@ -1,12 +1,9 @@
 import { datacontextTable } from '@/lib/db/schemas/datacontext'
 import { Constraint } from '@/lib/types/activity'
 import {
-  decimal,
   foreignKey,
-  index,
   integer,
   json,
-  numeric,
   pgTable,
   primaryKey,
   real,

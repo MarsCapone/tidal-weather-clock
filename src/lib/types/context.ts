@@ -10,6 +10,8 @@ export type TideInfo = {
   type: TideType
 } & Timestamp
 
+export type TideData = TideInfo[]
+
 export type SunData = {
   sunRise: string
   sunSet: string
@@ -45,7 +47,7 @@ export type WindDataPoints = TimeBasedDataPoints<WindInfo> & {
 export type DataContext = {
   referenceDate: string
   sunData: SunData
-  tideData: TideInfo[]
+  tideData: TideData
   weatherData: WeatherDataPoints
   windData: WindDataPoints
 }
