@@ -3,12 +3,9 @@ import { OpenMeteoAndEasyTideDataFetcher } from '@/app/api/dataContext/[dateStri
 import logger from '@/app/api/pinoLogger'
 import CONSTANTS from '@/lib/constants'
 import { db } from '@/lib/db'
-import {
-  getActivitiesByUserId,
-  getAllActivities,
-} from '@/lib/db/helpers/activity'
+import { getAllActivities } from '@/lib/db/helpers/activity'
 import { addDataContext } from '@/lib/db/helpers/datacontext'
-import { activityScoresTable, activityTable } from '@/lib/db/schemas/activity'
+import { activityScoresTable } from '@/lib/db/schemas/activity'
 import { getScores } from '@/lib/score'
 import { dateOptions } from '@/lib/utils/dates'
 import { formatISO, startOfToday } from 'date-fns'
