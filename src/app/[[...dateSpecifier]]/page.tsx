@@ -14,14 +14,9 @@ import {
 } from '@/lib/db/helpers/datacontext'
 import { getOrPutSetting } from '@/lib/db/helpers/settings'
 import { defaultWorkingHours, WorkingHoursSetting } from '@/lib/types/settings'
-import {
-  dateOptions,
-  utcDateStringToUtc,
-  utcDateToLocalDateString,
-  utcDateToLocalTimeString,
-} from '@/lib/utils/dates'
+import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
 import { TZDate } from '@date-fns/tz'
-import { addDays, formatISO, isBefore, startOfToday } from 'date-fns'
+import { addDays, isBefore, startOfToday } from 'date-fns'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
