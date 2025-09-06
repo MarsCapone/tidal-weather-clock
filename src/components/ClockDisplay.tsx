@@ -93,7 +93,7 @@ export function TimeToNext({
 
   if (isInThePast) {
     return (
-      <div className="flex flex-col items-center justify-center gap-1 p-10">
+      <div className="flex flex-col items-center justify-center gap-1 px-10 py-2">
         <div className="mb-8">
           <div className="text-xl font-bold xl:text-3xl">
             you are looking at a date in the past
@@ -105,7 +105,7 @@ export function TimeToNext({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center gap-1 p-10">
+    <div className="flex flex-col items-center justify-center gap-1 px-10 py-2">
       {displayTime && currentTime && (
         <div className="mb-8">
           <div className="text-xl font-bold xl:text-3xl">the time is</div>

@@ -98,9 +98,17 @@ export async function getScores({
       }),
     )
 
+    // if any constraint score is 0, then the activity is not possible, so the entire score should be 0
+    // but if there are no constraints, then the activity is always possible, so the score should be 1
+    const finalScore = constraintScores.some((s) => s === 0)
+      ? 0
+      : constraintScores.length === 0
+        ? 1
+        : calcMean(constraintScores)
+
     return {
       timestamp: timeSlot.timestamp,
-      value: constraintScores.length === 0 ? 1 : calcMean(constraintScores),
+      value: finalScore,
       debug: {
         timeSlot,
         constraintsWithScores,

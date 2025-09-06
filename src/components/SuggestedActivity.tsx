@@ -30,7 +30,6 @@ export default function SuggestedActivity({
   nextSuggestion,
   prevSuggestion,
 }: SuggestedActivityProps) {
-  const { useDescriptiveIntervals } = useFlags()
   const { timeZone } = useContext(TimeZoneContext)
 
   // don't show this panel at all if there is nothing to show
@@ -111,7 +110,7 @@ function SuggestedActivityContent({
   return (
     <div className={`card card-md ${className || ''}`}>
       <div className="card-body">
-        <div className="card-title">The next best activity is:</div>
+        <div className="card-title font-thin">The next best activity is...</div>
         {children}
       </div>
     </div>

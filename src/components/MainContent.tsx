@@ -2,6 +2,7 @@
 
 import ClockDisplay from '@/components/ClockDisplay'
 import DayTimeline from '@/components/DayTimeline'
+import MoreSuggestions from '@/components/MoreSuggestions'
 import SuggestedActivity from '@/components/SuggestedActivity'
 import { WeatherDetails } from '@/components/WeatherDetails'
 import WeatherOverview from '@/components/WeatherOverview'
@@ -25,9 +26,6 @@ export default function MainContentWithoutDate({
   activityScores: ActivityScore[]
 }) {
   const { showSuggestedActivity } = useFlags()
-  const [suggestionIndex, setSuggestionIndex] = React.useState(0)
-
-  const suggestedActivity = activityScores[suggestionIndex]
 
   if (dataContext === undefined) {
     return (
@@ -54,17 +52,13 @@ export default function MainContentWithoutDate({
               dataContext={dataContext}
               workingHours={workingHours}
             />
-            {showSuggestedActivity && (
-              <SuggestedActivity
-                activityScore={suggestedActivity}
-                nextSuggestion={undefined}
-                prevSuggestion={undefined}
-              />
-            )}
             <ClockDisplay
-              suggestedActivity={suggestedActivity}
+              suggestedActivity={activityScores[0]}
               dataContext={dataContext}
             />
+            {showSuggestedActivity && (
+              <MoreSuggestions activityScores={activityScores} />
+            )}
             <WeatherDetails
               dataContext={dataContext}
               workingHours={workingHours}

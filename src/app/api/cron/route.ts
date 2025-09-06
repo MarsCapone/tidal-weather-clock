@@ -12,6 +12,7 @@ import { activityScoresTable, activityTable } from '@/lib/db/schemas/activity'
 import { getScores } from '@/lib/score'
 import { dateOptions } from '@/lib/utils/dates'
 import { formatISO, startOfToday } from 'date-fns'
+import { sql } from 'drizzle-orm'
 import fastCartesian from 'fast-cartesian'
 
 export async function GET(request: Request): Promise<Response> {
@@ -80,7 +81,22 @@ export async function GET(request: Request): Promise<Response> {
     },
   )
 
-  await db.insert(activityScoresTable).values(allActivityScoreValues)
+  await db
+    .insert(activityScoresTable)
+    .values(allActivityScoreValues)
+    .onConflictDoUpdate({
+      target: [
+        activityScoresTable.activity_id,
+        activityScoresTable.activity_version,
+        activityScoresTable.datacontext_id,
+        activityScoresTable.timestamp,
+      ],
+      set: {
+        score: sql.raw(`excluded.${activityScoresTable.score.name}`),
+        debug: sql.raw(`excluded.${activityScoresTable.debug.name}`),
+      },
+    })
+
   logger.debug(
     'Inserted all scores for all activities, data contexts and users',
     {
