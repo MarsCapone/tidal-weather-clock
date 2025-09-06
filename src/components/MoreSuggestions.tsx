@@ -5,10 +5,12 @@ import React from 'react'
 
 export type MoreSuggestionsProps = {
   activityScores: ActivityScore[]
+  allActivityScores: ActivityScore[]
 }
 
 export default function MoreSuggestions({
   activityScores,
+  allActivityScores,
 }: MoreSuggestionsProps) {
   const dialogId = `more-suggestions-${Math.random().toString(36)}`
   const openDialog = () => {
@@ -18,6 +20,20 @@ export default function MoreSuggestions({
     }
   }
 
+  let text = ''
+  let description = ''
+  let passedActivities = activityScores
+
+  if (activityScores.length === 0 && allActivityScores.length > 0) {
+    text = 'See all activities'
+    description = 'no rated suggestions'
+    passedActivities = allActivityScores
+  } else if (activityScores.length > 0) {
+    text = 'See more suggestions'
+  } else {
+    description = 'try adding more activities or loosening constraints'
+  }
+
   return (
     <>
       <div className="mx-4 mb-4 md:m-8">
@@ -25,12 +41,17 @@ export default function MoreSuggestions({
           className="btn btn-primary btn-md md:btn-lg rounded-md sm:w-48 md:w-fit"
           onClick={openDialog}
         >
-          <span>More suggestions</span>
+          <div className="flex flex-col">
+            <div>{text || 'No suggestions available'}</div>
+            {activityScores.length === 0 && (
+              <div className="text-xs font-thin">({description})</div>
+            )}
+          </div>
         </button>
       </div>
       <MoreSuggestionsDialog
         dialogId={dialogId}
-        activityScores={activityScores}
+        activityScores={passedActivities}
       />
     </>
   )
@@ -38,7 +59,8 @@ export default function MoreSuggestions({
 
 type MoreSuggestionsDialogProps = {
   dialogId: string
-} & MoreSuggestionsProps
+  activityScores: ActivityScore[]
+}
 
 function MoreSuggestionsDialog({
   dialogId,
@@ -72,12 +94,13 @@ function SingleActivityScore({ score }: { score: ActivityScore }) {
             tz: timeZone,
           })}
         </div>
-        <span className="flex flex-row items-center gap-1">
-          ({renderScore(score.score)})
+        <span className="flex flex-row items-center gap-2">
+          {renderScore(score.score)}
+          <span>{score.score * 100}%</span>
         </span>
       </div>
       <div className="text-sm font-thin">{score.description}</div>
-      <div>{JSON.stringify(score.debug)}</div>
+      {/*<div>{JSON.stringify(score.debug)}</div>*/}
     </div>
   )
 }

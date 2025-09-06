@@ -74,17 +74,21 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
 
   const dateIsInThePast = isBefore(initialDate, startOfToday(dateOptions))
 
-  const activityScores =
-    dataContextId !== undefined
+  async function getActivityScoresWithThreshhold(scoreThreshold: number) {
+    return dataContextId !== undefined
       ? await getBestActivitiesForDatacontext(
           dataContextId,
           [userId, 'global'],
           {
             futureOnly: !dateIsInThePast, // todo: add a setting for these
-            scoreThreshold: 0.5,
+            scoreThreshold,
           },
         )
       : []
+  }
+
+  const activityScores = await getActivityScoresWithThreshhold(0.5)
+  const allActivityScores = await getActivityScoresWithThreshhold(0)
 
   return (
     <DateProvider initialDate={initialDate} dataContextRange={dataContextRange}>
@@ -97,6 +101,7 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
         workingHours={workingHours || defaultWorkingHours}
         dataContext={dataContext}
         activityScores={activityScores}
+        allActivityScores={allActivityScores}
       />
     </DateProvider>
   )

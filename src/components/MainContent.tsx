@@ -3,27 +3,27 @@
 import ClockDisplay from '@/components/ClockDisplay'
 import DayTimeline from '@/components/DayTimeline'
 import MoreSuggestions from '@/components/MoreSuggestions'
-import SuggestedActivity from '@/components/SuggestedActivity'
 import { WeatherDetails } from '@/components/WeatherDetails'
 import WeatherOverview from '@/components/WeatherOverview'
 import { ActivityScore } from '@/lib/db/helpers/activity'
 import { Activity } from '@/lib/types/activity'
 import { DataContext } from '@/lib/types/context'
 import { WorkingHoursSetting } from '@/lib/types/settings'
-import { DateContext } from '@/lib/utils/contexts'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import Link from 'next/link'
-import React, { useContext } from 'react'
+import React from 'react'
 
 export default function MainContentWithoutDate({
   workingHours,
   dataContext,
   activityScores,
+  allActivityScores,
 }: {
   activities: Activity[]
   workingHours: WorkingHoursSetting
   dataContext: DataContext | undefined
   activityScores: ActivityScore[]
+  allActivityScores: ActivityScore[]
 }) {
   const { showSuggestedActivity } = useFlags()
 
@@ -57,7 +57,10 @@ export default function MainContentWithoutDate({
               dataContext={dataContext}
             />
             {showSuggestedActivity && (
-              <MoreSuggestions activityScores={activityScores} />
+              <MoreSuggestions
+                activityScores={activityScores}
+                allActivityScores={allActivityScores}
+              />
             )}
             <WeatherDetails
               dataContext={dataContext}
