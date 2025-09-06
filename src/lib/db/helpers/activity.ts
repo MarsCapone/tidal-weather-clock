@@ -1,9 +1,8 @@
 import logger from '@/app/api/pinoLogger'
 import { db } from '@/lib/db'
-import { activityTable } from '@/lib/db/schemas/activity'
+import { activityScoresTable, activityTable } from '@/lib/db/schemas/activity'
 import { Activity } from '@/lib/types/activity'
-import { DataContext } from '@/lib/types/context'
-import { and, desc, inArray, sql } from 'drizzle-orm'
+import { and, desc, eq, gte, inArray, sql } from 'drizzle-orm'
 
 export async function getActivitiesByUserId(
   userId: string,
@@ -106,4 +105,50 @@ export async function putActivities(activities: Activity[], userId: string) {
 
   const activityIds = (await Promise.all(inserts)).flat()
   logger.debug('updated activities', { activityIds })
+}
+
+export async function getBestActivitiesForDatacontext(
+  dataContextId: number,
+  userIds: string[],
+  options?: {
+    scoreThreshold?: number
+    futureOnly?: boolean
+  },
+) {
+  const limitFuture = options?.futureOnly ?? false
+
+  const results = await db
+    .select()
+    .from(activityScoresTable)
+    .innerJoin(
+      activityTable,
+      and(
+        eq(activityScoresTable.activity_id, activityTable.id),
+        eq(activityScoresTable.activity_version, activityTable.version),
+      ),
+    )
+    .where(
+      and(
+        eq(activityScoresTable.datacontext_id, dataContextId),
+        gte(activityScoresTable.score, options?.scoreThreshold ?? 0.5),
+        sql`CASE WHEN ${limitFuture} THEN ${activityScoresTable.timestamp}::timestamp > now() ELSE true END`,
+        inArray(activityTable.user_id, userIds),
+      ),
+    )
+
+  return results.map(
+    ({
+      activity: { name, description, user_id },
+      activity_score: { score, timestamp, debug },
+    }) => {
+      return {
+        name,
+        description,
+        user_id,
+        score,
+        timestamp,
+        debug,
+      }
+    },
+  )
 }

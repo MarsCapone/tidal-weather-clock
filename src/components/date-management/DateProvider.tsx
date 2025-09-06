@@ -5,7 +5,8 @@ import { DateContext } from '@/lib/utils/contexts'
 import logger from '@/lib/utils/logger'
 import { TZDate } from '@date-fns/tz'
 import { formatISO } from 'date-fns'
-import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
 
 type DateProviderProps = {
   initialDate: TZDate
@@ -18,29 +19,15 @@ export default function DateProvider({
   children,
 }: DateProviderProps) {
   const [date, setDate] = useState<TZDate>(initialDate)
+  const router = useRouter()
 
   const updateDate = (newDate: TZDate) => {
     setDate(newDate)
-    window.history.pushState(
-      {
-        date: formatISO(newDate, { representation: 'date' }),
-      },
-      '',
-      `/static/${formatISO(newDate, {
-        representation: 'date',
-      })}`,
-    )
+    const newPath = `/static/${formatISO(newDate, {
+      representation: 'date',
+    })}`
+    router.push(newPath)
   }
-
-  window.addEventListener('popstate', (event) => {
-    const stateDate = event.state.date
-    logger.debug('detected history state change', {
-      stateDate,
-    })
-    if (stateDate !== undefined) {
-      setDate(stateDate)
-    }
-  })
 
   return (
     <DateContext value={{ date, setDate }}>

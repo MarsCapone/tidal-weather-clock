@@ -1,14 +1,22 @@
+import logger from '@/app/api/pinoLogger'
 import DateProvider from '@/components/date-management/DateProvider'
 import MainContentWithoutDate from '@/components/MainContent'
 import { getUserId } from '@/lib/auth0'
 import CONSTANTS from '@/lib/constants'
-import { getActivitiesByUserId } from '@/lib/db/helpers/activity'
-import { getDataContextRange } from '@/lib/db/helpers/datacontext'
+import {
+  getActivitiesByUserId,
+  getBestActivitiesForDatacontext,
+} from '@/lib/db/helpers/activity'
+import {
+  getDataContextByDate,
+  getDataContextRange,
+} from '@/lib/db/helpers/datacontext'
 import { getOrPutSetting } from '@/lib/db/helpers/settings'
 import { defaultWorkingHours, WorkingHoursSetting } from '@/lib/types/settings'
 import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
 import { TZDate } from '@date-fns/tz'
-import { addDays, startOfToday } from 'date-fns'
+import { addDays, formatISO, startOfToday } from 'date-fns'
+import { revalidatePath } from 'next/cache'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
@@ -58,12 +66,22 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
     userId,
     defaultWorkingHours,
   )
+  const {
+    id: dataContextId,
+    dataContext,
+    lastUpdated: dcLastUpdated,
+  } = (await getDataContextByDate(initialDate, CONSTANTS.LOCATION_COORDS)) || {}
 
   return (
     <DateProvider initialDate={initialDate} dataContextRange={dataContextRange}>
+      <div className="flex flex-row items-end justify-end text-xs">
+        data-context-id: {dataContextId}{' '}
+        {dcLastUpdated && `| last-updated: ${formatISO(dcLastUpdated)}`}
+      </div>
       <MainContentWithoutDate
         activities={activities}
         workingHours={workingHours || defaultWorkingHours}
+        dataContext={dataContext}
       />
     </DateProvider>
   )
