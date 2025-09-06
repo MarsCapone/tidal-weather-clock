@@ -36,9 +36,9 @@ export default function MoreSuggestions({
 
   return (
     <>
-      <div className="mx-4 mb-4 md:m-8">
+      <div className="mx-4 mb-4 lg:m-4">
         <button
-          className="btn btn-primary btn-md md:btn-lg rounded-md sm:w-48 md:w-fit"
+          className={`btn btn-primary btn-md md:btn-lg w-fit rounded-md ${text === '' ? 'btn-disabled' : ''}`}
           onClick={openDialog}
         >
           <div className="flex flex-col">
