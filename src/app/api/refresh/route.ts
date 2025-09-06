@@ -1,19 +1,8 @@
 import logger from '@/app/api/pinoLogger'
 import { doRefresh } from '@/app/api/refresh/index'
 import { getUserId } from '@/lib/auth0'
-import CONSTANTS from '@/lib/constants'
-import { db } from '@/lib/db'
-import {
-  getActivitiesByUserId,
-  getAllActivities,
-} from '@/lib/db/helpers/activity'
-import { getDataContextsByDateRange } from '@/lib/db/helpers/datacontext'
-import { activityScoresTable } from '@/lib/db/schemas/activity'
-import { getScores } from '@/lib/score'
 import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
 import { addDays, startOfToday } from 'date-fns'
-import { sql } from 'drizzle-orm'
-import fastCartesian from 'fast-cartesian'
 import { NextRequest } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -34,10 +23,19 @@ export async function POST(request: NextRequest) {
     ? utcDateStringToUtc(end_date)
     : addDays(startOfToday(dateOptions), 7)
 
+  logger.info('Refreshing data', {
+    scope,
+    userId,
+    startDate,
+    endDate,
+  })
+
   await doRefresh({
     scope: scope || 'global',
     userId,
     startDate,
     endDate,
   })
+
+  return new Response('OK')
 }

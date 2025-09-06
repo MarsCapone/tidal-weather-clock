@@ -1,4 +1,3 @@
-import { uploadDebugData } from '@/app/api/dataContext/[dateString]/debug'
 import CONSTANTS from '@/lib/constants'
 import { DataContext, TideInfo } from '@/lib/types/context'
 import { IDataContextFetcher, ILogger } from '@/lib/types/interfaces'
@@ -8,6 +7,7 @@ import {
   utcDateStringToFractionalUtc,
   utcDateStringToUtc,
 } from '@/lib/utils/dates'
+import { uploadDebugData } from '@/lib/utils/debug'
 import { calcMean } from '@/lib/utils/math'
 import { TZDate } from '@date-fns/tz'
 import {

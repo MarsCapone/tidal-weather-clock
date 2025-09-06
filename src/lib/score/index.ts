@@ -1,4 +1,3 @@
-import { uploadDebugData } from '@/app/api/dataContext/[dateString]/debug'
 import logger from '@/app/api/pinoLogger'
 import { DefaultConstraintScorer } from '@/lib/score/constraint-scorer'
 import { Activity, TimeSlot } from '@/lib/types/activity'
@@ -8,6 +7,7 @@ import {
   naiveDateToFractionalUtc,
   utcDateStringToUtc,
 } from '@/lib/utils/dates'
+import { uploadDebugData } from '@/lib/utils/debug'
 import { calcMean } from '@/lib/utils/math'
 import { eachHourOfInterval, endOfDay, formatISO, startOfDay } from 'date-fns'
 
