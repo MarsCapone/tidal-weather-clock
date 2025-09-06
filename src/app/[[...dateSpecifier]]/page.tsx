@@ -17,6 +17,7 @@ import { defaultWorkingHours, WorkingHoursSetting } from '@/lib/types/settings'
 import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
 import { TZDate } from '@date-fns/tz'
 import { addDays, isBefore, startOfToday } from 'date-fns'
+import { revalidatePath } from 'next/cache'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
@@ -90,17 +91,18 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
   const activityScores = await getActivityScoresWithThreshhold(0.5)
   const allActivityScores = await getActivityScoresWithThreshhold(0)
 
-  const refreshData = async () => {
+  const refreshData = async (currentPath: string) => {
     'use server'
     const options = {
-      scope: 'user',
+      scope: userId ? 'user' : ('global' as const),
       userId,
       startDate: initialDate,
       endDate: initialDate,
       refreshDataContext: true,
     }
-    logger.info('Refreshing data', options)
+    logger.info('Refreshing data', { options, currentPath })
     await doRefresh(options as DoRefreshOptions)
+    revalidatePath(currentPath)
   }
 
   return (

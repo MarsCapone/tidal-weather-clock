@@ -78,16 +78,24 @@ export default function MainContent({
 
 export type RefreshDataProps = {
   lastUpdatedTime: Date | undefined
-  onClickedRefreshAction: () => void
+  onClickedRefreshAction: (currentPath: string) => Promise<void>
 }
 export function RefreshData({
   lastUpdatedTime,
   onClickedRefreshAction,
 }: RefreshDataProps) {
+  const [refreshing, setRefreshing] = React.useState(false)
   const { isPast } = React.useContext(DateContext)
   const formattedTime = lastUpdatedTime
     ? `${formatDistanceToNowStrict(lastUpdatedTime)} ago`
     : 'never'
+
+  const onClick = () => {
+    setRefreshing(true)
+    onClickedRefreshAction(window.location.pathname).then(() => {
+      setRefreshing(false)
+    })
+  }
 
   return (
     <div className="md:bg-base-100 p-4 md:absolute md:top-24 md:right-2 md:z-10">
@@ -96,8 +104,8 @@ export function RefreshData({
           <span>Last updated: {formattedTime} </span>
           {!isPast && (
             <button
-              className={'btn btn-xs btn-accent rounded-field w-fit'}
-              onClick={onClickedRefreshAction}
+              className={`btn btn-xs btn-accent rounded-field w-fit ${refreshing ? 'btn-disabled' : ''}`}
+              onClick={onClick}
             >
               Refresh <RefreshCwIcon className="h-4 w-4" />
             </button>
