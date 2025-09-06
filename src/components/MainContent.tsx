@@ -9,8 +9,8 @@ import { ActivityScore } from '@/lib/db/helpers/activity'
 import { Activity } from '@/lib/types/activity'
 import { DataContext } from '@/lib/types/context'
 import { WorkingHoursSetting } from '@/lib/types/settings'
-import { TimeZoneContext } from '@/lib/utils/contexts'
-import { formatDistanceToNowStrict } from 'date-fns'
+import { DateContext, TimeZoneContext } from '@/lib/utils/contexts'
+import { formatDistanceToNowStrict, isBefore, startOfToday } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import { RefreshCwIcon, RefreshCwOffIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -84,6 +84,7 @@ export function RefreshData({
   lastUpdatedTime,
   onClickedRefreshAction,
 }: RefreshDataProps) {
+  const { isPast } = React.useContext(DateContext)
   const formattedTime = lastUpdatedTime
     ? `${formatDistanceToNowStrict(lastUpdatedTime)} ago`
     : 'never'
@@ -93,12 +94,14 @@ export function RefreshData({
       <div className="flex flex-row items-center justify-center text-xs md:justify-end">
         <div className="flex items-center gap-2 md:flex-col md:items-end">
           <span>Last updated: {formattedTime} </span>
-          <button
-            className={'btn btn-xs btn-accent rounded-field w-fit'}
-            onClick={onClickedRefreshAction}
-          >
-            Refresh <RefreshCwIcon className="h-4 w-4" />
-          </button>
+          {!isPast && (
+            <button
+              className={'btn btn-xs btn-accent rounded-field w-fit'}
+              onClick={onClickedRefreshAction}
+            >
+              Refresh <RefreshCwIcon className="h-4 w-4" />
+            </button>
+          )}
         </div>
       </div>
     </div>

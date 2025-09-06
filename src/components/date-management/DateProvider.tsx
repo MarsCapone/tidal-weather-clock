@@ -3,7 +3,7 @@
 import DatePagination from '@/components/date-management/DatePagination'
 import { DateContext } from '@/lib/utils/contexts'
 import { TZDate } from '@date-fns/tz'
-import { formatISO } from 'date-fns'
+import { formatISO, isBefore, startOfToday } from 'date-fns'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
@@ -19,6 +19,7 @@ export default function DateProvider({
 }: DateProviderProps) {
   const [date, setDate] = useState<TZDate>(initialDate)
   const router = useRouter()
+  const isPast = isBefore(date, startOfToday())
 
   const updateDate = (newDate: TZDate) => {
     setDate(newDate)
@@ -29,7 +30,7 @@ export default function DateProvider({
   }
 
   return (
-    <DateContext value={{ date, setDate }}>
+    <DateContext value={{ date, setDate, isPast }}>
       <DatePagination
         date={date}
         setDate={updateDate}

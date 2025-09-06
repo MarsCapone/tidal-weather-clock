@@ -110,10 +110,14 @@ export async function putActivities(activities: Activity[], userId: string) {
 export type ActivityScore = {
   name: string
   description: string
+  priority: number
   user_id: string
   score: number
   timestamp: string
   debug: Record<string, unknown>
+  activityId: string
+  activityVersion: number
+  dataContextId: number
 }
 
 export async function getBestActivitiesForDatacontext(
@@ -147,16 +151,20 @@ export async function getBestActivitiesForDatacontext(
 
   return results.map(
     ({
-      activity: { name, description, user_id },
-      activity_score: { score, timestamp, debug },
+      activity: { name, description, user_id, version, id, priority },
+      activity_score: { score, timestamp, debug, datacontext_id },
     }) => {
       return {
         name,
         description,
+        priority,
         user_id,
         score,
         timestamp,
         debug,
+        activityId: id,
+        activityVersion: version,
+        dataContextId: datacontext_id,
       } as ActivityScore
     },
   )
