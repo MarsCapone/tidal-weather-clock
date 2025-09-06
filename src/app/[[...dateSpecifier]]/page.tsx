@@ -72,16 +72,22 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
     lastUpdated: dcLastUpdated,
   } = (await getDataContextByDate(initialDate, CONSTANTS.LOCATION_COORDS)) || {}
 
+  const activityScores =
+    dataContextId !== undefined
+      ? await getBestActivitiesForDatacontext(dataContextId, [userId, 'global'])
+      : []
+
   return (
     <DateProvider initialDate={initialDate} dataContextRange={dataContextRange}>
       <div className="flex flex-row items-end justify-end text-xs">
-        data-context-id: {dataContextId}{' '}
+        {dataContextId && `data-context-id: ${dataContextId} `}
         {dcLastUpdated && `| last-updated: ${formatISO(dcLastUpdated)}`}
       </div>
       <MainContentWithoutDate
         activities={activities}
         workingHours={workingHours || defaultWorkingHours}
         dataContext={dataContext}
+        activityScores={activityScores}
       />
     </DateProvider>
   )

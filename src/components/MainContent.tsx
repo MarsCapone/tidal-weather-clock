@@ -7,6 +7,7 @@ import SuggestedActivity from '@/components/SuggestedActivity'
 import { WeatherDetails } from '@/components/WeatherDetails'
 import WeatherOverview from '@/components/WeatherOverview'
 import { APP_CONFIG } from '@/lib/config'
+import { ActivityScore } from '@/lib/db/helpers/activity'
 import { Activity } from '@/lib/types/activity'
 import { DataContext } from '@/lib/types/context'
 import { WorkingHoursSetting } from '@/lib/types/settings'
@@ -24,52 +25,24 @@ export default function MainContentWithoutDate({
   activities,
   workingHours,
   dataContext,
+  activityScores,
 }: {
   activities: Activity[]
   workingHours: WorkingHoursSetting
   dataContext: DataContext | undefined
+  activityScores: ActivityScore[]
 }) {
   const { showSuggestedActivity } = useFlags()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
   const { date } = useContext(DateContext)
 
-  useEffect(() => {}, [date])
-
-  // useEffect(() => {
-  //   tryDataFetchersWithCache(
-  //     logger,
-  //     startOfDay(date, dateOptions),
-  //     APP_CONFIG.dataFetchers,
-  //     APP_CONFIG.clientCache,
-  //     (lat, lng, date) =>
-  //       `[${lat},${lng}]-${formatISO(date, { representation: 'date' })}`,
-  //   ).then((dc) => {
-  //     if (dc === null) {
-  //       logger.warn('final data context is null')
-  //     }
-  //     logger.info('setting data context', { dataContext: dc })
-  //     setDataContext(dc)
-  //     setIsLoading(false)
-  //   })
-  // }, [date])
-
-  if (isLoading) {
+  if (dataContext === undefined) {
     return (
-      <>
-        <h1 className="text-2xl">Loading data...</h1>
-        <span className="loading loading-dots loading-lg"></span>
-      </>
-    )
-  }
-
-  if (dataContext === null || dataContext === undefined) {
-    return (
-      <>
+      <div className="flex flex-col items-center justify-center gap-4">
         <h1 className="text-3xl">No data context available</h1>
-        <button className="btn btn-warning rounded-md">
+        <button className="btn btn-warning w-full rounded-md md:w-36">
           <Link href="/">Back to Today</Link>
         </button>
-      </>
+      </div>
     )
   }
 

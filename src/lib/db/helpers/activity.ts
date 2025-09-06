@@ -107,6 +107,15 @@ export async function putActivities(activities: Activity[], userId: string) {
   logger.debug('updated activities', { activityIds })
 }
 
+export type ActivityScore = {
+  name: string
+  description: string
+  user_id: string
+  score: number
+  timestamp: string
+  debug: Record<string, unknown>
+}
+
 export async function getBestActivitiesForDatacontext(
   dataContextId: number,
   userIds: string[],
@@ -114,7 +123,7 @@ export async function getBestActivitiesForDatacontext(
     scoreThreshold?: number
     futureOnly?: boolean
   },
-) {
+): Promise<ActivityScore[]> {
   const limitFuture = options?.futureOnly ?? false
 
   const results = await db
@@ -148,7 +157,7 @@ export async function getBestActivitiesForDatacontext(
         score,
         timestamp,
         debug,
-      }
+      } as ActivityScore
     },
   )
 }
