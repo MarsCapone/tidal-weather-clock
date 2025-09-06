@@ -1,7 +1,6 @@
 import {
   Activity,
   ActivityScore,
-  Constraint,
   DayConstraint,
   SunConstraint,
   TideConstraint,

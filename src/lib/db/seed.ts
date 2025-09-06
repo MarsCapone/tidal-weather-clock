@@ -1,3 +1,4 @@
+import logger from '@/app/api/pinoLogger'
 import { putActivities } from '@/lib/db/helpers/activity'
 import { db } from '@/lib/db/index'
 import { activityTable } from '@/lib/db/schemas/activity'
@@ -93,7 +94,7 @@ const main = async () => {
   const deleted = await db
     .delete(activityTable)
     .returning({ id: activityTable.id, version: activityTable.version })
-  console.warn('deleted existing activities', deleted)
+  logger.warn('deleted existing activities', { deleted })
 
   await addActivities()
 }

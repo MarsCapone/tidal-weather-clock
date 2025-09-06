@@ -1,4 +1,3 @@
-import logger from '@/app/api/pinoLogger'
 import DateProvider from '@/components/date-management/DateProvider'
 import MainContentWithoutDate from '@/components/MainContent'
 import { getUserId } from '@/lib/auth0'
@@ -16,7 +15,6 @@ import { defaultWorkingHours, WorkingHoursSetting } from '@/lib/types/settings'
 import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
 import { TZDate } from '@date-fns/tz'
 import { addDays, formatISO, isBefore, startOfToday } from 'date-fns'
-import { revalidatePath } from 'next/cache'
 import { notFound } from 'next/navigation'
 import React from 'react'
 

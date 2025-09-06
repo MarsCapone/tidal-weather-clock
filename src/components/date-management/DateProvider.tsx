@@ -2,11 +2,10 @@
 
 import DatePagination from '@/components/date-management/DatePagination'
 import { DateContext } from '@/lib/utils/contexts'
-import logger from '@/lib/utils/logger'
 import { TZDate } from '@date-fns/tz'
 import { formatISO } from 'date-fns'
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 type DateProviderProps = {
   initialDate: TZDate

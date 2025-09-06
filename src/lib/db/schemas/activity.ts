@@ -8,7 +8,6 @@ import {
   primaryKey,
   real,
   text,
-  timestamp,
   uniqueIndex,
 } from 'drizzle-orm/pg-core'
 import { v4 as uuidv4 } from 'uuid'

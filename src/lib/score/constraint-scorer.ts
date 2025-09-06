@@ -1,5 +1,4 @@
 import {
-  Constraint,
   DayConstraint,
   SunConstraint,
   TideConstraint,

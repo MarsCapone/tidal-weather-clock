@@ -1,18 +1,7 @@
-import ClockChart, {
-  ClockChartProps,
-  TimePointer,
-  TimeRange,
-} from '@/components/ClockChart'
-import { getActivityGroupInfo } from '@/components/SuggestedActivity'
 import { ActivityScore } from '@/lib/db/helpers/activity'
 import { DataContext } from '@/lib/types/context'
 import { TimeZoneContext } from '@/lib/utils/contexts'
-import {
-  formatInterval,
-  naiveDateToFractionalLocal,
-  utcDateStringToUtc,
-} from '@/lib/utils/dates'
-import { EnrichedActivityScore } from '@/lib/utils/suggestions'
+import { utcDateStringToUtc } from '@/lib/utils/dates'
 import { tz, TZDate } from '@date-fns/tz'
 import {
   Duration,
