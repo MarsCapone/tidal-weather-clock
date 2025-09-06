@@ -14,7 +14,7 @@ import { DateContext } from '@/lib/utils/contexts'
 import { dateOptions } from '@/lib/utils/dates'
 import tryDataFetchersWithCache from '@/lib/utils/fetchData'
 import logger from '@/lib/utils/logger'
-import { ActivityRecommender, groupScores } from '@/lib/utils/suggestions'
+import { EnrichedActivityScore } from '@/lib/utils/suggestions'
 import { formatISO, startOfDay } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import Link from 'next/link'
@@ -30,6 +30,8 @@ export default function MainContentWithoutDate({
   const { showSuggestedActivity, showActivityTable } = useFlags()
   const [dataContext, setDataContext] = useState<DataContext | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [suggestions, setSuggestions] = useState<EnrichedActivityScore[]>([])
+  const [allSuggestions, setAllSuggestions] = useState<any[]>([])
   const [selectionIndex, setSelectionIndex] = useState(0)
   const { date } = useContext(DateContext)
 
@@ -51,6 +53,44 @@ export default function MainContentWithoutDate({
     })
   }, [date])
 
+  // Fetch suggestions from the backend API when dataContext, activities, or workingHours change
+  useEffect(() => {
+    if (!dataContext) return
+
+    const fetchSuggestions = async () => {
+      try {
+        setIsLoading(true)
+        const dateString = formatISO(date, { representation: 'date' })
+
+        // Prepare query parameters
+        const params = new URLSearchParams()
+        params.append('activities', JSON.stringify(activities))
+        params.append('workingHours', JSON.stringify(workingHours))
+        params.append('groupBy', 'timeAndActivity')
+
+        // Fetch suggestions from the API
+        const response = await fetch(
+          `/api/suggestions/${dateString}?${params.toString()}`,
+        )
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch suggestions: ${response.statusText}`)
+        }
+
+        const data = await response.json()
+        setSuggestions(data.suggestions)
+        setAllSuggestions(data.allSuggestions)
+        setSelectionIndex(0) // Reset selection index when suggestions change
+      } catch (error) {
+        logger.error('Error fetching suggestions', { error })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchSuggestions()
+  }, [dataContext, activities, workingHours, date])
+
   if (isLoading) {
     return (
       <>
@@ -71,22 +111,11 @@ export default function MainContentWithoutDate({
     )
   }
 
-  const suggestions = new ActivityRecommender(
-    dataContext,
-    workingHours,
-  ).getRecommendedActivities(activities || [])
-  const filteredSuggestions = groupScores(
-    suggestions.filter((r) => r.feasible),
-    'timeAndActivity',
-  )
-
   const suggestedActivity =
-    filteredSuggestions.length > 0 ? filteredSuggestions[selectionIndex] : null
+    suggestions.length > 0 ? suggestions[selectionIndex] : null
 
   const nextSuggestion = () =>
-    setSelectionIndex(
-      Math.min(filteredSuggestions.length - 1, selectionIndex + 1),
-    )
+    setSelectionIndex(Math.min(suggestions.length - 1, selectionIndex + 1))
   const prevSuggestion = () =>
     setSelectionIndex(Math.max(0, selectionIndex - 1))
 
@@ -128,7 +157,7 @@ export default function MainContentWithoutDate({
         </div>
         {showActivityTable && showSuggestedActivity && (
           <div className="my-8">
-            <ActivityScoreList scores={suggestions} />
+            <ActivityScoreList scores={allSuggestions} />
           </div>
         )}
       </div>

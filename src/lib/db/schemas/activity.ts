@@ -42,6 +42,7 @@ export const activityScoresTable = pgTable(
     datacontext_id: integer().references(() => datacontextTable.id),
     activity_id: text(),
     activity_version: integer(),
+    timestamp: text().notNull(),
     score: real().notNull().default(0),
     debug: json().notNull().default('{}'),
   },
@@ -54,6 +55,7 @@ export const activityScoresTable = pgTable(
       table.activity_id,
       table.activity_version,
       table.datacontext_id,
+      table.timestamp,
     ),
   ],
 )

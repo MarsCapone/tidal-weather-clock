@@ -48,7 +48,7 @@ const EXPIRY_HOURS = 24
  *
  * @param date the date to get the datacontext for
  */
-async function getDataContextForDateString(
+export async function getDataContextForDateString(
   date: Date,
 ): Promise<DataContext | null> {
   const today = startOfToday()

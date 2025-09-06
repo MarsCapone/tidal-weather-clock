@@ -2,6 +2,7 @@ import logger from '@/app/api/pinoLogger'
 import { db } from '@/lib/db'
 import { activityTable } from '@/lib/db/schemas/activity'
 import { Activity } from '@/lib/types/activity'
+import { DataContext } from '@/lib/types/context'
 import { and, desc, inArray, sql } from 'drizzle-orm'
 
 export async function getActivitiesByUserId(
@@ -50,7 +51,25 @@ export async function getActivitiesByUserId(
   return activityResponses
 }
 
-//  TODO: rethink how activities are stored so that it's easier to manage them
+export async function getAllActivities(): Promise<Activity[]> {
+  const dbResult = await db
+    .selectDistinctOn([activityTable.id])
+    .from(activityTable)
+    .orderBy(activityTable.id, desc(activityTable.version))
+
+  return dbResult.map(
+    ({ id, name, description, priority, content, version, user_id }) => ({
+      id,
+      name,
+      description,
+      priority,
+      scope: user_id === 'global' ? 'global' : 'user',
+      version,
+      user_id,
+      constraints: content['constraints'] || [],
+    }),
+  )
+}
 
 export async function putActivities(activities: Activity[], userId: string) {
   // we do not want to overwrite global activities, unless we are setting them for the global user

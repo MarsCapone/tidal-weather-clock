@@ -42,17 +42,19 @@ export async function getScores({
   const timeSlots: TimeSlot[] = hoursOfDay
     .map((h) => {
       const hourTimestamp = formatISO(h, dateOptions)
-      const wind = dataContext.windData.points.find(
-        ({ timestamp }) => timestamp === hourTimestamp,
+      const wind = dataContext.windData.points.find(({ timestamp }) =>
+        hourTimestamp.startsWith(timestamp),
       )
-      const weather = dataContext.weatherData.points.find(
-        ({ timestamp }) => timestamp === hourTimestamp,
+      const weather = dataContext.weatherData.points.find(({ timestamp }) =>
+        hourTimestamp.startsWith(timestamp),
       )
       if (wind === undefined || weather === undefined) {
         logger.warn('Not enough data to build timeslot', {
           hour: h,
-          wind: dataContext.windData.points,
-          weather: dataContext.weatherData.points,
+          wind: dataContext.windData.points.map(({ timestamp }) => timestamp),
+          weather: dataContext.weatherData.points.map(
+            ({ timestamp }) => timestamp,
+          ),
         })
         return null
       }
@@ -106,11 +108,15 @@ export async function getScores({
     }
   })
 
-  await uploadDebugData('activityScore', 'activity_score_calculation.json', {
-    dataContext,
-    activity,
-    scores,
-  })
+  await uploadDebugData(
+    'activityScore',
+    `activity_score_calculation-${activity.id}@v${activity.version}.json`,
+    {
+      dataContext,
+      activity,
+      scores,
+    },
+  )
 
   return scores
 }

@@ -88,7 +88,7 @@ export async function getDataContextByDate(
 export async function addDataContext(
   dataContext: DataContext,
   location: LatLong,
-): Promise<void> {
+): Promise<number> {
   const [latitude, longitude] = location
 
   const [{ id }] = await db
@@ -117,4 +117,5 @@ export async function addDataContext(
     location,
     date: dataContext.referenceDate,
   })
+  return id
 }

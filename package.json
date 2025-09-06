@@ -38,6 +38,7 @@
     "diff-arrays-of-objects": "^1.1.9",
     "drizzle-orm": "^0.44.4",
     "express": "^5.1.0",
+    "fast-cartesian": "^9.0.1",
     "fast-equals": "^5.2.2",
     "jsdom": "^26.1.0",
     "json-edit-react": "^1.28.2",

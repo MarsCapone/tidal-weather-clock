@@ -23,6 +23,7 @@ export async function uploadDebugData(
 
   const { url } = await put(fileName, JSON.stringify(data), {
     access: 'public',
+    addRandomSuffix: true,
   })
 
   logger.debug(`uploaded debug data`, {
