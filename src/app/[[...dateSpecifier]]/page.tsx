@@ -61,7 +61,7 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
   const dataContextRange = await getDataContextRange(CONSTANTS.LOCATION_COORDS)
   const workingHours = await getOrPutSetting<WorkingHoursSetting>(
     'working_hours',
-    userId,
+    userId || 'global',
     defaultWorkingHours,
   )
   const {
@@ -76,7 +76,7 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
     return dataContextId !== undefined
       ? await getBestActivitiesForDatacontext(
           dataContextId,
-          [userId, 'global'],
+          [userId || 'global', 'global'],
           {
             futureOnly: !dateIsInThePast, // todo: add a setting for these
             scoreThreshold,

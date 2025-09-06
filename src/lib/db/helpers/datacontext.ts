@@ -4,7 +4,7 @@ import { datacontextTable } from '@/lib/db/schemas/datacontext'
 import { DataContext } from '@/lib/types/context'
 import { LatLong } from '@/lib/types/settings'
 import { formatISO } from 'date-fns'
-import { and, eq, sql } from 'drizzle-orm'
+import { and, eq, gte, lte, sql } from 'drizzle-orm'
 
 export async function getDataContextRange(
   location: [number, number],
@@ -45,8 +45,27 @@ export async function getDataContextByDate(
   date: Date,
   location: [number, number],
 ): Promise<{ id: number; dataContext: DataContext; lastUpdated: Date } | null> {
+  const results = await getDataContextsByDateRange(date, date, location)
+  if (results.length > 0) {
+    const { id, dataContext, lastUpdated } = results[0]
+    logger.debug('fetched data context from db', {
+      date,
+      lastUpdated,
+      location,
+      id,
+    })
+    return { id, dataContext, lastUpdated }
+  }
+  return null
+}
+
+export async function getDataContextsByDateRange(
+  startDate: Date,
+  endDate: Date,
+  location: [number, number],
+): Promise<{ id: number; dataContext: DataContext; lastUpdated: Date }[]> {
   const [latitude, longitude] = location
-  const [result] = await db
+  const results = await db
     .select({
       id: datacontextTable.id,
       dataContext: datacontextTable.data,
@@ -55,34 +74,24 @@ export async function getDataContextByDate(
     .from(datacontextTable)
     .where(
       and(
-        eq(datacontextTable.date, formatISO(date, { representation: 'date' })),
+        gte(
+          datacontextTable.date,
+          formatISO(startDate, { representation: 'date' }),
+        ),
+        lte(
+          datacontextTable.date,
+          formatISO(endDate, { representation: 'date' }),
+        ),
         eq(datacontextTable.latitude, latitude),
         eq(datacontextTable.longitude, longitude),
       ),
     )
 
-  if (!result) {
-    return null
-  }
-
-  const { id, dataContext, lastUpdated } = result
-
-  logger.debug('fetched data context from db', {
-    date,
-    lastUpdated,
-    location,
-    id,
-  })
-
-  return {
-    id,
-    dataContext,
-    lastUpdated,
-  } as {
+  return results as {
     id: number
     dataContext: DataContext
     lastUpdated: Date
-  }
+  }[]
 }
 
 export async function addDataContext(

@@ -7,13 +7,17 @@ export default async function OutOfHoursSettings() {
   const userId = await getUserId()
   const workingHours = await getOrPutSetting<WorkingHoursSetting>(
     'working_hours',
-    userId,
+    userId || 'global',
     defaultWorkingHours,
   )
 
   async function updateWorkingHours(wh: WorkingHoursSetting) {
     'use server'
-    await putSetting<WorkingHoursSetting>('working_hours', wh, userId)
+    await putSetting<WorkingHoursSetting>(
+      'working_hours',
+      wh,
+      userId || 'global',
+    )
   }
 
   return (

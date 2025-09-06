@@ -289,8 +289,6 @@ export class OpenMeteoAndEasyTideDataFetcher implements IDataContextFetcher {
     if (!dailyPoint || hourlyPoints.length === 0) {
       this.logger.error('No data for date', {
         date,
-        openMeteoDaily,
-        openMeteoHourly,
       })
       throw new Error('No data for date')
     }
