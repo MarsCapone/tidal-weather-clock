@@ -1,6 +1,6 @@
 import { ActivityScore } from '@/lib/db/helpers/activity'
 import { DataContext } from '@/lib/types/context'
-import { TimeZoneContext } from '@/lib/utils/contexts'
+import { DateContext, TimeZoneContext } from '@/lib/utils/contexts'
 import { utcDateStringToUtc } from '@/lib/utils/dates'
 import { tz, TZDate } from '@date-fns/tz'
 import {
@@ -38,6 +38,7 @@ export function TimeToNext({
   const [currentTime, setCurrentTime] = React.useState<TZDate>(new TZDate())
   const { showSecondsCountdown, showSuggestedActivity } = useFlags()
   const { timeZone } = useContext(TimeZoneContext)
+  const { isPast } = useContext(DateContext)
 
   useEffect(() => {
     const updateTime = () => {
@@ -67,11 +68,9 @@ export function TimeToNext({
     suggestedActivity &&
     utcDateStringToUtc(suggestedActivity.timestamp).withTimeZone(timeZone)
 
-  const isInThePast = timestamp ? isBefore(timestamp, currentTime) : false
-
   const activityView = getActivityView(
     suggestedActivity,
-    isInThePast,
+    isPast,
     showSuggestedActivity,
     {
       diff,
@@ -80,7 +79,7 @@ export function TimeToNext({
     },
   )
 
-  if (isInThePast) {
+  if (isPast) {
     return (
       <div className="flex flex-col items-center justify-center gap-1 px-10 py-2">
         <div className="mb-8">
@@ -138,9 +137,6 @@ function getActivityView(
     return (
       <>
         {activity}
-        <div className="bg-base-content text-base-100 w-fit px-1 py-0.5 text-xl font-extrabold md:text-3xl xl:text-5xl">
-          {suggestedActivity.name}
-        </div>
         <div className="text-md font-bold md:text-xl xl:text-3xl">
           was the activity suggested
         </div>
