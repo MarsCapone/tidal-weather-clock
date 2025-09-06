@@ -1,17 +1,10 @@
 import logger from '@/app/api/pinoLogger'
-import { doRefresh } from '@/app/api/refresh'
+import { doRefresh, refreshDataContexts } from '@/app/api/refresh'
 import { OpenMeteoAndEasyTideDataFetcher } from '@/app/api/refresh/opendatasources'
 import CONSTANTS from '@/lib/constants'
-import { db } from '@/lib/db'
-import { getAllActivities } from '@/lib/db/helpers/activity'
-import { addDataContext } from '@/lib/db/helpers/datacontext'
-import { activityScoresTable } from '@/lib/db/schemas/activity'
-import { getScores } from '@/lib/score'
 import { dateOptions } from '@/lib/utils/dates'
 import { deleteDebugData } from '@/lib/utils/debug'
 import { addDays, formatISO, startOfToday } from 'date-fns'
-import { sql } from 'drizzle-orm'
-import fastCartesian from 'fast-cartesian'
 
 export async function GET(request: Request): Promise<Response> {
   /* This handler will be called when the cron job runs.
@@ -30,13 +23,7 @@ export async function GET(request: Request): Promise<Response> {
 
   // refresh all data contexts
   const today = startOfToday(dateOptions)
-  const dataFetcher = new OpenMeteoAndEasyTideDataFetcher(logger)
-  const dataContexts = await dataFetcher.getDataContexts(today)
-
-  await Promise.all(
-    dataContexts.map((dc) => addDataContext(dc, CONSTANTS.LOCATION_COORDS)),
-  )
-  logger.debug('Refreshed data contexts', { count: dataContexts.length })
+  const dataContextIds = await refreshDataContexts(today)
 
   const { updatedScoreCount } = await doRefresh({
     scope: 'all',
@@ -46,12 +33,12 @@ export async function GET(request: Request): Promise<Response> {
   })
 
   logger.info('Cron job completed successfully', {
-    dataContextsCount: dataContexts.length,
+    dataContextsCount: dataContextIds.length,
     date: formatISO(today, dateOptions),
   })
 
   return Response.json({
-    dataContextsCount: dataContexts.length,
+    dataContextsCount: dataContextIds.length,
     activityScoresCount: updatedScoreCount,
     date: formatISO(today, dateOptions),
     message: 'Cron job completed successfully',

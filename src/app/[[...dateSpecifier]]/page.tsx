@@ -1,5 +1,7 @@
+import logger from '@/app/api/pinoLogger'
+import { doRefresh, DoRefreshOptions } from '@/app/api/refresh'
 import DateProvider from '@/components/date-management/DateProvider'
-import MainContentWithoutDate from '@/components/MainContent'
+import MainContent, { RefreshData } from '@/components/MainContent'
 import { getUserId } from '@/lib/auth0'
 import CONSTANTS from '@/lib/constants'
 import {
@@ -12,7 +14,12 @@ import {
 } from '@/lib/db/helpers/datacontext'
 import { getOrPutSetting } from '@/lib/db/helpers/settings'
 import { defaultWorkingHours, WorkingHoursSetting } from '@/lib/types/settings'
-import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
+import {
+  dateOptions,
+  utcDateStringToUtc,
+  utcDateToLocalDateString,
+  utcDateToLocalTimeString,
+} from '@/lib/utils/dates'
 import { TZDate } from '@date-fns/tz'
 import { addDays, formatISO, isBefore, startOfToday } from 'date-fns'
 import { notFound } from 'next/navigation'
@@ -88,13 +95,26 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
   const activityScores = await getActivityScoresWithThreshhold(0.5)
   const allActivityScores = await getActivityScoresWithThreshhold(0)
 
+  const refreshData = async () => {
+    'use server'
+    const options = {
+      scope: 'user',
+      userId,
+      startDate: initialDate,
+      endDate: initialDate,
+      refreshDataContext: true,
+    }
+    logger.info('Refreshing data', options)
+    await doRefresh(options as DoRefreshOptions)
+  }
+
   return (
     <DateProvider initialDate={initialDate} dataContextRange={dataContextRange}>
-      <div className="flex flex-row items-end justify-end text-xs">
-        {dataContextId && `data-context-id: ${dataContextId} `}
-        {dcLastUpdated && `| last-updated: ${formatISO(dcLastUpdated)}`}
-      </div>
-      <MainContentWithoutDate
+      <RefreshData
+        lastUpdatedTime={dcLastUpdated}
+        onClickedRefreshAction={refreshData}
+      />
+      <MainContent
         activities={activities}
         workingHours={workingHours || defaultWorkingHours}
         dataContext={dataContext}

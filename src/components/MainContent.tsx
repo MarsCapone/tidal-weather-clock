@@ -9,11 +9,14 @@ import { ActivityScore } from '@/lib/db/helpers/activity'
 import { Activity } from '@/lib/types/activity'
 import { DataContext } from '@/lib/types/context'
 import { WorkingHoursSetting } from '@/lib/types/settings'
+import { TimeZoneContext } from '@/lib/utils/contexts'
+import { formatDistanceToNowStrict } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
+import { RefreshCwIcon, RefreshCwOffIcon } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
-export default function MainContentWithoutDate({
+export default function MainContent({
   workingHours,
   dataContext,
   activityScores,
@@ -70,5 +73,34 @@ export default function MainContentWithoutDate({
         </div>
       </div>
     </>
+  )
+}
+
+export type RefreshDataProps = {
+  lastUpdatedTime: Date | undefined
+  onClickedRefreshAction: () => void
+}
+export function RefreshData({
+  lastUpdatedTime,
+  onClickedRefreshAction,
+}: RefreshDataProps) {
+  const formattedTime = lastUpdatedTime
+    ? `${formatDistanceToNowStrict(lastUpdatedTime)} ago`
+    : 'never'
+
+  return (
+    <div className="md:bg-base-100 p-4 md:absolute md:top-24 md:right-2 md:z-10">
+      <div className="flex flex-row items-center justify-center text-xs md:justify-end">
+        <div className="flex items-center gap-2 md:flex-col md:items-end">
+          <span>Last updated: {formattedTime} </span>
+          <button
+            className={'btn btn-xs btn-accent rounded-field w-fit'}
+            onClick={onClickedRefreshAction}
+          >
+            Refresh <RefreshCwIcon className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }
