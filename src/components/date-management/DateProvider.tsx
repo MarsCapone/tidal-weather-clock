@@ -1,8 +1,11 @@
 'use client'
-import { DateContext } from '@/lib/utils/contexts'
-import { TZDate } from '@date-fns/tz'
-import React, { useState } from 'react'
+
 import DatePagination from '@/components/date-management/DatePagination'
+import { DateContext } from '@/lib/utils/contexts'
+import logger from '@/lib/utils/logger'
+import { TZDate } from '@date-fns/tz'
+import { formatISO } from 'date-fns'
+import React, { useState } from 'react'
 
 type DateProviderProps = {
   initialDate: TZDate
@@ -16,11 +19,34 @@ export default function DateProvider({
 }: DateProviderProps) {
   const [date, setDate] = useState<TZDate>(initialDate)
 
+  const updateDate = (newDate: TZDate) => {
+    setDate(newDate)
+    window.history.pushState(
+      {
+        date: formatISO(newDate, { representation: 'date' }),
+      },
+      '',
+      `/static/${formatISO(newDate, {
+        representation: 'date',
+      })}`,
+    )
+  }
+
+  window.addEventListener('popstate', (event) => {
+    const stateDate = event.state.date
+    logger.debug('detected history state change', {
+      stateDate,
+    })
+    if (stateDate !== undefined) {
+      setDate(stateDate)
+    }
+  })
+
   return (
     <DateContext value={{ date, setDate }}>
       <DatePagination
         date={date}
-        setDate={setDate}
+        setDate={updateDate}
         dataContextRange={dataContextRange}
       />
       {children}
