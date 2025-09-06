@@ -9,11 +9,9 @@ const defaultConstraints: Record<string, Constraint> = {
   highTide: {
     type: 'tide',
     minHeight: 0.9,
-    timeFromTideEvent: {
-      event: 'high',
-      maxHoursAfter: 2,
-      maxHoursBefore: 2,
-    },
+    eventType: 'high',
+    maxHoursAfter: 2,
+    maxHoursBefore: 2,
   },
   daylight: {
     type: 'sun',
@@ -22,11 +20,9 @@ const defaultConstraints: Record<string, Constraint> = {
   },
   lowTide: {
     type: 'tide',
-    timeFromTideEvent: {
-      event: 'low',
-      maxHoursAfter: 1.5,
-      maxHoursBefore: 1.5,
-    },
+    eventType: 'low',
+    maxHoursAfter: 1.5,
+    maxHoursBefore: 1.5,
   },
 }
 
