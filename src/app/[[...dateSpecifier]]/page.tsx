@@ -15,7 +15,7 @@ import { getOrPutSetting } from '@/lib/db/helpers/settings'
 import { defaultWorkingHours, WorkingHoursSetting } from '@/lib/types/settings'
 import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
 import { TZDate } from '@date-fns/tz'
-import { addDays, formatISO, startOfToday } from 'date-fns'
+import { addDays, formatISO, isBefore, startOfToday } from 'date-fns'
 import { revalidatePath } from 'next/cache'
 import { notFound } from 'next/navigation'
 import React from 'react'
@@ -72,9 +72,18 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
     lastUpdated: dcLastUpdated,
   } = (await getDataContextByDate(initialDate, CONSTANTS.LOCATION_COORDS)) || {}
 
+  const dateIsInThePast = isBefore(initialDate, startOfToday(dateOptions))
+
   const activityScores =
     dataContextId !== undefined
-      ? await getBestActivitiesForDatacontext(dataContextId, [userId, 'global'])
+      ? await getBestActivitiesForDatacontext(
+          dataContextId,
+          [userId, 'global'],
+          {
+            futureOnly: !dateIsInThePast, // todo: add a setting for these
+            scoreThreshold: 0.5,
+          },
+        )
       : []
 
   return (

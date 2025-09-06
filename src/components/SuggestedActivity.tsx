@@ -1,6 +1,10 @@
+import { ActivityScore } from '@/lib/db/helpers/activity'
 import { Constraint } from '@/lib/types/activity'
-import { DarkModeContext } from '@/lib/utils/contexts'
-import { formatInterval } from '@/lib/utils/dates'
+import { DarkModeContext, TimeZoneContext } from '@/lib/utils/contexts'
+import {
+  formatInterval,
+  utcDateStringToLocalTimeString,
+} from '@/lib/utils/dates'
 import {
   ActivityGroupInfo,
   EnrichedActivityScore,
@@ -12,7 +16,7 @@ import React, { useContext, useEffect } from 'react'
 import GenericObject from './GenericObject'
 
 export type SuggestedActivityProps = {
-  activityScore: EnrichedActivityScore | null
+  activityScore: ActivityScore | null
   className?: string
   nextSuggestion?: () => void
   prevSuggestion?: () => void
@@ -27,47 +31,39 @@ export default function SuggestedActivity({
   prevSuggestion,
 }: SuggestedActivityProps) {
   const { useDescriptiveIntervals } = useFlags()
+  const { timeZone } = useContext(TimeZoneContext)
 
   // don't show this panel at all if there is nothing to show
   if (!activityScore) {
     return null
   }
 
-  const intervals = getActivityGroupInfo(activityScore)
-
   return (
     <SuggestedActivityContent className={className}>
-      <p className="text-2xl font-extrabold">{activityScore.activity.name}</p>
-      <div className="text-base-content/50 flex flex-row justify-around gap-4 font-mono text-sm md:flex-col lg:flex-row">
-        {intervals.map((agi, i) => (
-          <div
-            className="flex flex-col justify-center md:gap-x-2"
-            key={`interval-${i}`}
-          >
-            {formatInterval(agi.interval, 1, useDescriptiveIntervals).map(
-              (part, j) => (
-                <div key={j}>{part}</div>
-              ),
-            )}
-            <div>{renderScore(agi.score)}</div>
+      <div className="flex flex-col justify-center gap-8 md:flex-row">
+        <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
+          <div className="text-2xl font-extrabold">
+            {activityScore.name}
+            <span className={'px-4 font-normal'}>at</span>
+            {utcDateStringToLocalTimeString(activityScore.timestamp, {
+              tz: timeZone,
+            })}
           </div>
-        ))}
-      </div>
-      <div className="card-actions">
-        <div className="w-full">
-          <div className="flex flex-row justify-between gap-2 md:flex-col lg:flex-row">
-            <NavButton
-              direction="prev"
-              disabled={prevSuggestion === undefined}
-              onClick={prevSuggestion}
-            />
-            <ExplainButton selection={activityScore} />
-            <NavButton
-              direction="next"
-              disabled={nextSuggestion === undefined}
-              onClick={nextSuggestion}
-            />
-          </div>
+          <span className="flex flex-row items-center gap-1">
+            ({renderScore(activityScore.score)})
+          </span>
+        </div>
+        <div className="flex flex-row justify-between gap-2 md:flex-col lg:flex-row">
+          <NavButton
+            direction="prev"
+            disabled={prevSuggestion === undefined}
+            onClick={prevSuggestion}
+          />
+          <NavButton
+            direction="next"
+            disabled={nextSuggestion === undefined}
+            onClick={nextSuggestion}
+          />
         </div>
       </div>
     </SuggestedActivityContent>
@@ -105,38 +101,6 @@ const renderScore = (score: number) => {
   )
 }
 
-export type ExplainButtonProps = {
-  selection: EnrichedActivityScore
-}
-
-export function ExplainButton({ selection }: ExplainButtonProps) {
-  if (!selection || !selection.activity) {
-    return null
-  }
-
-  const dialogId = `explain-${Math.random().toString(36)}`
-  const openDialog = () => {
-    const dialog = document.getElementById(dialogId) as HTMLDialogElement
-    if (dialog) {
-      dialog.showModal()
-    }
-  }
-  return (
-    <>
-      <div
-        className="btn btn-primary flex-grow rounded-sm"
-        onClick={() => openDialog()}
-      >
-        Explain
-      </div>
-      <SuggestedActivityExplanationDialog
-        dialogId={dialogId}
-        suggestedActivity={selection}
-      />
-    </>
-  )
-}
-
 function SuggestedActivityContent({
   children,
   className,
@@ -145,9 +109,9 @@ function SuggestedActivityContent({
   className?: string
 }) {
   return (
-    <div className={`card card-lg shadow-sm ${className || ''}`}>
+    <div className={`card card-md ${className || ''}`}>
       <div className="card-body">
-        <div className="card-title">Suggested Activity</div>
+        <div className="card-title">The next best activity is:</div>
         {children}
       </div>
     </div>
@@ -168,7 +132,7 @@ function NavButton({
 }: NavButtonProps) {
   return (
     <button
-      className={`btn btn-secondary join-item rounded-sm lg:w-1/4 ${disabled ? 'disabled btn-disabled' : ''} ${className || ''}`}
+      className={`btn btn-secondary join-item w-36 rounded-sm sm:w-48 ${disabled ? 'disabled btn-disabled' : ''} ${className || ''}`}
       onClick={() => {
         if (!disabled && onClick) {
           onClick()
@@ -176,205 +140,7 @@ function NavButton({
       }}
     >
       {direction === 'next' ? 'Next' : 'Previous'}
+      <span className="hidden sm:block">suggestion</span>
     </button>
-  )
-}
-
-type SuggestedActivityExplanationDialogProps = {
-  dialogId: string
-  suggestedActivity: EnrichedActivityScore
-}
-function SuggestedActivityExplanationDialog({
-  dialogId,
-  suggestedActivity,
-}: SuggestedActivityExplanationDialogProps) {
-  const { debugMode, usAiExplanations: useAiExplanations } = useFlags()
-  const [aiExplanations, setAiExplanations] = React.useState<string[] | null>(
-    null,
-  )
-  const { isDarkMode } = useContext(DarkModeContext)
-
-  useEffect(() => {
-    if (!useAiExplanations) {
-      return
-    }
-
-    // the relevant information to send to the AI for explanation is:
-    // - the activity name
-    // - the intervals with scores
-    // - the constraints
-    // - the context
-    const intervals: ActivityGroupInfo[] = (
-      suggestedActivity.intervals || [
-        {
-          constraintScores: suggestedActivity.constraintScores,
-          interval: suggestedActivity.interval,
-          score: suggestedActivity.score,
-          slot: suggestedActivity.debug?.slot,
-        },
-      ]
-    )
-      .sort((a, b) => compareAsc(a.interval.start, b.interval.start))
-      .map((agi) => {
-        const { start, end } = agi.interval
-        return {
-          ...agi,
-          interval: {
-            start,
-            end: addHours(end, 1), // end is inclusive, so we add 1 hour to make it exclusive
-          },
-        }
-      })
-
-    const scope = {
-      activityName: suggestedActivity.activity.name,
-      activityPriority: suggestedActivity.activity.priority,
-      contexts: intervals,
-      constraints: suggestedActivity.activity.constraints,
-    }
-
-    fetch('/api/explain', {
-      method: 'POST',
-      body: JSON.stringify({ scope, debugMode }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.explanation) {
-          setAiExplanations(data.explanation)
-        }
-      })
-  }, [suggestedActivity, debugMode, useAiExplanations])
-
-  const intervals = (
-    'intervals' in suggestedActivity
-      ? suggestedActivity.intervals!
-      : [
-          {
-            constraintScores: suggestedActivity.constraintScores,
-            interval: suggestedActivity.interval,
-            score: suggestedActivity.score,
-            slot: suggestedActivity.debug?.slot,
-          },
-        ]
-  ).sort((a, b) => compareAsc(a.interval.start, b.interval.start))
-
-  const constraintsMap: {
-    [p: string]: Omit<Constraint, 'type'>
-  } = Object.fromEntries(
-    suggestedActivity.activity.constraints.map((constraint, index) => {
-      const { type, ...constraintWithoutType } = constraint
-
-      return [`${index}:${type}`, constraintWithoutType]
-    }),
-  )
-
-  return (
-    <dialog className="modal" id={dialogId}>
-      <div className="modal-box max-h-5xl h-11/12 w-11/12 max-w-5xl">
-        <p className="text-2xl font-extrabold">
-          {suggestedActivity.activity.name}
-        </p>
-        <div className="">
-          <div className="overflow-x-auto">
-            <table className="table-primary table-md table-pin-rows table">
-              <thead>
-                <tr>
-                  <th className="min-w-32">Time</th>
-                  <th>Average Score</th>
-                  {useAiExplanations && <th>Explanation</th>}
-                  {(debugMode || !useAiExplanations) && (
-                    <>
-                      <th>Detailed Score</th>
-                      <th>Configuration</th>
-                      <th>Context</th>
-                    </>
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {intervals.map((interval, i) => {
-                  return (
-                    <tr key={`$interval-${i}`}>
-                      <td className="align-text-top">
-                        {formatInterval(interval.interval, 1)}
-                      </td>
-                      <td className="flex flex-col align-text-top">
-                        <span>{interval.score.toFixed(3)}</span>
-                        <span>{renderScore(interval.score)}</span>
-                      </td>
-                      {useAiExplanations && (
-                        <td className="align-text-top">
-                          <MarkdownPreview
-                            source={
-                              aiExplanations
-                                ? aiExplanations[i]
-                                  ? aiExplanations[i].trim()
-                                  : 'No explanation available'
-                                : 'Thinking...'
-                            }
-                            className=""
-                            wrapperElement={{
-                              'data-color-mode': isDarkMode ? 'dark' : 'light',
-                            }}
-                          />
-                        </td>
-                      )}
-                      {(debugMode || !useAiExplanations) && (
-                        <>
-                          <td className="align-text-top">
-                            {interval.constraintScores && (
-                              <GenericObject
-                                className={'w-40 text-sm'}
-                                obj={interval.constraintScores}
-                                options={{
-                                  decimalPlaces: 2,
-                                }}
-                              />
-                            )}
-                          </td>
-                          <td className="align-text-top">
-                            <GenericObject
-                              className={'w-20'}
-                              obj={{
-                                ...constraintsMap,
-                                '+:priority':
-                                  suggestedActivity.activity.priority,
-                              }}
-                              options={{
-                                decimalPlaces: 0,
-                                jsonEditorProps: {
-                                  minWidth: 300,
-                                },
-                              }}
-                            />
-                          </td>
-                          <td className="align-text-top">
-                            <GenericObject
-                              className={'w-20'}
-                              obj={interval.slot || {}}
-                              options={{
-                                jsonEditorProps: {
-                                  minWidth: 300,
-                                },
-                              }}
-                            />
-                          </td>
-                        </>
-                      )}
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <form className="modal-backdrop" method="dialog">
-        <button>close</button>
-      </form>
-    </dialog>
   )
 }
