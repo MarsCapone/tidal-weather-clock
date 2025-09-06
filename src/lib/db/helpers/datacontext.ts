@@ -3,7 +3,7 @@ import { db } from '@/lib/db'
 import { datacontextTable } from '@/lib/db/schemas/datacontext'
 import { DataContext } from '@/lib/types/context'
 import { LatLong } from '@/lib/types/settings'
-import { formatISO } from 'date-fns'
+import { addDays, formatISO } from 'date-fns'
 import { and, eq, gte, lte, sql } from 'drizzle-orm'
 
 export async function getDataContextRange(
@@ -65,6 +65,9 @@ export async function getDataContextsByDateRange(
   location: [number, number],
 ): Promise<{ id: number; dataContext: DataContext; lastUpdated: Date }[]> {
   const [latitude, longitude] = location
+  if (startDate.getTime() === endDate.getTime()) {
+    endDate = addDays(endDate, 1)
+  }
   const results = await db
     .select({
       id: datacontextTable.id,
