@@ -1,6 +1,14 @@
 import { ActivityScore } from '@/lib/db/helpers/activity'
+import getHumanReadableScore from '@/lib/utils/activity-score-formatter'
 import { TimeZoneContext } from '@/lib/utils/contexts'
 import { utcDateStringToLocalTimeString } from '@/lib/utils/dates'
+import {
+  ActivityScoreWithInterval,
+  groupActivityScores,
+} from '@/lib/utils/group-activity-score'
+import { formatISO } from 'date-fns'
+import { JsonEditor } from 'json-edit-react'
+import { ArrowRight } from 'lucide-react'
 import React from 'react'
 
 export type MoreSuggestionsProps = {
@@ -66,12 +74,17 @@ function MoreSuggestionsDialog({
   dialogId,
   activityScores,
 }: MoreSuggestionsDialogProps) {
+  const groupedScores = groupActivityScores(activityScores)
+
   return (
     <dialog className={'modal'} id={dialogId}>
       <div className="modal-box max-h-5xl max-w-5xl">
         <div className="flex flex-col justify-start">
-          {activityScores.map((score, i) => (
-            <SingleActivityScore key={`score-${i}`} score={score} />
+          {groupedScores.flatMap((score, index) => (
+            <React.Fragment key={`score-${index}`}>
+              {!!index && <div className={'divider'} />}
+              <SingleActivityScore score={score} />
+            </React.Fragment>
           ))}
         </div>
       </div>
@@ -82,30 +95,73 @@ function MoreSuggestionsDialog({
   )
 }
 
-function SingleActivityScore({ score }: { score: ActivityScore }) {
-  const { timeZone } = React.useContext(TimeZoneContext)
+function SingleActivityScore({ score }: { score: ActivityScoreWithInterval }) {
+  const scoreOutOfFive = (score.score * 5).toFixed(1)
+
   return (
     <div className="flex flex-col">
-      <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
-        <div className="text-2xl font-extrabold">
-          {score.name}
-          <span className={'px-4 font-normal'}>at</span>
-          {utcDateStringToLocalTimeString(score.timestamp, {
-            tz: timeZone,
-          })}
-        </div>
+      <div className="flex flex-col items-center justify-center gap-2">
+        <div className="text-2xl font-extrabold">{score.name}</div>
+        <div className="text-sm font-thin italic">{score.description}</div>
+        <Interval
+          start={score.interval.startTimestamp}
+          end={score.interval.endTimestamp}
+        />
         <span className="flex flex-row items-center gap-2">
           {renderScore(score.score)}
-          <span>{score.score * 100}%</span>
+          <span>({scoreOutOfFive})</span>
         </span>
       </div>
-      <div className="text-sm font-thin">{score.description}</div>
-      {/*<div>{JSON.stringify(score.debug)}</div>*/}
+      {/*<ExplainedScore score={score} />*/}
     </div>
   )
 }
 
-const renderScore = (score: number) => {
+function Interval({ start, end }: { start: string; end: string }) {
+  const { timeZone } = React.useContext(TimeZoneContext)
+  function LocalTime({ timestamp }: { timestamp: string }) {
+    return (
+      <div>
+        <div className="flex flex-col items-center gap-0 text-xl font-bold">
+          <span>
+            {utcDateStringToLocalTimeString(timestamp, { tz: timeZone })}
+          </span>
+          <span className="text-xs font-thin">
+            {formatISO(timestamp, { representation: 'date' })}
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-row items-center gap-1">
+      <LocalTime timestamp={start} />
+      <div className={'px-4 font-normal'}>
+        <ArrowRight className="h-6 w-6" />
+      </div>
+      <LocalTime timestamp={end} />
+    </div>
+  )
+}
+
+function ExplainedScore({ score }: { score: ActivityScore }) {
+  const readableScores = getHumanReadableScore(score.debug)
+
+  const reasons = readableScores.constraintAnalysis.map(
+    (reason, i) => reason.details,
+  )
+
+  return (
+    <div>
+      <div>{reasons.join(' | ')}</div>
+      <JsonEditor data={readableScores} />
+      <JsonEditor data={score.debug} />
+    </div>
+  )
+}
+
+function renderScore(score: number): React.ReactElement {
   // max score is 1. 5 half stars gives 10 possible options
   const outOf10 = Math.round(score * 10)
   return (

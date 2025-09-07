@@ -73,15 +73,6 @@ export type Activity = {
   version?: number
 }
 
-export type ActivityScore<DebugType = never> = {
-  activity: Activity
-  constraintScores: { [constraintType: string]: number }
-  debug?: DebugType
-  feasible: boolean
-  score: number
-  timestamp: string
-}
-
 export type TimeSlot = {
   timestamp: string
   fractionalHour: number

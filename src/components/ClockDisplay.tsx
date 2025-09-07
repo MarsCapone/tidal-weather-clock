@@ -9,7 +9,6 @@ import {
   formatDuration,
   formatRelative,
   intervalToDuration,
-  isBefore,
 } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import React, { useContext, useEffect } from 'react'

@@ -1,7 +1,7 @@
 import logger from '@/app/api/pinoLogger'
 import { db } from '@/lib/db'
 import { activityScoresTable, activityTable } from '@/lib/db/schemas/activity'
-import { Activity } from '@/lib/types/activity'
+import { Activity, Constraint, TimeSlot } from '@/lib/types/activity'
 import { and, desc, eq, gte, inArray, sql } from 'drizzle-orm'
 
 export async function getActivitiesByUserId(
@@ -114,7 +114,13 @@ export type ActivityScore = {
   user_id: string
   score: number
   timestamp: string
-  debug: Record<string, unknown>
+  debug: {
+    timeSlot: TimeSlot
+    constraintsWithScores: {
+      constraint: Constraint
+      score: number
+    }[]
+  }
   activityId: string
   activityVersion: number
   dataContextId: number
