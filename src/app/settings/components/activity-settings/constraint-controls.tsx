@@ -1,4 +1,3 @@
-import { UseFormRegister } from 'react-hook-form'
 import { InputActivities } from '@/app/settings/components/activity-settings/types'
 import {
   Input,
@@ -6,6 +5,7 @@ import {
 } from '@/app/settings/components/common/form'
 import { Constraint } from '@/lib/types/activity'
 import { knotsToMps } from '@/lib/utils/units'
+import { UseFormRegister } from 'react-hook-form'
 
 type ControlsProps = {
   register: UseFormRegister<InputActivities>
@@ -186,7 +186,7 @@ export function TideConstraintControls({
               className="radio radio-primary"
               disabled={disabled}
               {...register(
-                `activities.${activityIndex}.constraints.${constraintIndex}.timeFromTideEvent.event`,
+                `activities.${activityIndex}.constraints.${constraintIndex}.eventType`,
               )}
             />
             <input
@@ -195,7 +195,7 @@ export function TideConstraintControls({
               className="radio radio-primary"
               disabled={disabled}
               {...register(
-                `activities.${activityIndex}.constraints.${constraintIndex}.timeFromTideEvent.event`,
+                `activities.${activityIndex}.constraints.${constraintIndex}.eventType`,
               )}
             />
             High
@@ -209,7 +209,7 @@ export function TideConstraintControls({
             min: 0,
             max: 12,
             ...register(
-              `activities.${activityIndex}.constraints.${constraintIndex}.timeFromTideEvent.maxHoursBefore`,
+              `activities.${activityIndex}.constraints.${constraintIndex}.maxHoursBefore`,
             ),
             disabled,
           }}
@@ -222,7 +222,7 @@ export function TideConstraintControls({
             min: 0,
             max: 12,
             ...register(
-              `activities.${activityIndex}.constraints.${constraintIndex}.timeFromTideEvent.maxHoursAfter`,
+              `activities.${activityIndex}.constraints.${constraintIndex}.maxHoursAfter`,
             ),
             disabled,
           }}
@@ -319,15 +319,6 @@ export function TimeConstraintControls({
           type: 'float',
           min: 0,
           max: 24,
-          disabled,
-        }}
-      />
-      <Input
-        title={'Ignore working hours setting'}
-        className={'checkbox checkbox-sm rounded-sm'}
-        inputProps={{
-          ...register(getTarget('ignoreWorkingHours')),
-          type: 'checkbox',
           disabled,
         }}
       />

@@ -1,5 +1,5 @@
-import { createContext } from 'react'
 import { TZDate } from '@date-fns/tz'
+import { createContext } from 'react'
 
 export const DarkModeContext = createContext({
   isDarkMode: false,
@@ -13,5 +13,6 @@ export const TimeZoneContext = createContext({
 
 export const DateContext = createContext({
   date: new TZDate(),
+  isPast: false,
   setDate: (d: TZDate) => {},
 })

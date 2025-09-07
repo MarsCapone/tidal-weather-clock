@@ -1,3 +1,11 @@
+import {
+  SunData,
+  TideData,
+  TideType,
+  WeatherInfo,
+  WindInfo,
+} from '@/lib/types/context'
+
 export type WindConstraint = {
   directionTolerance?: number // tolerance in degrees for preferred directions
   maxGustSpeed?: number // these will be meters per second
@@ -17,13 +25,11 @@ export type WeatherConstraint = {
 }
 
 export type TideConstraint = {
+  eventType: TideType
   maxHeight?: number
   minHeight?: number
-  timeFromTideEvent?: {
-    event: 'high' | 'low'
-    maxHoursAfter?: number
-    maxHoursBefore?: number
-  }
+  maxHoursAfter?: number
+  maxHoursBefore?: number
   type: 'tide'
 }
 
@@ -39,7 +45,6 @@ export type TimeConstraint = {
   earliestHour?: number // 24hr format
   latestHour?: number
   preferredHours?: number[]
-  ignoreWorkingHours?: boolean
   type: 'time'
 }
 
@@ -65,13 +70,15 @@ export type Activity = {
   name: string
   priority: number // 1-10, higher is more important
   scope: 'global' | 'user'
+  version?: number
 }
 
-export type ActivityScore<DebugType = never> = {
-  activity: Activity
-  constraintScores: { [constraintType: string]: number }
-  debug?: DebugType
-  feasible: boolean
-  score: number
+export type TimeSlot = {
   timestamp: string
+  fractionalHour: number
+
+  wind: WindInfo
+  weather: WeatherInfo
+  sun: SunData
+  tide: TideData
 }

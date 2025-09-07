@@ -1,4 +1,12 @@
-import { Activity, ActivityScore } from '@/lib/types/activity'
+import {
+  Activity,
+  DayConstraint,
+  SunConstraint,
+  TideConstraint,
+  TimeConstraint,
+  WeatherConstraint,
+  WindConstraint,
+} from '@/lib/types/activity'
 import { DataContext } from '@/lib/types/context'
 
 export type GetCacheOptions = {
@@ -33,17 +41,6 @@ export interface IDataContextFetcher {
   isCacheable(): boolean
 }
 
-export interface IActivityRecommender<DebugType = never> {
-  // Finds the best feasible activity for a specific hour
-  getBestActivityForTime(
-    activities: [],
-    targetHour: number,
-  ): ActivityScore<DebugType> | null
-
-  // Returns all activity-time combinations ranked by score
-  getRecommendedActivities(activities: Activity[]): ActivityScore<DebugType>[]
-}
-
 export interface IActivityFetcher {
   getActivities(userId: string | undefined): Promise<Activity[]>
 
@@ -51,4 +48,13 @@ export interface IActivityFetcher {
     userId: string | undefined,
     activities: Activity[],
   ): Promise<void>
+}
+
+export interface IConstraintScorer {
+  getDayScore(constraint: DayConstraint): number
+  getSunScore(constraint: SunConstraint): number
+  getTideScore(constraint: TideConstraint): number
+  getTimeScore(constraint: TimeConstraint): number
+  getWeatherScore(constraint: WeatherConstraint): number
+  getWindScore(constraint: WindConstraint): number
 }

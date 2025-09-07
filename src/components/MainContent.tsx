@@ -1,110 +1,49 @@
 'use client'
 
-import ActivityScoreList from '@/components/ActivityScoreList'
 import ClockDisplay from '@/components/ClockDisplay'
 import DayTimeline from '@/components/DayTimeline'
-import SuggestedActivity from '@/components/SuggestedActivity'
+import MoreSuggestions from '@/components/MoreSuggestions'
 import { WeatherDetails } from '@/components/WeatherDetails'
 import WeatherOverview from '@/components/WeatherOverview'
-import { APP_CONFIG } from '@/lib/config'
+import { ActivityScore } from '@/lib/db/helpers/activity'
 import { Activity } from '@/lib/types/activity'
 import { DataContext } from '@/lib/types/context'
 import { WorkingHoursSetting } from '@/lib/types/settings'
 import { DateContext } from '@/lib/utils/contexts'
-import { dateOptions } from '@/lib/utils/dates'
-import tryDataFetchersWithCache from '@/lib/utils/fetchData'
-import logger from '@/lib/utils/logger'
-import { ActivityRecommender, groupScores } from '@/lib/utils/suggestions'
-import { formatISO, startOfDay } from 'date-fns'
+import { formatDistanceToNowStrict } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
+import { RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
-import React, { useContext, useEffect, useState } from 'react'
+import React from 'react'
 
-export default function MainContentWithoutDate({
-  activities,
+export default function MainContent({
   workingHours,
+  dataContext,
+  activityScores,
+  allActivityScores,
 }: {
   activities: Activity[]
   workingHours: WorkingHoursSetting
+  dataContext: DataContext | undefined
+  activityScores: ActivityScore[]
+  allActivityScores: ActivityScore[]
 }) {
-  const { showSuggestedActivity, showActivityTable } = useFlags()
-  const [dataContext, setDataContext] = useState<DataContext | null>(null)
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [selectionIndex, setSelectionIndex] = useState(0)
-  const { date } = useContext(DateContext)
+  const { showSuggestedActivity } = useFlags()
 
-  useEffect(() => {
-    tryDataFetchersWithCache(
-      logger,
-      startOfDay(date, dateOptions),
-      APP_CONFIG.dataFetchers,
-      APP_CONFIG.clientCache,
-      (lat, lng, date) =>
-        `[${lat},${lng}]-${formatISO(date, { representation: 'date' })}`,
-    ).then((dc) => {
-      if (dc === null) {
-        logger.warn('final data context is null')
-      }
-      logger.info('setting data context', { dataContext: dc })
-      setDataContext(dc)
-      setIsLoading(false)
-    })
-  }, [date])
-
-  if (isLoading) {
+  if (dataContext === undefined) {
     return (
-      <>
-        <h1 className="text-2xl">Loading data...</h1>
-        <span className="loading loading-dots loading-lg"></span>
-      </>
-    )
-  }
-
-  if (dataContext === null || dataContext === undefined) {
-    return (
-      <>
+      <div className="flex flex-col items-center justify-center gap-4">
         <h1 className="text-3xl">No data context available</h1>
-        <button className="btn btn-warning rounded-md">
+        <button className="btn btn-warning w-full rounded-md md:w-36">
           <Link href="/">Back to Today</Link>
         </button>
-      </>
+      </div>
     )
   }
-
-  const suggestions = new ActivityRecommender(
-    dataContext,
-    workingHours,
-  ).getRecommendedActivities(activities || [])
-  const filteredSuggestions = groupScores(
-    suggestions.filter((r) => r.feasible),
-    'timeAndActivity',
-  )
-
-  const suggestedActivity =
-    filteredSuggestions.length > 0 ? filteredSuggestions[selectionIndex] : null
-
-  const nextSuggestion = () =>
-    setSelectionIndex(
-      Math.min(filteredSuggestions.length - 1, selectionIndex + 1),
-    )
-  const prevSuggestion = () =>
-    setSelectionIndex(Math.max(0, selectionIndex - 1))
 
   return (
     <>
       <div>
-        {showSuggestedActivity && (
-          <SuggestedActivity
-            activityScore={suggestedActivity}
-            className={'md:hidden'}
-            nextSuggestion={
-              selectionIndex < filteredSuggestions.length - 1
-                ? nextSuggestion
-                : undefined
-            }
-            prevSuggestion={selectionIndex > 0 ? prevSuggestion : undefined}
-          />
-        )}
         <div className="flex flex-col items-start justify-center gap-6 md:flex-row">
           <div className="w-full">
             <DayTimeline
@@ -117,21 +56,62 @@ export default function MainContentWithoutDate({
               workingHours={workingHours}
             />
             <ClockDisplay
-              suggestedActivity={suggestedActivity}
+              suggestedActivity={activityScores[0]}
               dataContext={dataContext}
             />
+            {showSuggestedActivity && (
+              <MoreSuggestions
+                activityScores={activityScores}
+                allActivityScores={allActivityScores}
+              />
+            )}
             <WeatherDetails
               dataContext={dataContext}
               workingHours={workingHours}
             />
           </div>
         </div>
-        {showActivityTable && showSuggestedActivity && (
-          <div className="my-8">
-            <ActivityScoreList scores={suggestions} />
-          </div>
-        )}
       </div>
     </>
+  )
+}
+
+export type RefreshDataProps = {
+  lastUpdatedTime: Date | undefined
+  onClickedRefreshAction: (currentPath: string) => Promise<void>
+}
+export function RefreshData({
+  lastUpdatedTime,
+  onClickedRefreshAction,
+}: RefreshDataProps) {
+  const [refreshing, setRefreshing] = React.useState(false)
+  const { isPast } = React.useContext(DateContext)
+  const formattedTime = lastUpdatedTime
+    ? `${formatDistanceToNowStrict(lastUpdatedTime)} ago`
+    : 'never'
+
+  const onClick = () => {
+    setRefreshing(true)
+    onClickedRefreshAction(window.location.pathname).then(() => {
+      setRefreshing(false)
+    })
+  }
+
+  return (
+    <div className="md:bg-base-100 p-4 md:absolute md:top-24 md:right-2 md:z-10">
+      <div className="flex flex-row items-center justify-center text-xs md:justify-end">
+        <div className="flex items-center gap-2 md:flex-col md:items-end">
+          <span>Last updated: {formattedTime} </span>
+          {!isPast && (
+            <button
+              className={`btn btn-xs btn-accent rounded-field w-fit ${refreshing ? 'btn-disabled' : ''}`}
+              onClick={onClick}
+            >
+              Refresh <RefreshCwIcon className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }

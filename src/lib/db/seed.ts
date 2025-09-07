@@ -1,4 +1,7 @@
+import logger from '@/app/api/pinoLogger'
 import { putActivities } from '@/lib/db/helpers/activity'
+import { db } from '@/lib/db/index'
+import { activityTable } from '@/lib/db/schemas/activity'
 import { Activity, Constraint } from '@/lib/types/activity'
 import { kebabCase } from 'change-case'
 
@@ -6,11 +9,9 @@ const defaultConstraints: Record<string, Constraint> = {
   highTide: {
     type: 'tide',
     minHeight: 0.9,
-    timeFromTideEvent: {
-      event: 'high',
-      maxHoursAfter: 2,
-      maxHoursBefore: 2,
-    },
+    eventType: 'high',
+    maxHoursAfter: 2,
+    maxHoursBefore: 2,
   },
   daylight: {
     type: 'sun',
@@ -19,15 +20,13 @@ const defaultConstraints: Record<string, Constraint> = {
   },
   lowTide: {
     type: 'tide',
-    timeFromTideEvent: {
-      event: 'low',
-      maxHoursAfter: 1.5,
-      maxHoursBefore: 1.5,
-    },
+    eventType: 'low',
+    maxHoursAfter: 1.5,
+    maxHoursBefore: 1.5,
   },
 }
 
-const main = async () => {
+const addActivities = async () => {
   const activities: Omit<Activity, 'id' | 'scope' | 'priority'>[] = [
     {
       name: 'Paddle Boarding (inland)',
@@ -85,6 +84,15 @@ const main = async () => {
     })),
     'global',
   )
+}
+
+const main = async () => {
+  const deleted = await db
+    .delete(activityTable)
+    .returning({ id: activityTable.id, version: activityTable.version })
+  logger.warn('deleted existing activities', { deleted })
+
+  await addActivities()
 }
 
 main()

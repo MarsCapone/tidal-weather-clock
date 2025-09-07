@@ -1,14 +1,14 @@
 import { DataContext } from '@/lib/types/context'
-import { mpsToKnots } from '@/lib/utils/units'
-import { ArrowBigUpIcon } from 'lucide-react'
+import { WorkingHoursSetting } from '@/lib/types/settings'
+import { utcDateStringToFractionalUtc } from '@/lib/utils/dates'
 import { calcMean } from '@/lib/utils/math'
+import { isInWorkingHours } from '@/lib/utils/settings'
+import { mpsToKnots } from '@/lib/utils/units'
 import {
   describeCloudiness,
   describeWindDirection,
 } from '@/lib/utils/weather-descriptions'
-import { utcDateStringToFractionalUtc } from '@/lib/utils/dates'
-import { WorkingHoursSetting } from '@/lib/types/settings'
-import { isInWorkingHours } from '@/lib/utils/settings'
+import { ArrowBigUpIcon } from 'lucide-react'
 
 export type WeatherOverviewProps = {
   dataContext: DataContext
@@ -76,7 +76,7 @@ export default function WeatherOverview({
         {dominantWindDirection && (
           <div className={'flex flex-row justify-center'}>
             <ArrowBigUpIcon
-              className={'h-10 w-10 stroke-1'}
+              className={'fill-accent h-10 w-10 stroke-1'}
               style={{ rotate: `${dominantWindDirection + 180}deg` }}
             />
             <div className={''}>

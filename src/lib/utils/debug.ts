@@ -3,7 +3,10 @@ import { dateOptions } from '@/lib/utils/dates'
 import { del, list, put } from '@vercel/blob'
 import { formatISO, isBefore, startOfToday, subDays } from 'date-fns'
 
-export type DebugCategory = 'dataContextSource' | 'dataContext'
+export type DebugCategory =
+  | 'dataContextSource'
+  | 'dataContext'
+  | 'activityScore'
 
 export async function uploadDebugData(
   category: DebugCategory,
@@ -20,6 +23,7 @@ export async function uploadDebugData(
 
   const { url } = await put(fileName, JSON.stringify(data), {
     access: 'public',
+    addRandomSuffix: true,
   })
 
   logger.debug(`uploaded debug data`, {

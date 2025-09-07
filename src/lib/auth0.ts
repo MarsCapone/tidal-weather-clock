@@ -17,7 +17,7 @@ export const getUserId = async () => {
   const session = await auth0.getSession()
 
   if (session === null) {
-    return 'global'
+    return null
   }
 
   const email = session.user.email

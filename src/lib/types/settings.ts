@@ -8,3 +8,5 @@ export const defaultWorkingHours: WorkingHoursSetting = {
   endHour: 18,
   enabled: true,
 }
+
+export type LatLong = [number, number]

@@ -1,28 +1,133 @@
-import { neon } from '@neondatabase/serverless'
-
-const sql = neon(process.env.DATABASE_URL!)
+import logger from '@/app/api/pinoLogger'
+import { db } from '@/lib/db'
+import { datacontextTable } from '@/lib/db/schemas/datacontext'
+import { DataContext } from '@/lib/types/context'
+import { LatLong } from '@/lib/types/settings'
+import { addDays, formatISO } from 'date-fns'
+import { and, eq, gte, lte, sql } from 'drizzle-orm'
 
 export async function getDataContextRange(
   location: [number, number],
 ): Promise<{ earliest: string; latest: string; all: string[] }> {
-  const [result] = await sql`
-    SELECT MIN(date)::text AS earliest, MAX(date)::text AS latest
-    FROM datacontext
-    WHERE latitude = ${location[0]} AND longitude = ${location[1]}
-  `
+  const [latitude, longitude] = location
 
-  const dates = await sql`
-  SELECT date::text FROM datacontext
-  WHERE latitude = ${location[0]} AND longitude = ${location[1]}
-  ORDER BY date DESC`
+  const [{ earliest, latest }] = await db
+    .select({
+      earliest: sql<string>`MIN(${datacontextTable.date})::text`.as('earliest'),
+      latest: sql<string>`MAX(${datacontextTable.date})::text`.as('latest'),
+    })
+    .from(datacontextTable)
+    .where(
+      and(
+        eq(datacontextTable.latitude, latitude),
+        eq(datacontextTable.longitude, longitude),
+      ),
+    )
 
-  if (!result) {
-    throw new Error('No data context found for the given location')
-  }
+  const dates = await db
+    .select({ date: datacontextTable.date })
+    .from(datacontextTable)
+    .where(
+      and(
+        eq(datacontextTable.latitude, latitude),
+        eq(datacontextTable.longitude, longitude),
+      ),
+    )
 
   return {
-    earliest: result.earliest,
-    latest: result.latest,
+    earliest,
+    latest,
     all: dates.map((d) => d.date),
   }
+}
+
+export async function getDataContextByDate(
+  date: Date,
+  location: [number, number],
+): Promise<{ id: number; dataContext: DataContext; lastUpdated: Date } | null> {
+  const results = await getDataContextsByDateRange(date, date, location)
+  if (results.length > 0) {
+    const { id, dataContext, lastUpdated } = results[0]
+    logger.debug('fetched data context from db', {
+      date,
+      lastUpdated,
+      location,
+      id,
+    })
+    return { id, dataContext, lastUpdated }
+  }
+  return null
+}
+
+export async function getDataContextsByDateRange(
+  startDate: Date,
+  endDate: Date,
+  location: [number, number],
+): Promise<{ id: number; dataContext: DataContext; lastUpdated: Date }[]> {
+  const [latitude, longitude] = location
+  if (startDate.getTime() === endDate.getTime()) {
+    endDate = addDays(endDate, 1)
+  }
+  const results = await db
+    .select({
+      id: datacontextTable.id,
+      dataContext: datacontextTable.data,
+      lastUpdated: datacontextTable.last_updated,
+    })
+    .from(datacontextTable)
+    .where(
+      and(
+        gte(
+          datacontextTable.date,
+          formatISO(startDate, { representation: 'date' }),
+        ),
+        lte(
+          datacontextTable.date,
+          formatISO(endDate, { representation: 'date' }),
+        ),
+        eq(datacontextTable.latitude, latitude),
+        eq(datacontextTable.longitude, longitude),
+      ),
+    )
+
+  return results as {
+    id: number
+    dataContext: DataContext
+    lastUpdated: Date
+  }[]
+}
+
+export async function addDataContext(
+  dataContext: DataContext,
+  location: LatLong,
+): Promise<number> {
+  const [latitude, longitude] = location
+
+  const [{ id }] = await db
+    .insert(datacontextTable)
+    .values({
+      date: dataContext.referenceDate,
+      latitude,
+      longitude,
+      data: dataContext,
+      last_updated: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: [
+        datacontextTable.date,
+        datacontextTable.latitude,
+        datacontextTable.longitude,
+      ],
+      set: {
+        data: dataContext,
+        last_updated: new Date(),
+      },
+    })
+    .returning({ id: datacontextTable.id })
+  logger.info('saved data context to db', {
+    id,
+    location,
+    date: dataContext.referenceDate,
+  })
+  return id
 }
