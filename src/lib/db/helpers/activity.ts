@@ -1,7 +1,8 @@
 import logger from '@/app/api/pinoLogger'
 import { db } from '@/lib/db'
 import { activityScoresTable, activityTable } from '@/lib/db/schemas/activity'
-import { Activity, Constraint, TimeSlot } from '@/lib/types/activity'
+import { TimeSlot } from '@/lib/score'
+import { Constraint, TActivity } from '@/lib/types/TActivity'
 import { and, desc, eq, gte, inArray, sql } from 'drizzle-orm'
 
 export async function getActivitiesByUserId(
@@ -14,7 +15,7 @@ export async function getActivitiesByUserId(
   }
   logger.debug('getActivitiesByUserId', { userIds, includeGlobal })
 
-  const activityResponses: Activity[] = (
+  const activityResponses: TActivity[] = (
     await db
       .selectDistinctOn([activityTable.id], {
         id: activityTable.id,
@@ -50,7 +51,7 @@ export async function getActivitiesByUserId(
   return activityResponses
 }
 
-export async function getAllActivities(): Promise<Activity[]> {
+export async function getAllActivities(): Promise<TActivity[]> {
   const dbResult = await db
     .selectDistinctOn([activityTable.id])
     .from(activityTable)
@@ -70,7 +71,7 @@ export async function getAllActivities(): Promise<Activity[]> {
   )
 }
 
-export async function putActivities(activities: Activity[], userId: string) {
+export async function putActivities(activities: TActivity[], userId: string) {
   // we do not want to overwrite global activities, unless we are setting them for the global user
   const filteredActivities = activities.filter((a) =>
     userId === 'global' ? a.scope === 'global' : a.scope === 'user',

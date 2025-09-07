@@ -1,5 +1,5 @@
 import { datacontextTable } from '@/lib/db/schemas/datacontext'
-import { Constraint } from '@/lib/types/activity'
+import { Constraint } from '@/lib/types/TActivity'
 import {
   foreignKey,
   integer,

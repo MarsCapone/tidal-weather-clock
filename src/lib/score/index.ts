@@ -1,7 +1,13 @@
 import logger from '@/app/api/pinoLogger'
 import { DefaultConstraintScorer } from '@/lib/score/constraint-scorer'
-import { Activity, TimeSlot } from '@/lib/types/activity'
-import { DataContext } from '@/lib/types/context'
+import {
+  DataContext,
+  SunData,
+  TideData,
+  WeatherInfo,
+  WindInfo,
+} from '@/lib/types/context'
+import { TActivity } from '@/lib/types/TActivity'
 import {
   dateOptions,
   naiveDateToFractionalUtc,
@@ -13,7 +19,7 @@ import { eachHourOfInterval, endOfDay, formatISO, startOfDay } from 'date-fns'
 
 type GetScoreParams = {
   dataContext: DataContext
-  activity: Activity
+  activity: TActivity
 }
 
 type GetScoreResult = {
@@ -21,6 +27,16 @@ type GetScoreResult = {
   value: number
   debug: Record<string, any>
 }[]
+
+export type TimeSlot = {
+  timestamp: string
+  fractionalHour: number
+
+  wind: WindInfo
+  weather: WeatherInfo
+  sun: SunData
+  tide: TideData
+}
 
 export async function getScores({
   dataContext,

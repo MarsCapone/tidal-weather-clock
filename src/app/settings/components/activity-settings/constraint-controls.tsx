@@ -3,7 +3,7 @@ import {
   Input,
   NamedFormComponent,
 } from '@/app/settings/components/common/form'
-import { Constraint } from '@/lib/types/activity'
+import { Constraint } from '@/lib/types/TActivity'
 import { knotsToMps } from '@/lib/utils/units'
 import { UseFormRegister } from 'react-hook-form'
 

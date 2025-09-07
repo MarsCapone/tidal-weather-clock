@@ -1,5 +1,5 @@
-import { Activity } from '@/lib/types/activity'
+import { TActivity } from '@/lib/types/TActivity'
 
 export type InputActivities = {
-  activities: Activity[]
+  activities: TActivity[]
 }

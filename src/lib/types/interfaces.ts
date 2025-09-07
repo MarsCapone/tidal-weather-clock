@@ -1,13 +1,13 @@
-import {
-  Activity,
-  DayConstraint,
-  SunConstraint,
-  TideConstraint,
-  TimeConstraint,
-  WeatherConstraint,
-  WindConstraint,
-} from '@/lib/types/activity'
 import { DataContext } from '@/lib/types/context'
+import {
+  TActivity,
+  TDayConstraint,
+  TSunConstraint,
+  TTideConstraint,
+  TTimeConstraint,
+  TWeatherConstraint,
+  TWindConstraint,
+} from '@/lib/types/TActivity'
 
 export type GetCacheOptions = {
   expiryHours: number
@@ -42,19 +42,19 @@ export interface IDataContextFetcher {
 }
 
 export interface IActivityFetcher {
-  getActivities(userId: string | undefined): Promise<Activity[]>
+  getActivities(userId: string | undefined): Promise<TActivity[]>
 
   setActivities(
     userId: string | undefined,
-    activities: Activity[],
+    activities: TActivity[],
   ): Promise<void>
 }
 
 export interface IConstraintScorer {
-  getDayScore(constraint: DayConstraint): number
-  getSunScore(constraint: SunConstraint): number
-  getTideScore(constraint: TideConstraint): number
-  getTimeScore(constraint: TimeConstraint): number
-  getWeatherScore(constraint: WeatherConstraint): number
-  getWindScore(constraint: WindConstraint): number
+  getDayScore(constraint: TDayConstraint): number
+  getSunScore(constraint: TSunConstraint): number
+  getTideScore(constraint: TTideConstraint): number
+  getTimeScore(constraint: TTimeConstraint): number
+  getWeatherScore(constraint: TWeatherConstraint): number
+  getWindScore(constraint: TWindConstraint): number
 }

@@ -1,4 +1,9 @@
-export type TideType = 'high' | 'low'
+// eslint-disable-next-line import-x/no-namespace
+import * as z from 'zod'
+
+export const TideType = z.enum(['high', 'low'])
+
+export type TTideType = z.infer<typeof TideType>
 
 export type Timestamp = {
   timestamp: string
@@ -7,7 +12,7 @@ export type Timestamp = {
 export type TideInfo = {
   height: number
   time: number
-  type: TideType
+  type: TTideType
 } & Timestamp
 
 export type TideData = TideInfo[]

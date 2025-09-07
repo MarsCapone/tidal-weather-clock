@@ -3,7 +3,7 @@
 import ActivityArray from '@/app/settings/components/activity-settings/ActivityArray'
 import { InputActivities } from '@/app/settings/components/activity-settings/types'
 import { SettingCard, SettingTitle } from '@/app/settings/components/common'
-import { Activity } from '@/lib/types/activity'
+import { TActivity } from '@/lib/types/TActivity'
 import logger from '@/lib/utils/logger'
 import { mpsToKnots } from '@/lib/utils/units'
 import { PlusIcon } from 'lucide-react'
@@ -12,8 +12,8 @@ import { v4 as uuidv4 } from 'uuid'
 
 export type ActivitySettingsFormProps = {
   userId: string
-  activities: Activity[]
-  setActivitiesAction: (activities: Activity[]) => void
+  activities: TActivity[]
+  setActivitiesAction: (activities: TActivity[]) => void
 }
 export default function ActivitySettingsForm({
   activities,
