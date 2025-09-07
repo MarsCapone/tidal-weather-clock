@@ -10,11 +10,11 @@ export default function ColorschemeToggle() {
   return (
     <div>
       <label className="flex cursor-pointer gap-2">
-        <SunIcon height={20} />
+        <SunIcon className={'h-4 w-4 md:h-6 md:w-6'} />
         <input
           data-testid={'colorscheme-toggle'}
           id="theme-controller"
-          className="toggle theme-controller"
+          className="toggle toggle-xs md:toggle-md theme-controller"
           type="checkbox"
           value="night"
           onChange={(e) => {
@@ -22,7 +22,7 @@ export default function ColorschemeToggle() {
             setIsDarkMode(isDark)
           }}
         />
-        <MoonIcon height={20} />
+        <MoonIcon className={'h-4 w-4 md:h-6 md:w-6'} />
       </label>
     </div>
   )

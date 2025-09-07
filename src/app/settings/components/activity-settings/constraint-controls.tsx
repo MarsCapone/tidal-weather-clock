@@ -14,7 +14,7 @@ type ControlsProps = {
   disabled: boolean
 }
 
-type RegisterParams = Parameters<ControlsProps['register']>
+type RegisterParams = Parameters<UseFormRegister<TInputActivities>>
 type KeysOfUnion<T> = T extends T ? keyof T : never
 type ConstraintKey = KeysOfUnion<Constraint>
 

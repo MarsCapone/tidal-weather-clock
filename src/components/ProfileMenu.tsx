@@ -39,7 +39,7 @@ export function ProfileMenuInternal({
     <ProfileMenuWrapper
       buttonContent={
         <div className="avatar">
-          <div className="w-10 rounded-full">
+          <div className="w-6 rounded-full md:w-10">
             <img
               data-testid={'profile-menu-avatar'}
               src={session.user.picture}
