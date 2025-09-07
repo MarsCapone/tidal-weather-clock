@@ -1,5 +1,4 @@
 import { TimeSlot } from '@/lib/score/index'
-import { IConstraintScorer } from '@/lib/types/interfaces'
 import {
   TDayConstraint,
   TSunConstraint,
@@ -7,7 +6,8 @@ import {
   TTimeConstraint,
   TWeatherConstraint,
   TWindConstraint,
-} from '@/lib/types/TActivity'
+} from '@/lib/types/activity'
+import { IConstraintScorer } from '@/lib/types/interfaces'
 import {
   naiveDateAddFractional,
   utcDateStringToFractionalUtc,

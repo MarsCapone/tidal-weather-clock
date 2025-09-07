@@ -1,14 +1,14 @@
-import { InputActivities } from '@/app/settings/components/activity-settings/types'
+import { TInputActivities } from '@/app/settings/components/activity-settings/types'
 import {
   Input,
   NamedFormComponent,
 } from '@/app/settings/components/common/form'
-import { Constraint } from '@/lib/types/TActivity'
+import { Constraint } from '@/lib/types/activity'
 import { knotsToMps } from '@/lib/utils/units'
-import { UseFormRegister } from 'react-hook-form'
+import { ErrorMessage } from '@hookform/error-message'
+import { useFormContext, UseFormRegister } from 'react-hook-form'
 
 type ControlsProps = {
-  register: UseFormRegister<InputActivities>
   activityIndex: number
   constraintIndex: number
   disabled: boolean
@@ -25,11 +25,14 @@ const makeRegisterTarget = (
 ): RegisterParams[0] => `activities.${ai}.constraints.${ci}.${key}`
 
 export function WindConstraintControls({
-  register,
   activityIndex,
   constraintIndex,
   disabled,
 }: ControlsProps) {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<TInputActivities>()
   function getTarget(key: ConstraintKey) {
     return makeRegisterTarget(key, activityIndex, constraintIndex)
   }
@@ -39,19 +42,16 @@ export function WindConstraintControls({
       <div className={'grid grid-cols-3 gap-x-4'}>
         <WindSpeedInput
           title={'Min wind speed'}
-          register={register}
           target={getTarget('minSpeed')}
           disabled={disabled}
         />
         <WindSpeedInput
           title={'Max wind speed'}
-          register={register}
           target={getTarget('maxSpeed')}
           disabled={disabled}
         />
         <WindSpeedInput
           title={'Max gust speed'}
-          register={register}
           target={getTarget('maxGustSpeed')}
           disabled={disabled}
         />
@@ -69,26 +69,30 @@ export function WindConstraintControls({
             disabled,
           }}
         />
-        <Input
-          title={'Preferred directions'}
-          suffix={'List of preferred wind directions (origin) in degrees'}
-          className={'input input-sm'}
-          inputProps={{
-            ...register(getTarget('maxGustSpeed')),
-            type: 'float',
-            disabled,
-          }}
-        />
+        <ErrorMessage name={getTarget('maxGustSpeed')} errors={errors} />
+        {/*<Input*/}
+        {/*  title={'Preferred directions'}*/}
+        {/*  suffix={'List of preferred wind directions (origin) in degrees'}*/}
+        {/*  className={'input input-sm'}*/}
+        {/*  inputProps={{*/}
+        {/*    ...register(getTarget('preferredDirections')),*/}
+        {/*    disabled,*/}
+        {/*  }}*/}
+        {/*/>*/}
+        {/*<ErrorMessage name={getTarget('preferredDirections')} errors={errors} />*/}
       </div>
     </div>
   )
 }
 export function WeatherConstraintControls({
-  register,
   activityIndex,
   constraintIndex,
   disabled,
 }: ControlsProps) {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<TInputActivities>()
   function getTarget(key: ConstraintKey) {
     return makeRegisterTarget(key, activityIndex, constraintIndex)
   }
@@ -103,6 +107,7 @@ export function WeatherConstraintControls({
           disabled,
         }}
       />
+      <ErrorMessage name={getTarget('minTemperature')} errors={errors} />
       <Input
         title={'Max temperature (ºC)'}
         className={'input input-sm'}
@@ -112,6 +117,7 @@ export function WeatherConstraintControls({
           disabled,
         }}
       />
+      <ErrorMessage name={getTarget('maxTemperature')} errors={errors} />
       <Input
         title={'Max UV Index'}
         className={'input input-sm'}
@@ -121,6 +127,7 @@ export function WeatherConstraintControls({
           disabled,
         }}
       />
+      <ErrorMessage name={getTarget('maxUvIndex')} errors={errors} />
       <Input
         title={'Max cloud cover (%)'}
         className={'input input-sm'}
@@ -130,6 +137,7 @@ export function WeatherConstraintControls({
           disabled,
         }}
       />
+      <ErrorMessage name={getTarget('maxCloudCover')} errors={errors} />
       <Input
         title={'Max likelihood of rain'}
         className={'input input-sm'}
@@ -139,15 +147,22 @@ export function WeatherConstraintControls({
           disabled,
         }}
       />
+      <ErrorMessage
+        name={getTarget('maxPrecipitationProbability')}
+        errors={errors}
+      />
     </div>
   )
 }
 export function TideConstraintControls({
-  register,
   activityIndex,
   constraintIndex,
   disabled,
 }: ControlsProps) {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<TInputActivities>()
   function getTarget(key: ConstraintKey) {
     return makeRegisterTarget(key, activityIndex, constraintIndex)
   }
@@ -163,6 +178,7 @@ export function TideConstraintControls({
             disabled,
           }}
         />
+        <ErrorMessage name={getTarget('minHeight')} errors={errors} />
         <Input
           title={'Max height (m)'}
           className={'input input-sm'}
@@ -172,6 +188,7 @@ export function TideConstraintControls({
             disabled,
           }}
         />
+        <ErrorMessage name={getTarget('maxHeight')} errors={errors} />
       </div>
       <NamedFormComponent
         title={'Time from tidal event'}
@@ -185,22 +202,19 @@ export function TideConstraintControls({
               value={'low'}
               className="radio radio-primary"
               disabled={disabled}
-              {...register(
-                `activities.${activityIndex}.constraints.${constraintIndex}.eventType`,
-              )}
+              {...register(getTarget('eventType'))}
             />
             <input
               type="radio"
               value={'high'}
               className="radio radio-primary"
               disabled={disabled}
-              {...register(
-                `activities.${activityIndex}.constraints.${constraintIndex}.eventType`,
-              )}
+              {...register(getTarget('eventType'))}
             />
             High
           </label>
         </NamedFormComponent>
+        <ErrorMessage name={getTarget('eventType')} errors={errors} />
         <Input
           title={'Max hours before'}
           className={'input input-sm'}
@@ -208,12 +222,11 @@ export function TideConstraintControls({
             type: 'float',
             min: 0,
             max: 12,
-            ...register(
-              `activities.${activityIndex}.constraints.${constraintIndex}.maxHoursBefore`,
-            ),
+            ...register(getTarget('maxHoursBefore')),
             disabled,
           }}
         />
+        <ErrorMessage name={getTarget('maxHoursBefore')} errors={errors} />
         <Input
           title={'Max hours after'}
           className={'input input-sm'}
@@ -221,23 +234,25 @@ export function TideConstraintControls({
             type: 'float',
             min: 0,
             max: 12,
-            ...register(
-              `activities.${activityIndex}.constraints.${constraintIndex}.maxHoursAfter`,
-            ),
+            ...register(getTarget('maxHoursAfter')),
             disabled,
           }}
         />
+        <ErrorMessage name={getTarget('maxHoursAfter')} errors={errors} />
       </NamedFormComponent>
     </div>
   )
 }
 
 export function SunConstraintControls({
-  register,
   activityIndex,
   constraintIndex,
   disabled,
 }: ControlsProps) {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<TInputActivities>()
   function getTarget(key: ConstraintKey) {
     return makeRegisterTarget(key, activityIndex, constraintIndex)
   }
@@ -253,6 +268,7 @@ export function SunConstraintControls({
           disabled,
         }}
       />
+      <ErrorMessage name={getTarget('requiresDaylight')} errors={errors} />
       <Input
         title={'Requires Darkness'}
         className={'checkbox checkbox-sm rounded-sm'}
@@ -262,6 +278,7 @@ export function SunConstraintControls({
           disabled,
         }}
       />
+      <ErrorMessage name={getTarget('requiresDarkness')} errors={errors} />
 
       <Input
         title={'Max hours before sunset'}
@@ -274,6 +291,7 @@ export function SunConstraintControls({
           disabled,
         }}
       />
+      <ErrorMessage name={getTarget('maxHoursBeforeSunset')} errors={errors} />
       <Input
         title={'Min hours after sunrise'}
         className={'input input-sm'}
@@ -285,16 +303,20 @@ export function SunConstraintControls({
           disabled,
         }}
       />
+      <ErrorMessage name={getTarget('minHoursAfterSunrise')} errors={errors} />
     </div>
   )
 }
 
 export function TimeConstraintControls({
-  register,
   activityIndex,
   constraintIndex,
   disabled,
 }: ControlsProps) {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<TInputActivities>()
   function getTarget(key: ConstraintKey) {
     return makeRegisterTarget(key, activityIndex, constraintIndex)
   }
@@ -311,6 +333,7 @@ export function TimeConstraintControls({
           disabled,
         }}
       />
+      <ErrorMessage name={getTarget('earliestHour')} errors={errors} />
       <Input
         title={'Latest Hour'}
         className={'input input-sm'}
@@ -322,6 +345,7 @@ export function TimeConstraintControls({
           disabled,
         }}
       />
+      <ErrorMessage name={getTarget('latestHour')} errors={errors} />
       <Input
         title={'Preferred hours'}
         suffix={'List of preferred hours for doing this activity'}
@@ -334,15 +358,19 @@ export function TimeConstraintControls({
           disabled,
         }}
       />
+      <ErrorMessage name={getTarget('preferredHours')} errors={errors} />
     </div>
   )
 }
 export function DayConstraintControls({
-  register,
   activityIndex,
   constraintIndex,
   disabled,
 }: ControlsProps) {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<TInputActivities>()
   function getTarget(key: ConstraintKey) {
     return makeRegisterTarget(key, activityIndex, constraintIndex)
   }
@@ -357,6 +385,7 @@ export function DayConstraintControls({
           disabled,
         }}
       />
+      <ErrorMessage name={getTarget('isWeekday')} errors={errors} />
       <Input
         title={'Weekend?'}
         className={'checkbox checkbox-sm rounded-sm'}
@@ -366,42 +395,49 @@ export function DayConstraintControls({
           disabled,
         }}
       />
+      <ErrorMessage name={getTarget('isWeekend')} errors={errors} />
 
-      <Input
-        title={'Dates'}
-        suffix={'List of date ranges to do this activity'}
-        className={'input input-sm'}
-        inputProps={{
-          ...register(getTarget('dateRanges')),
-          disabled,
-        }}
-      />
+      {/*<Input*/}
+      {/*  title={'Dates'}*/}
+      {/*  suffix={'List of date ranges to do this activity'}*/}
+      {/*  className={'input input-sm'}*/}
+      {/*  inputProps={{*/}
+      {/*    ...register(getTarget('dateRanges')),*/}
+      {/*    disabled,*/}
+      {/*  }}*/}
+      {/*/>*/}
+      {/*<ErrorMessage name={getTarget('dateRanges')} errors={errors} />*/}
     </div>
   )
 }
 
 function WindSpeedInput({
   title,
-  register,
   target,
   disabled,
 }: {
   title: string
-  register: UseFormRegister<InputActivities>
   target: RegisterParams[0]
   disabled: boolean
 }) {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<TInputActivities>()
   return (
-    <Input
-      title={`${title} (knots)`}
-      className={'input input-sm'}
-      inputProps={{
-        ...register(target, {
-          setValueAs: (value) => knotsToMps(value),
-        }),
-        type: 'float',
-        disabled,
-      }}
-    />
+    <>
+      <Input
+        title={`${title} (knots)`}
+        className={'input input-sm'}
+        inputProps={{
+          ...register(target, {
+            setValueAs: (value) => knotsToMps(value),
+          }),
+          type: 'float',
+          disabled,
+        }}
+      />
+      <ErrorMessage name={target} errors={errors} />
+    </>
   )
 }

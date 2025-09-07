@@ -2,7 +2,7 @@ import logger from '@/app/api/pinoLogger'
 import { putActivities } from '@/lib/db/helpers/activity'
 import { db } from '@/lib/db/index'
 import { activityTable } from '@/lib/db/schemas/activity'
-import { Constraint, TActivity } from '@/lib/types/TActivity'
+import { Constraint, TActivity } from '@/lib/types/activity'
 import { kebabCase } from 'change-case'
 
 const defaultConstraints: Record<string, Constraint> = {

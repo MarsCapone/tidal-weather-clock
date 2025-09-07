@@ -1,20 +1,26 @@
 'use client'
 
 import ActivityArray from '@/app/settings/components/activity-settings/ActivityArray'
-import { InputActivities } from '@/app/settings/components/activity-settings/types'
+import {
+  InputActivities,
+  TInputActivities,
+} from '@/app/settings/components/activity-settings/types'
 import { SettingCard, SettingTitle } from '@/app/settings/components/common'
-import { TActivity } from '@/lib/types/TActivity'
+import { Activity, TActivity } from '@/lib/types/activity'
 import logger from '@/lib/utils/logger'
 import { mpsToKnots } from '@/lib/utils/units'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
+import * as z from 'zod'
 
 export type ActivitySettingsFormProps = {
   userId: string
   activities: TActivity[]
   setActivitiesAction: (activities: TActivity[]) => void
 }
+
 export default function ActivitySettingsForm({
   activities,
   setActivitiesAction,
@@ -44,8 +50,13 @@ export default function ActivitySettingsForm({
       }),
     })),
   }
-  const methods = useForm<InputActivities>({
+  const methods = useForm<
+    z.input<typeof InputActivities>,
+    any,
+    z.output<typeof InputActivities>
+  >({
     defaultValues,
+    resolver: zodResolver(InputActivities),
   })
   const {
     control,
@@ -58,11 +69,14 @@ export default function ActivitySettingsForm({
     name: 'activities',
   })
 
-  const onSubmit = (data: InputActivities) => {
-    logger.info('setting activities', data)
+  const onSubmit = (data: TInputActivities) => {
+    logger.warn('zod activities', {
+      data: InputActivities.safeParse(data),
+    })
     setActivitiesAction(data.activities)
   }
 
+  // @ts-ignore
   return (
     <div>
       <FormProvider {...methods}>
@@ -99,11 +113,6 @@ export default function ActivitySettingsForm({
             </div>
           </div>
           <SettingCard>
-            {errors.activities && (
-              <div className="alert alert-error">
-                <span>{JSON.stringify(errors)}</span>
-              </div>
-            )}
             <ActivityArray fields={fields} removeByIndex={remove} />
           </SettingCard>
         </form>

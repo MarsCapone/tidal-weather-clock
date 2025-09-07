@@ -1,4 +1,3 @@
-import { DataContext } from '@/lib/types/context'
 import {
   TActivity,
   TDayConstraint,
@@ -7,7 +6,8 @@ import {
   TTimeConstraint,
   TWeatherConstraint,
   TWindConstraint,
-} from '@/lib/types/TActivity'
+} from '@/lib/types/activity'
+import { DataContext } from '@/lib/types/context'
 
 export type GetCacheOptions = {
   expiryHours: number

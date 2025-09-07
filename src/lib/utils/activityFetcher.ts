@@ -1,5 +1,5 @@
+import { TActivity } from '@/lib/types/activity'
 import { IActivityFetcher } from '@/lib/types/interfaces'
-import { TActivity } from '@/lib/types/TActivity'
 import logger from '@/lib/utils/logger'
 
 export class ServerActivityFetcher implements IActivityFetcher {

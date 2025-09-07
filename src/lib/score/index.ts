@@ -1,5 +1,6 @@
 import logger from '@/app/api/pinoLogger'
 import { DefaultConstraintScorer } from '@/lib/score/constraint-scorer'
+import { TActivity } from '@/lib/types/activity'
 import {
   DataContext,
   SunData,
@@ -7,7 +8,6 @@ import {
   WeatherInfo,
   WindInfo,
 } from '@/lib/types/context'
-import { TActivity } from '@/lib/types/TActivity'
 import {
   dateOptions,
   naiveDateToFractionalUtc,

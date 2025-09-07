@@ -4,22 +4,22 @@ import * as z from 'zod'
 
 export const WindConstraint = z.object({
   // tolerance in degrees for preferred directions
-  directionTolerance: z.number().optional(),
-  maxGustSpeed: z.number().optional(), // m/s
-  maxSpeed: z.number().optional(), // m/s
-  minSpeed: z.number().optional(), // m/s
-  preferredDirections: z.array(z.number()).optional(),
+  directionTolerance: z.coerce.number().optional(),
+  maxGustSpeed: z.coerce.number().optional(), // m/s
+  maxSpeed: z.coerce.number().optional(), // m/s
+  minSpeed: z.coerce.number().optional(), // m/s
+  preferredDirections: z.array(z.coerce.number()).optional(),
   type: z.literal('wind'),
 })
 
 export type TWindConstraint = z.infer<typeof WindConstraint>
 
 export const WeatherConstraint = z.object({
-  maxCloudCover: z.number().optional(),
-  maxTemperature: z.number().optional(),
-  minTemperature: z.number().optional(),
-  maxUvIndex: z.number().optional(),
-  maxPrecipitationProbability: z.number().optional(),
+  maxCloudCover: z.coerce.number().optional(),
+  maxTemperature: z.coerce.number().optional(),
+  minTemperature: z.coerce.number().optional(),
+  maxUvIndex: z.coerce.number().optional(),
+  maxPrecipitationProbability: z.coerce.number().optional(),
   type: z.literal('weather'),
 })
 
@@ -27,18 +27,18 @@ export type TWeatherConstraint = z.infer<typeof WeatherConstraint>
 
 export const TideConstraint = z.object({
   eventType: TideType.optional(),
-  maxHeight: z.number().optional(),
-  minHeight: z.number().optional(),
-  maxHoursAfter: z.number().optional(),
-  maxHoursBefore: z.number().optional(),
+  maxHeight: z.coerce.number().optional(),
+  minHeight: z.coerce.number().optional(),
+  maxHoursAfter: z.coerce.number().optional(),
+  maxHoursBefore: z.coerce.number().optional(),
   type: z.literal('tide'),
 })
 
 export type TTideConstraint = z.infer<typeof TideConstraint>
 
 export const SunConstraint = z.object({
-  maxHoursBeforeSunset: z.number().optional(),
-  minHoursAfterSunrise: z.number().optional(),
+  maxHoursBeforeSunset: z.coerce.number().optional(),
+  minHoursAfterSunrise: z.coerce.number().optional(),
   requiresDarkness: z.boolean().optional(),
   requiresDaylight: z.boolean().optional(),
   type: z.literal('sun'),
@@ -47,9 +47,9 @@ export const SunConstraint = z.object({
 export type TSunConstraint = z.infer<typeof SunConstraint>
 
 export const TimeConstraint = z.object({
-  earliestHour: z.number().optional(),
-  latestHour: z.number().optional(),
-  preferredHours: z.array(z.number()).optional(),
+  earliestHour: z.coerce.number().optional(),
+  latestHour: z.coerce.number().optional(),
+  preferredHours: z.array(z.coerce.number()).optional(),
   type: z.literal('time'),
 })
 
@@ -92,9 +92,9 @@ export const Activity = z.object({
   description: z.string(),
   id: z.string(),
   name: z.string(),
-  priority: z.number(),
+  priority: z.coerce.number(),
   scope: z.literal('global').or(z.literal('user')),
-  version: z.number().optional(),
+  version: z.coerce.number().optional(),
 })
 
 export type TActivity = z.infer<typeof Activity>

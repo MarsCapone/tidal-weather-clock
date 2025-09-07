@@ -2,7 +2,7 @@ import logger from '@/app/api/pinoLogger'
 import { db } from '@/lib/db'
 import { activityScoresTable, activityTable } from '@/lib/db/schemas/activity'
 import { TimeSlot } from '@/lib/score'
-import { Constraint, TActivity } from '@/lib/types/TActivity'
+import { Constraint, TActivity } from '@/lib/types/activity'
 import { and, desc, eq, gte, inArray, sql } from 'drizzle-orm'
 
 export async function getActivitiesByUserId(

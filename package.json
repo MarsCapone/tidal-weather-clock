@@ -23,6 +23,8 @@
     "@ai-sdk/amazon-bedrock": "^3.0.0",
     "@auth0/nextjs-auth0": "^4.9.0",
     "@date-fns/tz": "^1.2.0",
+    "@hookform/error-message": "^2.0.1",
+    "@hookform/resolvers": "^5.2.1",
     "@neondatabase/serverless": "^1.0.1",
     "@noble/hashes": "^1.8.0",
     "@tanstack/react-table": "^8.21.3",
