@@ -1,10 +1,13 @@
 import {
-  FieldArrayWithId,
-  useFieldArray,
-  useFormContext,
-} from 'react-hook-form'
-import { Input } from '@/app/settings/components/common/form'
+  DayConstraintControls,
+  SunConstraintControls,
+  TideConstraintControls,
+  TimeConstraintControls,
+  WeatherConstraintControls,
+  WindConstraintControls,
+} from '@/app/settings/components/activity-settings/constraint-controls'
 import { InputActivities } from '@/app/settings/components/activity-settings/types'
+import { Input } from '@/app/settings/components/common/form'
 import {
   Calendar1Icon,
   ClockIcon,
@@ -15,15 +18,12 @@ import {
   Trash2Icon,
   WindIcon,
 } from 'lucide-react'
-import {
-  DayConstraintControls,
-  SunConstraintControls,
-  WindConstraintControls,
-  WeatherConstraintControls,
-  TimeConstraintControls,
-  TideConstraintControls,
-} from '@/app/settings/components/activity-settings/constraint-controls'
 import React from 'react'
+import {
+  FieldArrayWithId,
+  useFieldArray,
+  useFormContext,
+} from 'react-hook-form'
 
 type ActivityArrayProps = {
   fields: FieldArrayWithId<InputActivities>[]
@@ -162,7 +162,7 @@ function ConstraintArray({ index, disabled }: ConstraintFormProps) {
         {!disabled && (
           <button
             className={'btn btn-sm rounded-field'}
-            onClick={() => prepend({ type: 'tide' })}
+            onClick={() => prepend({ type: 'wind' })}
           >
             Add Constraint <PlusIcon className="h-4 w-4" />
           </button>
