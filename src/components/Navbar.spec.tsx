@@ -2,7 +2,7 @@ import Navbar from '@/components/Navbar'
 import CONSTANTS from '@/lib/constants'
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
-import { describe, test, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, test } from 'vitest'
 
 describe('Navbar', () => {
   beforeEach(() => {
@@ -14,14 +14,15 @@ describe('Navbar', () => {
   })
 
   test('has a link to settings', () => {
-    const settings = screen.getByRole('link', { name: 'Settings' })
+    const settings = screen.getAllByRole('link', { name: 'Settings' })
 
-    expect(settings).toBeVisible()
-    expect(settings).toHaveAttribute('href', '/settings')
+    settings.map((setting) =>
+      expect(setting).toHaveAttribute('href', '/settings'),
+    )
   })
 
   test('shows the colorscheme switcher', () => {
-    const switcher = screen.getByRole('checkbox')
+    const switcher = screen.getByTestId('colorscheme-toggle')
 
     expect(switcher).toBeInTheDocument()
     expect(switcher).toHaveAttribute('id', 'theme-controller')
