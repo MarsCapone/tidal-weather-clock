@@ -1,6 +1,5 @@
 import logger from '@/app/api/pinoLogger'
 import { doRefresh, refreshDataContexts } from '@/app/api/refresh'
-import { OpenMeteoAndEasyTideDataFetcher } from '@/app/api/refresh/opendatasources'
 import CONSTANTS from '@/lib/constants'
 import { dateOptions } from '@/lib/utils/dates'
 import { deleteDebugData } from '@/lib/utils/debug'

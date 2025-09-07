@@ -2,7 +2,6 @@ import { tz, TZDate, tzOffset } from '@date-fns/tz'
 import {
   addHours,
   format,
-  formatDistanceToNow,
   formatDuration,
   formatISO,
   formatRelative,

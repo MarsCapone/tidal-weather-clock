@@ -1,6 +1,5 @@
 // Human-readable output types
 import { ActivityScore } from '@/lib/db/helpers/activity'
-import { TimeSlot } from '@/lib/types/activity'
 
 type ReadableTimeSlot = {
   timeWindow: string
@@ -78,10 +77,18 @@ function formatDate(date: Date): string {
 }
 
 function getScoreGrade(score: number): string {
-  if (score >= 0.9) return 'Excellent'
-  if (score >= 0.7) return 'Good'
-  if (score >= 0.5) return 'Fair'
-  if (score >= 0.3) return 'Poor'
+  if (score >= 0.9) {
+    return 'Excellent'
+  }
+  if (score >= 0.7) {
+    return 'Good'
+  }
+  if (score >= 0.5) {
+    return 'Fair'
+  }
+  if (score >= 0.3) {
+    return 'Poor'
+  }
   return 'Unsuitable'
 }
 
@@ -137,12 +144,24 @@ function getWindDirection(degrees: number): string {
 }
 
 function getWindStrength(speed: number): string {
-  if (speed < 1) return 'calm'
-  if (speed < 4) return 'light'
-  if (speed < 8) return 'gentle'
-  if (speed < 13) return 'moderate'
-  if (speed < 19) return 'fresh'
-  if (speed < 25) return 'strong'
+  if (speed < 1) {
+    return 'calm'
+  }
+  if (speed < 4) {
+    return 'light'
+  }
+  if (speed < 8) {
+    return 'gentle'
+  }
+  if (speed < 13) {
+    return 'moderate'
+  }
+  if (speed < 19) {
+    return 'fresh'
+  }
+  if (speed < 25) {
+    return 'strong'
+  }
   return 'gale'
 }
 
@@ -155,7 +174,9 @@ function formatTides(tides: any[], timeStart: Date): string {
       (a, b) => Math.abs(a.time - currentHour) - Math.abs(b.time - currentHour),
     )
 
-  if (relevantTides.length === 0) return 'No significant tide changes'
+  if (relevantTides.length === 0) {
+    return 'No significant tide changes'
+  }
 
   const nextTide = relevantTides[0]
   const timeUntil = Math.abs(nextTide.time - currentHour)
