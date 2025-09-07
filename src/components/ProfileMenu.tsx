@@ -1,7 +1,7 @@
 import { auth0 } from '@/lib/auth0'
+import { SessionData } from '@auth0/nextjs-auth0/types'
 import { LogInIcon, LogOutIcon } from 'lucide-react'
 import React from 'react'
-import { SessionData } from '@auth0/nextjs-auth0/types'
 
 export default async function ProfileMenu() {
   const session = await auth0.getSession()
@@ -26,11 +26,11 @@ export function ProfileMenuInternal({
               <span>Sign Up</span>
             </a>
           </div>
-          <li className={'menu-item'}>
+          <div className={'menu-item'}>
             <a href="/auth/login" className={'btn btn-soft rounded-field'}>
               <span>Log In</span>
             </a>
-          </li>
+          </div>
         </div>
       </ProfileMenuWrapper>
     )
