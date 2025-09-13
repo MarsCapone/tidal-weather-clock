@@ -70,11 +70,13 @@ export default function ActivitySettingsForm({
   })
 
   const onSubmit = (data: TInputActivities) => {
-    logger.warn('zod activities', {
+    logger.warn('saving zod activities', {
       data: InputActivities.safeParse(data),
     })
     setActivitiesAction(data.activities)
   }
+
+  const hasErrors = Object.keys(errors).length !== 0
 
   // @ts-ignore
   return (
@@ -84,12 +86,18 @@ export default function ActivitySettingsForm({
           <div className="bg-base-100 mb-4 flex flex-row items-center justify-between">
             <div>
               <SettingTitle title={'Activity Settings'} />
-              <div className="text-md px-4 italic">
+              <div className="text-md px-4">
                 You cannot edit global activities
+                {hasErrors && (
+                  <div className="text-error text-xs italic">
+                    Please fix the errors below
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex gap-2">
               <button
+                type={'button'}
                 className="btn btn-primary rounded-field"
                 onClick={() =>
                   prepend({

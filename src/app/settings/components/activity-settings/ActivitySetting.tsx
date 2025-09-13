@@ -1,6 +1,10 @@
 import ActivitySettingsForm from '@/app/settings/components/activity-settings/ActivitySettingsForm'
 import { getUserId } from '@/lib/auth0'
-import { getActivitiesByUserId, putActivities } from '@/lib/db/helpers/activity'
+import {
+  getActivitiesByUserId,
+  putActivities,
+  setActivities,
+} from '@/lib/db/helpers/activity'
 import { TActivity } from '@/lib/types/activity'
 
 export default async function ActivitySetting() {
@@ -9,7 +13,7 @@ export default async function ActivitySetting() {
 
   async function updateActivities(act: TActivity[]) {
     'use server'
-    await putActivities(act, userId)
+    await setActivities(act, userId)
   }
 
   return (

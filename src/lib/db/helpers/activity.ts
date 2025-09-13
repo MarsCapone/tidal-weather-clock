@@ -3,7 +3,7 @@ import { db } from '@/lib/db'
 import { activityScoresTable, activityTable } from '@/lib/db/schemas/activity'
 import { TimeSlot } from '@/lib/score'
 import { Constraint, TActivity } from '@/lib/types/activity'
-import { and, desc, eq, gte, inArray, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, gte, inArray, notInArray, sql } from 'drizzle-orm'
 
 export async function getActivitiesByUserId(
   userId: string,
@@ -37,7 +37,7 @@ export async function getActivitiesByUserId(
         activityTable.priority,
         activityTable.version,
       )
-      .orderBy(activityTable.id, desc(activityTable.version))
+      .orderBy(asc(activityTable.id), desc(activityTable.version))
   ).map(({ id, name, description, priority, scope, content, version }) => ({
     id,
     name,
@@ -48,7 +48,7 @@ export async function getActivitiesByUserId(
     constraints: content['constraints'] || [],
   }))
 
-  return activityResponses
+  return activityResponses.sort((a, b) => a.priority - b.priority)
 }
 
 export async function getAllActivities(): Promise<TActivity[]> {
@@ -106,6 +106,40 @@ export async function putActivities(activities: TActivity[], userId: string) {
 
   const activityIds = (await Promise.all(inserts)).flat()
   logger.debug('updated activities', { activityIds })
+}
+
+export async function setActivities(activities: TActivity[], userId: string) {
+  // delete everything for that userId where the id is not in the current list of activities
+  const deletedActivities = await db
+    .delete(activityTable)
+    .where(
+      and(
+        eq(activityTable.user_id, userId),
+        notInArray(
+          activityTable.id,
+          activities.map((a) => a.id),
+        ),
+      ),
+    )
+    .returning({
+      id: activityTable.id,
+      version: activityTable.version,
+    })
+  logger.debug('deleted activities', { userId, deletedActivities })
+  await Promise.all(
+    deletedActivities.map(({ id, version }) =>
+      db
+        .delete(activityScoresTable)
+        .where(
+          and(
+            eq(activityScoresTable.activity_id, id),
+            eq(activityScoresTable.activity_version, version),
+          ),
+        ),
+    ),
+  )
+  logger.debug('deleted activity scores', { userId, deletedActivities })
+  await putActivities(activities, userId)
 }
 
 export type ActivityScore = {
