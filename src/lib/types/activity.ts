@@ -90,11 +90,11 @@ export const Activity = z.object({
         DayConstraint,
       ]),
     )
-    .min(1),
+    .min(1, { message: 'At least one constraint is required' }),
   description: z.string(),
   id: z.string(),
   name: z.string(),
-  priority: z.coerce.number(),
+  priority: z.coerce.number().min(1).max(10).default(1),
   scope: z.literal('global').or(z.literal('user')),
   version: z.coerce.number().optional(),
 })

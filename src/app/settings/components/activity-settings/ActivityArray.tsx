@@ -183,7 +183,15 @@ function ConstraintArray({ index, disabled }: ConstraintFormProps) {
   return (
     <div>
       <div className={'mb-4 flex flex-row items-center justify-between gap-4'}>
-        <div className={'text-md'}>Constraints</div>
+        <div className={'text-md'}>
+          Constraints
+          <div className={'text-error text-xs'}>
+            <ErrorMessage
+              name={`activities.${index}.constraints`}
+              errors={errors}
+            />
+          </div>
+        </div>
         {!disabled && (
           <button
             className={'btn btn-sm rounded-field'}
