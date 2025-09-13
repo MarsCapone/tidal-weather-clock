@@ -44,7 +44,7 @@ export async function createUserWithExtras(email: string): Promise<string> {
 
   // then do other setup
   // 1. copy all global activities to the user
-  const globalActivities = await getActivitiesByUserId('global')
+  const globalActivities = await getActivitiesByUserId(null)
   logger.debug('copying global activities to user', {
     userId,
     activityCount: globalActivities.length,

@@ -73,6 +73,18 @@ const addActivities = async () => {
         },
       ],
     },
+    {
+      name: 'Play Scrabble',
+      description:
+        "There's nothing else for it - it's time for a game of Scrabble!",
+      constraints: [
+        {
+          type: 'day',
+          isWeekday: true,
+          isWeekend: true,
+        },
+      ],
+    },
   ]
 
   await putActivities(
@@ -82,7 +94,7 @@ const addActivities = async () => {
       scope: 'global',
       priority: 1,
     })),
-    'global',
+    null,
   )
 }
 

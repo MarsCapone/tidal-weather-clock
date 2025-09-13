@@ -50,10 +50,7 @@ export async function doRefresh({
   const activities =
     scope === 'all'
       ? await getAllActivities()
-      : await getActivitiesByUserId(
-          scope === 'user' && userId !== null ? userId : 'global',
-          true,
-        )
+      : await getActivitiesByUserId(userId)
 
   const dataContextWrappers = await getDataContextsByDateRange(
     startDate,
