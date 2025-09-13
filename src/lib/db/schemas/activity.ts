@@ -1,4 +1,5 @@
 import { datacontextTable } from '@/lib/db/schemas/datacontext'
+import { usersTable } from '@/lib/db/schemas/users'
 import { Constraint } from '@/lib/types/activity'
 import {
   foreignKey,
@@ -27,7 +28,9 @@ export const activityTable = pgTable(
     name: text().notNull(),
     description: text().notNull(),
     priority: integer().notNull(),
-    user_id: text().notNull(),
+    user_id: text()
+      .notNull()
+      .references(() => usersTable.id),
     content: json().$type<ActivityContent>().notNull(),
     created_at: timestamp().defaultNow().notNull(),
   },

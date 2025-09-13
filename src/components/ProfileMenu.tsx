@@ -1,91 +1,26 @@
-import { auth0 } from '@/lib/auth0'
-import { SessionData } from '@auth0/nextjs-auth0/types'
-import { LogInIcon, LogOutIcon } from 'lucide-react'
+import logger from '@/app/api/pinoLogger'
+import { ProfileMenuInternal } from '@/components/ProfileMenuInternal'
+import { auth0, getUserId } from '@/lib/auth0'
+import { deleteUser } from '@/lib/db/helpers/users'
 import React from 'react'
 
 export default async function ProfileMenu() {
   const session = await auth0.getSession()
 
-  return <ProfileMenuInternal session={session} />
-}
-
-export function ProfileMenuInternal({
-  session,
-}: {
-  session: SessionData | null
-}) {
-  if (!session) {
-    return (
-      <ProfileMenuWrapper buttonContent={<LogInIcon />}>
-        <div className={'menu w-full gap-2'}>
-          <div className={'menu-item'}>
-            <a
-              href="/auth/login?screen_hint=signup"
-              className={'btn btn-soft rounded-field'}
-            >
-              <span>Sign Up</span>
-            </a>
-          </div>
-          <div className={'menu-item'}>
-            <a href="/auth/login" className={'btn btn-soft rounded-field'}>
-              <span>Log In</span>
-            </a>
-          </div>
-        </div>
-      </ProfileMenuWrapper>
-    )
+  const deleteUserAction = async () => {
+    'use server'
+    const userId = await getUserId()
+    if (userId !== null) {
+      await deleteUser(userId)
+    } else {
+      logger.error('Cannot delete user, no user id found')
+    }
   }
-  return (
-    <ProfileMenuWrapper
-      buttonContent={
-        <div className="avatar">
-          <div className="w-6 rounded-full md:w-10">
-            <img
-              data-testid={'profile-menu-avatar'}
-              src={session.user.picture}
-              alt={`Avatar for ${session.user.name}`}
-            />
-          </div>
-        </div>
-      }
-    >
-      <h4 className="text-xs">Welcome</h4>
-      <h1 className="text-md pl-4 font-bold">{session.user.name}</h1>
-      <h4 className="pl-4 font-mono text-xs">{session.user.email}</h4>
-      <div className="menu w-full gap-2">
-        <div className="menu-item">
-          <a href="/auth/logout" className="btn btn-soft rounded-field">
-            <span>Sign Out</span>
-            <LogOutIcon className={'w-4'} />
-          </a>
-        </div>
-      </div>
-    </ProfileMenuWrapper>
-  )
-}
 
-function ProfileMenuWrapper({
-  buttonContent,
-  children,
-}: {
-  buttonContent: React.ReactNode
-  children: React.ReactNode
-}) {
   return (
-    <div>
-      <div className={'dropdown dropdown-end dropdown-hover'}>
-        <div data-testid="profile-menu-button" tabIndex={0}>
-          {buttonContent}
-        </div>
-        <div
-          tabIndex={0}
-          className={
-            'dropdown-content bg-base-100 card card-sm z-1 w-72 shadow-sm'
-          }
-        >
-          <div className={'card-body'}>{children}</div>
-        </div>
-      </div>
-    </div>
+    <ProfileMenuInternal
+      session={session}
+      deleteUserAction={deleteUserAction}
+    />
   )
 }

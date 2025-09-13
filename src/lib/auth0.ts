@@ -1,7 +1,12 @@
+import { db } from '@/lib/db'
+import { createUserWithExtras, getUserIdByEmail } from '@/lib/db/helpers/users'
+import logger from '@/lib/utils/logger'
 import { Auth0Client } from '@auth0/nextjs-auth0/server'
 import { blake3 } from '@noble/hashes/blake3'
 import { bytesToHex } from '@noble/hashes/utils'
 import { secondsInDay } from 'date-fns/constants'
+import { eq } from 'drizzle-orm'
+import { usersTable } from './db/schemas/users'
 
 export const auth0 = new Auth0Client({
   session: {
@@ -21,10 +26,17 @@ export const getUserId = async () => {
   }
 
   const email = session.user.email
-  if (email) {
-    const data = new TextEncoder().encode(email)
-    return bytesToHex(blake3(data))
+  if (email === undefined) {
+    throw new Error('Unable to get user')
   }
 
-  throw new Error('Unable to get user')
+  const userId = await getUserIdByEmail(email)
+  if (userId !== null) {
+    return userId
+  }
+
+  logger.info('creating user', {
+    emailHash: bytesToHex(blake3(new TextEncoder().encode(email))),
+  })
+  return await createUserWithExtras(email)
 }
