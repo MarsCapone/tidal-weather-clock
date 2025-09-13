@@ -11,6 +11,7 @@ import logger from '@/lib/utils/logger'
 import { mpsToKnots } from '@/lib/utils/units'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
+import { useState } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
 import * as z from 'zod'
@@ -25,7 +26,7 @@ export default function ActivitySettingsForm({
   activities,
   setActivitiesAction,
 }: ActivitySettingsFormProps) {
-  const defaultValues = {
+  const [defaultValues, setDefaultValues] = useState<TInputActivities>({
     // when items are saved, they are converted to the correct unit, but we need to represent them
     // in the display unit first
     activities: activities.map((activity) => ({
@@ -49,7 +50,7 @@ export default function ActivitySettingsForm({
         return constraint
       }),
     })),
-  }
+  })
   const methods = useForm<
     z.input<typeof InputActivities>,
     any,
@@ -59,6 +60,7 @@ export default function ActivitySettingsForm({
     resolver: zodResolver(InputActivities),
   })
   const {
+    reset,
     control,
     handleSubmit,
     formState: { errors, isDirty },
@@ -74,6 +76,7 @@ export default function ActivitySettingsForm({
       data: InputActivities.safeParse(data),
     })
     setActivitiesAction(data.activities)
+    reset(data)
   }
 
   const hasErrors = Object.keys(errors).length !== 0
