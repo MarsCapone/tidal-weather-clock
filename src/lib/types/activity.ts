@@ -79,16 +79,18 @@ export type Constraint =
   | TDayConstraint
 
 export const Activity = z.object({
-  constraints: z.array(
-    z.discriminatedUnion('type', [
-      WindConstraint,
-      WeatherConstraint,
-      TideConstraint,
-      SunConstraint,
-      TimeConstraint,
-      DayConstraint,
-    ]),
-  ),
+  constraints: z
+    .array(
+      z.discriminatedUnion('type', [
+        WindConstraint,
+        WeatherConstraint,
+        TideConstraint,
+        SunConstraint,
+        TimeConstraint,
+        DayConstraint,
+      ]),
+    )
+    .min(1),
   description: z.string(),
   id: z.string(),
   name: z.string(),

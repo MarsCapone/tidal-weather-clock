@@ -37,7 +37,11 @@ export async function getActivitiesByUserId(
         activityTable.priority,
         activityTable.version,
       )
-      .orderBy(asc(activityTable.id), desc(activityTable.version))
+      .orderBy(
+        asc(activityTable.id),
+        desc(activityTable.version),
+        desc(activityTable.created_at),
+      )
   ).map(({ id, name, description, priority, scope, content, version }) => ({
     id,
     name,
@@ -48,7 +52,7 @@ export async function getActivitiesByUserId(
     constraints: content['constraints'] || [],
   }))
 
-  return activityResponses.sort((a, b) => a.priority - b.priority)
+  return activityResponses
 }
 
 export async function getAllActivities(): Promise<TActivity[]> {

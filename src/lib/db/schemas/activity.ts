@@ -8,6 +8,7 @@ import {
   primaryKey,
   real,
   text,
+  timestamp,
   uniqueIndex,
 } from 'drizzle-orm/pg-core'
 import { v4 as uuidv4 } from 'uuid'
@@ -28,6 +29,7 @@ export const activityTable = pgTable(
     priority: integer().notNull(),
     user_id: text().notNull(),
     content: json().$type<ActivityContent>().notNull(),
+    created_at: timestamp().defaultNow().notNull(),
   },
   (table) => [primaryKey({ columns: [table.id, table.version] })],
 )
