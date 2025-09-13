@@ -8,6 +8,8 @@ import {
 } from '@/lib/db/helpers/activity'
 import { activityScoresTable, activityTable } from '@/lib/db/schemas/activity'
 import { usersTable } from '@/lib/db/schemas/users'
+import { blake3 } from '@noble/hashes/blake3'
+import { bytesToHex } from '@noble/hashes/utils'
 import { addDays, startOfToday, subDays } from 'date-fns'
 import { eq, inArray } from 'drizzle-orm'
 import { v4 as uuidv4 } from 'uuid'
@@ -27,6 +29,9 @@ export async function getUserIdByEmail(email: string): Promise<string | null> {
 export async function createUserWithExtras(email: string): Promise<string> {
   /** Create a user and return the id */
 
+  logger.info('creating user', {
+    emailHash: bytesToHex(blake3(new TextEncoder().encode(email))),
+  })
   const userIdResults = await db
     .insert(usersTable)
     .values({

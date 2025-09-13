@@ -2,15 +2,16 @@
 
 import { SessionData } from '@auth0/nextjs-auth0/types'
 import { LogInIcon, LogOutIcon } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import React from 'react'
 
 export function ProfileMenuInternal({
   session,
-  deleteUserAction,
 }: {
   session: SessionData | null
-  deleteUserAction: () => Promise<void>
 }) {
+  const router = useRouter()
+
   if (!session) {
     return (
       <ProfileMenuWrapper buttonContent={<LogInIcon />}>
@@ -56,14 +57,14 @@ export function ProfileMenuInternal({
             <LogOutIcon className={'w-4'} />
           </a>
         </div>
-        <div className="menu-item">
-          <button
-            className={'btn btn-error rounded-field'}
-            onClick={deleteUserAction}
-          >
-            Delete Account
-          </button>
-        </div>
+        {/*<div className="menu-item">*/}
+        {/*  <button*/}
+        {/*    className={'btn btn-error rounded-field'}*/}
+        {/*    onClick={deleteUserAction}*/}
+        {/*  >*/}
+        {/*    Delete Account*/}
+        {/*  </button>*/}
+        {/*</div>*/}
       </div>
     </ProfileMenuWrapper>
   )

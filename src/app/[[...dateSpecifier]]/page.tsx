@@ -64,7 +64,7 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
   const dataContextRange = await getDataContextRange(CONSTANTS.LOCATION_COORDS)
   const workingHours = await getOrPutSetting<WorkingHoursSetting>(
     'working_hours',
-    userId || 'global',
+    userId,
     defaultWorkingHours,
   )
   const {

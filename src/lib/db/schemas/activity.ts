@@ -28,9 +28,7 @@ export const activityTable = pgTable(
     name: text().notNull(),
     description: text().notNull(),
     priority: integer().notNull(),
-    user_id: text()
-      .notNull()
-      .references(() => usersTable.id),
+    user_id: text().references(() => usersTable.id, { onDelete: 'cascade' }),
     content: json().$type<ActivityContent>().notNull(),
     created_at: timestamp().defaultNow().notNull(),
   },
@@ -44,18 +42,20 @@ export const activityScoresTable = pgTable(
       .primaryKey()
       .notNull()
       .$default(() => uuidv4()),
-    datacontext_id: integer().references(() => datacontextTable.id),
+    datacontext_id: integer().references(() => datacontextTable.id, {
+      onDelete: 'set null',
+    }),
     activity_id: text(),
     activity_version: integer(),
     timestamp: text().notNull(),
     score: real().notNull().default(0),
-    debug: json().notNull().default('{}'),
+    debug: json(),
   },
   (table) => [
     foreignKey({
       columns: [table.activity_id, table.activity_version],
       foreignColumns: [activityTable.id, activityTable.version],
-    }),
+    }).onDelete('cascade'),
     uniqueIndex('fks_uniq_idx').on(
       table.activity_id,
       table.activity_version,

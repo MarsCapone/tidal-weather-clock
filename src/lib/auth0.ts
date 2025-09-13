@@ -2,8 +2,6 @@ import { db } from '@/lib/db'
 import { createUserWithExtras, getUserIdByEmail } from '@/lib/db/helpers/users'
 import logger from '@/lib/utils/logger'
 import { Auth0Client } from '@auth0/nextjs-auth0/server'
-import { blake3 } from '@noble/hashes/blake3'
-import { bytesToHex } from '@noble/hashes/utils'
 import { secondsInDay } from 'date-fns/constants'
 import { eq } from 'drizzle-orm'
 import { usersTable } from './db/schemas/users'
@@ -35,8 +33,5 @@ export const getUserId = async () => {
     return userId
   }
 
-  logger.info('creating user', {
-    emailHash: bytesToHex(blake3(new TextEncoder().encode(email))),
-  })
-  return await createUserWithExtras(email)
+  return null
 }

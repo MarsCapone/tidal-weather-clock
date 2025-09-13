@@ -7,20 +7,5 @@ import React from 'react'
 export default async function ProfileMenu() {
   const session = await auth0.getSession()
 
-  const deleteUserAction = async () => {
-    'use server'
-    const userId = await getUserId()
-    if (userId !== null) {
-      await deleteUser(userId)
-    } else {
-      logger.error('Cannot delete user, no user id found')
-    }
-  }
-
-  return (
-    <ProfileMenuInternal
-      session={session}
-      deleteUserAction={deleteUserAction}
-    />
-  )
+  return <ProfileMenuInternal session={session} />
 }
