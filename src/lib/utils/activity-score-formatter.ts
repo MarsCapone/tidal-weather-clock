@@ -1,5 +1,15 @@
 // Human-readable output types
 import { ActivityScore } from '@/lib/db/helpers/activity'
+import { SunData, TideData, WeatherInfo, WindInfo } from '@/lib/types/context'
+import { Constraint } from '@/lib/types/activity'
+import { TimeSlot } from '@/lib/score'
+
+type ConstraintAnalysis = {
+  requirement: string
+  status: 'Excellent' | 'Good' | 'Fair' | 'Poor' | 'Failed'
+  score: number
+  details: string
+}
 
 type ReadableTimeSlot = {
   timeWindow: string
@@ -11,12 +21,7 @@ type ReadableTimeSlot = {
     tides: string
     daylight: string
   }
-  constraintAnalysis: Array<{
-    requirement: string
-    status: 'Excellent' | 'Good' | 'Fair' | 'Poor' | 'Failed'
-    score: number
-    details: string
-  }>
+  constraintAnalysis: ConstraintAnalysis[]
 }
 
 export default function getHumanReadableScore(
@@ -92,7 +97,7 @@ function getScoreGrade(score: number): string {
   return 'Unsuitable'
 }
 
-function formatWeather(weather: any): string {
+function formatWeather(weather: WeatherInfo): string {
   const temp = `${weather.temperature}°C`
   const clouds =
     weather.cloudCover === 100
@@ -106,11 +111,11 @@ function formatWeather(weather: any): string {
             : 'clear'
 
   const precip =
-    weather.precipitation > 0 ? `, ${weather.precipitation}mm rain` : ''
+    weather.precipitation! > 0 ? `, ${weather.precipitation}mm rain` : ''
   return `${temp}, ${clouds}${precip}`
 }
 
-function formatWind(wind: any): string {
+function formatWind(wind: WindInfo): string {
   const direction = getWindDirection(wind.direction)
   const strength = getWindStrength(wind.speed)
   const gusts =
@@ -165,7 +170,7 @@ function getWindStrength(speed: number): string {
   return 'gale'
 }
 
-function formatTides(tides: any[], timeStart: Date): string {
+function formatTides(tides: TideData, timeStart: Date): string {
   // Find tides within the next 6 hours for context
   const currentHour = timeStart.getUTCHours()
   const relevantTides = tides
@@ -190,7 +195,7 @@ function formatTides(tides: any[], timeStart: Date): string {
   return `${nextTide.type} tide ${timing} (${nextTide.height.toFixed(1)}m)`
 }
 
-function formatDaylight(sun: any, timeStart: Date): string {
+function formatDaylight(sun: SunData, timeStart: Date): string {
   const sunrise = new Date(sun.sunRise)
   const sunset = new Date(sun.sunSet)
   const current = timeStart
@@ -208,7 +213,11 @@ function formatDaylight(sun: any, timeStart: Date): string {
   }
 }
 
-function analyzeConstraint(constraint: any, score: number, timeSlot: any): any {
+function analyzeConstraint(
+  constraint: Constraint,
+  score: number,
+  timeSlot: TimeSlot,
+): ConstraintAnalysis {
   const status =
     score >= 0.9
       ? 'Excellent'
@@ -222,7 +231,7 @@ function analyzeConstraint(constraint: any, score: number, timeSlot: any): any {
 
   if (constraint.type === 'tide') {
     return {
-      requirement: `Tide: Min ${constraint.minHeight}m within ${constraint.timeFromTideEvent.maxHoursBefore}h before to ${constraint.timeFromTideEvent.maxHoursAfter}h after ${constraint.timeFromTideEvent.event} tide`,
+      requirement: `Tide: Min ${constraint.minHeight}m within ${constraint.maxHoursBefore}h before to ${constraint.maxHoursAfter}h after ${constraint.eventType} tide`,
       status,
       score,
       details:
@@ -254,7 +263,7 @@ function analyzeConstraint(constraint: any, score: number, timeSlot: any): any {
       requirement: `Wind: Maximum ${constraint.maxSpeed} mph`,
       status,
       score,
-      details: `Current wind: ${actualWind.toFixed(1)} mph (${actualWind <= constraint.maxSpeed ? 'within limit' : 'exceeds limit'})`,
+      details: `Current wind: ${actualWind.toFixed(1)} mph (${actualWind <= constraint.maxSpeed! ? 'within limit' : 'exceeds limit'})`,
     }
   }
 

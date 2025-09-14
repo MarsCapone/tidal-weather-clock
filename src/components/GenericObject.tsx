@@ -9,7 +9,7 @@ import React, { useContext } from 'react'
 
 export type GenericObjectProps = {
   className?: string
-  obj: any
+  obj: Record<string, unknown> | null | undefined
   options?: {
     decimalPlaces?: number
     jsonEditorProps?: Partial<JsonEditorProps>
@@ -42,7 +42,7 @@ export default function GenericObject({
   }
 
   const renderObject = (
-    o: Record<string, any>,
+    o: Record<string, string | number | boolean>,
     className?: string,
     level: number = 0,
   ) => {

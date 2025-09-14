@@ -2,7 +2,6 @@
 
 import { SessionData } from '@auth0/nextjs-auth0/types'
 import { LogInIcon, LogOutIcon } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import React from 'react'
 
 export function ProfileMenuInternal({
@@ -10,7 +9,7 @@ export function ProfileMenuInternal({
 }: {
   session: SessionData | null
 }) {
-  if (!session) {
+  if (!session || !session.user) {
     return (
       <ProfileMenuWrapper buttonContent={<LogInIcon />}>
         <div className={'menu w-full gap-2'}>

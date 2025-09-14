@@ -1,6 +1,6 @@
 import logger from '@/app/api/pinoLogger'
 import { DefaultConstraintScorer } from '@/lib/score/constraint-scorer'
-import { TActivity } from '@/lib/types/activity'
+import { Constraint, TActivity } from '@/lib/types/activity'
 import {
   DataContext,
   SunData,
@@ -22,10 +22,10 @@ type GetScoreParams = {
   activity: TActivity
 }
 
-type GetScoreResult = {
+type GetScoreResult<DebugType> = {
   timestamp: string
   value: number
-  debug: Record<string, any>
+  debug: DebugType
 }[]
 
 export type TimeSlot = {
@@ -41,7 +41,12 @@ export type TimeSlot = {
 export async function getScores({
   dataContext,
   activity,
-}: GetScoreParams): Promise<GetScoreResult> {
+}: GetScoreParams): Promise<
+  GetScoreResult<{
+    timeSlot: TimeSlot
+    constraintsWithScores: { constraint: Constraint; score: number }[]
+  }>
+> {
   /**
    * Given a data context and an activity calculate the scores for each available timeslot.
    * Time slots that are missing data are skipped.

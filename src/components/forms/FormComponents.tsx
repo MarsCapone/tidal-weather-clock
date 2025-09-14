@@ -87,7 +87,7 @@ export function PrefixSuffixInput({
       <label className={`input ${classNamesToString(inputClasses)}`}>
         {prefix}
         <input
-          className={`grow`}
+          className={'grow'}
           defaultValue={defaultValue}
           readOnly={readonly}
           type={type || 'text'}

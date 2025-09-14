@@ -32,9 +32,6 @@ export interface ILogger {
 }
 
 export interface IDataContextFetcher {
-  // get the data context for the specific date
-  getDataContext(date: Date): Promise<DataContext | null>
-
   // starting at `date` return as may data contexts as can be found
   getDataContexts(date: Date): Promise<DataContext[]>
 

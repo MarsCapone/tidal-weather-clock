@@ -1,10 +1,8 @@
-import { db } from '@/lib/db'
 import {
   createUserWithExtras,
   getUserIdByEmail,
   updateLastLogin,
 } from '@/lib/db/helpers/users'
-import logger from '@/lib/utils/logger'
 import { Auth0Client } from '@auth0/nextjs-auth0/server'
 import { SessionData } from '@auth0/nextjs-auth0/types'
 import { formatISO } from 'date-fns'

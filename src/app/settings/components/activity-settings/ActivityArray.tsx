@@ -117,7 +117,7 @@ function SingleActivity({ removeByIndex, index }: SingleActivityProps) {
           <ErrorMessage name={`activities.${index}.priority`} errors={errors} />
         </div>
         {!disabled && (
-          <button className={`my-2`} onClick={() => removeByIndex(index)}>
+          <button className={'my-2'} onClick={() => removeByIndex(index)}>
             <Trash2Icon className={'h-6 w-6'} />
           </button>
         )}

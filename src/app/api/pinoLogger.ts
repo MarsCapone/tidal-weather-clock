@@ -30,7 +30,7 @@ class CustomPinoLogger implements ILogger {
 
 const _logger = pino({
   formatters: {
-    bindings: (bindings) => {
+    bindings: () => {
       return {
         source: 'server',
       }

@@ -2,11 +2,7 @@ import logger from '@/app/api/pinoLogger'
 import { doRefresh } from '@/app/api/refresh'
 import ActivitySettingsForm from '@/app/settings/components/activity-settings/ActivitySettingsForm'
 import { auth0, getUserId } from '@/lib/auth0'
-import {
-  getActivitiesByUserId,
-  putActivities,
-  setActivities,
-} from '@/lib/db/helpers/activity'
+import { getActivitiesByUserId, setActivities } from '@/lib/db/helpers/activity'
 import { TActivity } from '@/lib/types/activity'
 import { addDays, startOfToday } from 'date-fns'
 
@@ -33,7 +29,7 @@ export default async function ActivitySetting() {
   if (!userId) {
     return (
       <div>
-        You must be logged in to edit your activities. '{userId}'{' '}
+        You must be logged in to edit your activities. &lsquo;{userId}&rsquo;{' '}
         {JSON.stringify(session)}
       </div>
     )

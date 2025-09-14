@@ -3,17 +3,7 @@ import { db } from '@/lib/db'
 import { activityScoresTable, activityTable } from '@/lib/db/schemas/activity'
 import { TimeSlot } from '@/lib/score'
 import { Constraint, TActivity } from '@/lib/types/activity'
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  gte,
-  inArray,
-  isNull,
-  notInArray,
-  sql,
-} from 'drizzle-orm'
+import { and, asc, desc, eq, gte, isNull, notInArray, sql } from 'drizzle-orm'
 
 export async function getActivitiesByUserId(userId: string | null) {
   const userIds = userId ? [userId] : []

@@ -1,4 +1,3 @@
-// eslint-disable-next-line import-x/no-namespace
 import * as z from 'zod'
 
 export const TideType = z.enum(['high', 'low'])
@@ -56,5 +55,3 @@ export type DataContext = {
   weatherData: WeatherDataPoints
   windData: WindDataPoints
 }
-
-export type DataContextWithId = WithId<DataContext>

@@ -3,16 +3,16 @@ import { createContext } from 'react'
 
 export const DarkModeContext = createContext({
   isDarkMode: false,
-  setIsDarkMode: (v: boolean) => {},
+  setIsDarkMode: () => {},
 })
 
 export const TimeZoneContext = createContext({
   timeZone: 'Etc/UTC',
-  setTimeZone: (tz: string) => {},
+  setTimeZone: () => {},
 })
 
 export const DateContext = createContext({
   date: new TZDate(),
   isPast: false,
-  setDate: (d: TZDate) => {},
+  setDate: () => {},
 })

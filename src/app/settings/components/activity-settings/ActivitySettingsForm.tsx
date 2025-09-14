@@ -6,7 +6,7 @@ import {
   TInputActivities,
 } from '@/app/settings/components/activity-settings/types'
 import { SettingCard, SettingTitle } from '@/app/settings/components/common'
-import { Activity, TActivity } from '@/lib/types/activity'
+import { TActivity } from '@/lib/types/activity'
 import logger from '@/lib/utils/logger'
 import { mpsToKnots } from '@/lib/utils/units'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -27,7 +27,7 @@ export default function ActivitySettingsForm({
   setActivitiesAction,
 }: ActivitySettingsFormProps) {
   const [zodErrors, setZodErrors] = useState<z.ZodError | null>(null)
-  const [defaultValues, setDefaultValues] = useState<TInputActivities>({
+  const [defaultValues] = useState<TInputActivities>({
     // when items are saved, they are converted to the correct unit, but we need to represent them
     // in the display unit first
     activities: activities.map((activity) => ({
@@ -54,7 +54,7 @@ export default function ActivitySettingsForm({
   })
   const methods = useForm<
     z.input<typeof InputActivities>,
-    any,
+    unknown,
     z.output<typeof InputActivities>
   >({
     defaultValues,
@@ -86,7 +86,6 @@ export default function ActivitySettingsForm({
 
   const hasErrors = Object.keys(errors).length !== 0
 
-  // @ts-ignore
   return (
     <div>
       <FormProvider {...methods}>

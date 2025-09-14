@@ -70,6 +70,7 @@ export function WeatherDetailsInternal({
     DEFAULT_SHOW_OUT_OF_HOURS,
   )
   const { timeZone } = useContext(TimeZoneContext)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const columns: AccessorKeyColumnDef<AggregatedDataPoint, any>[] = [
     columnHelper.accessor('timestamp', {
       header: () => <span>Time</span>,
@@ -124,7 +125,7 @@ export function WeatherDetailsInternal({
         return (
           <div className="flex flex-row items-center gap-2">
             <ArrowBigUpIcon
-              className={`fill-accent h-4 w-4`}
+              className={'fill-accent h-4 w-4'}
               style={{ rotate: `${info.getValue() + 180}deg` }}
             />
             {describeWindDirection(info.getValue(), true)}
@@ -220,7 +221,7 @@ export function WeatherDetailsInternal({
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row, rowIndex) => (
+            {table.getRowModel().rows.map((row) => (
               <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} data-testid={`${cell.column.id}-data`}>

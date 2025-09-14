@@ -1,17 +1,13 @@
 import logger from '@/app/api/pinoLogger'
 import { doRefresh } from '@/app/api/refresh'
 import { db } from '@/lib/db'
-import {
-  getActivitiesByUserId,
-  putActivities,
-  setActivities,
-} from '@/lib/db/helpers/activity'
+import { getActivitiesByUserId, putActivities } from '@/lib/db/helpers/activity'
 import { activityScoresTable, activityTable } from '@/lib/db/schemas/activity'
 import { usersTable } from '@/lib/db/schemas/users'
 import { blake3 } from '@noble/hashes/blake3'
 import { bytesToHex } from '@noble/hashes/utils'
 import { addDays, startOfToday, subDays } from 'date-fns'
-import { eq, inArray, sql } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 import { v4 as uuidv4 } from 'uuid'
 
 export async function getUserIdByEmail(email: string): Promise<string | null> {

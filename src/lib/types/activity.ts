@@ -1,5 +1,4 @@
 import { TideType } from '@/lib/types/context'
-// eslint-disable-next-line import-x/no-namespace
 import * as z from 'zod'
 
 export const WindConstraint = z.object({
@@ -12,7 +11,7 @@ export const WindConstraint = z.object({
   type: z.literal('wind'),
 })
 
-export type TWindConstraint = z.infer<typeof WindConstraint>
+export type TWindConstraint = z.output<typeof WindConstraint>
 
 export const WeatherConstraint = z.object({
   maxCloudCover: z.coerce.number().optional(),
@@ -23,7 +22,7 @@ export const WeatherConstraint = z.object({
   type: z.literal('weather'),
 })
 
-export type TWeatherConstraint = z.infer<typeof WeatherConstraint>
+export type TWeatherConstraint = z.output<typeof WeatherConstraint>
 
 export const TideConstraint = z.object({
   eventType: TideType.optional(),
@@ -34,7 +33,7 @@ export const TideConstraint = z.object({
   type: z.literal('tide'),
 })
 
-export type TTideConstraint = z.infer<typeof TideConstraint>
+export type TTideConstraint = z.output<typeof TideConstraint>
 
 export const SunConstraint = z.object({
   maxHoursBeforeSunset: z.coerce.number().optional(),
@@ -44,7 +43,7 @@ export const SunConstraint = z.object({
   type: z.literal('sun'),
 })
 
-export type TSunConstraint = z.infer<typeof SunConstraint>
+export type TSunConstraint = z.output<typeof SunConstraint>
 
 export const TimeConstraint = z.object({
   earliestHour: z.coerce.number().optional(),
@@ -53,7 +52,7 @@ export const TimeConstraint = z.object({
   type: z.literal('time'),
 })
 
-export type TTimeConstraint = z.infer<typeof TimeConstraint>
+export type TTimeConstraint = z.output<typeof TimeConstraint>
 
 export const DayConstraint = z.object({
   isWeekday: z.boolean().optional(),
@@ -68,15 +67,7 @@ export const DayConstraint = z.object({
     .optional(),
   type: z.literal('day'),
 })
-export type TDayConstraint = z.infer<typeof DayConstraint>
-
-export type Constraint =
-  | TWindConstraint
-  | TWeatherConstraint
-  | TTideConstraint
-  | TSunConstraint
-  | TTimeConstraint
-  | TDayConstraint
+export type TDayConstraint = z.output<typeof DayConstraint>
 
 export const Activity = z.object({
   constraints: z
@@ -99,4 +90,6 @@ export const Activity = z.object({
   version: z.coerce.number().optional(),
 })
 
-export type TActivity = z.infer<typeof Activity>
+export type TActivity = z.output<typeof Activity>
+
+export type Constraint = TActivity['constraints'][number]
