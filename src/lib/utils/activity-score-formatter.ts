@@ -7,7 +7,7 @@ import { utcDateStringToUtc, utcDateToLocalTimeString } from '@/lib/utils/dates'
 import { mpsToKnots } from '@/lib/utils/units'
 import { describeCloudiness } from '@/lib/utils/weather-descriptions'
 import { TZDate } from '@date-fns/tz'
-import { format, formatISO, isWeekend } from 'date-fns'
+import { isWeekend } from 'date-fns'
 
 type ConstraintAnalysis = {
   requirement: string

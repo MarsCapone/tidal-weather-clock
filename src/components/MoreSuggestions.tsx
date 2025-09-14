@@ -9,9 +9,7 @@ import {
   ActivityScoreWithInterval,
   groupActivityScores,
 } from '@/lib/utils/group-activity-score'
-import logger from '@/lib/utils/logger'
 import { differenceInHours, endOfToday, formatISO } from 'date-fns'
-import { JsonEditor } from 'json-edit-react'
 import { ArrowRight } from 'lucide-react'
 import React from 'react'
 
