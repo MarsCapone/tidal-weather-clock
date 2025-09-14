@@ -18,9 +18,9 @@ const CONSTANTS: Constants = {
     '/settings': 'Settings',
     '/settings/activities': 'Activity Settings',
   },
-  TITLE: 'Tidal Weather Clock',
+  TITLE: "Kath's Weather",
   MAX_BLOB_STORAGE_DAYS: 28,
-  LD_CLIENT_ID: '688e958f84052b0957d24bc7',
+  LD_CLIENT_ID: process.env.NEXT_PUBLIC_LD_CLIENT_ID!,
 }
 
 export default CONSTANTS

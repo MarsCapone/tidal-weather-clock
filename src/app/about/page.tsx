@@ -12,11 +12,8 @@ export default function Page() {
           <p>It currently only supports a single location.</p>
           <p>
             Activities can be configured with various constraints. Then tide,
-            sun, wind, and weather information is pulled from the{' '}
-            <a className="link" href="https://stormglass.io/">
-              Stormglass API
-            </a>
-            .
+            sun, wind, and weather information is pulled from OpenMeteo and the
+            Admiralty tide data.
           </p>
           <p>
             Each day all constraints are evaluated against the latest data, and
