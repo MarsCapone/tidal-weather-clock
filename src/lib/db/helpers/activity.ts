@@ -182,7 +182,7 @@ export async function getBestActivitiesForDatacontext(
   const lookbackHours = `'${String(options?.lookbackHours ?? 0)}'`
 
   const results = await db
-    .selectDistinctOn([activityTable.id])
+    .selectDistinctOn([activityTable.id, activityScoresTable.timestamp])
     .from(activityScoresTable)
     .innerJoin(
       activityTable,
@@ -203,6 +203,7 @@ export async function getBestActivitiesForDatacontext(
     )
     .orderBy(
       asc(activityTable.id),
+      desc(activityScoresTable.timestamp),
       desc(activityTable.version),
       desc(activityTable.created_at),
     )

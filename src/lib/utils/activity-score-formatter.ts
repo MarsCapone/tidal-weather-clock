@@ -4,6 +4,7 @@ import { TimeSlot } from '@/lib/score'
 import { Constraint } from '@/lib/types/activity'
 import { SunData, TideData, WeatherInfo, WindInfo } from '@/lib/types/context'
 import { utcDateStringToUtc, utcDateToLocalTimeString } from '@/lib/utils/dates'
+import { mpsToKnots } from '@/lib/utils/units'
 import { describeCloudiness } from '@/lib/utils/weather-descriptions'
 import { TZDate } from '@date-fns/tz'
 import { format, formatISO, isWeekend } from 'date-fns'
@@ -115,10 +116,10 @@ function formatWind(wind: WindInfo): string {
   const strength = getWindStrength(wind.speed)
   const gusts =
     wind.gustSpeed > wind.speed * 1.5
-      ? `, gusts to ${wind.gustSpeed.toFixed(1)} mph`
+      ? `, gusts to ${mpsToKnots(wind.gustSpeed).toFixed(1)} kts`
       : ''
 
-  return `${strength} ${direction} wind (${wind.speed.toFixed(1)} mph${gusts})`
+  return `${strength} ${direction} wind (${mpsToKnots(wind.speed).toFixed(1)} kts${gusts})`
 }
 
 function getWindDirection(degrees: number): string {
@@ -144,6 +145,8 @@ function getWindDirection(degrees: number): string {
 }
 
 function getWindStrength(speed: number): string {
+  speed = mpsToKnots(speed)
+
   if (speed < 1) {
     return 'calm'
   }
