@@ -1,9 +1,9 @@
-import { Activity } from '@/lib/types/activity'
+import { TActivity } from '@/lib/types/activity'
 import { IActivityFetcher } from '@/lib/types/interfaces'
 import logger from '@/lib/utils/logger'
 
 export class ServerActivityFetcher implements IActivityFetcher {
-  async getActivities(userId: string | undefined): Promise<Activity[]> {
+  async getActivities(userId: string | undefined): Promise<TActivity[]> {
     const response = await fetch(
       userId !== undefined
         ? `/api/activity?user_id=${userId}`
@@ -12,7 +12,7 @@ export class ServerActivityFetcher implements IActivityFetcher {
 
     const content = await response.json()
     if (response.ok && content) {
-      return content as Activity[]
+      return content as TActivity[]
     }
 
     throw new Error('Error getting activities')
@@ -20,7 +20,7 @@ export class ServerActivityFetcher implements IActivityFetcher {
 
   async setActivities(
     userId: string | undefined,
-    activities: Activity[],
+    activities: TActivity[],
   ): Promise<void> {
     const response = await fetch('/api/activity', {
       method: 'PUT',

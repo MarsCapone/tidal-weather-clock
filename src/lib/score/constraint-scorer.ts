@@ -1,11 +1,11 @@
+import { TimeSlot } from '@/lib/score/index'
 import {
-  DayConstraint,
-  SunConstraint,
-  TideConstraint,
-  TimeConstraint,
-  TimeSlot,
-  WeatherConstraint,
-  WindConstraint,
+  TDayConstraint,
+  TSunConstraint,
+  TTideConstraint,
+  TTimeConstraint,
+  TWeatherConstraint,
+  TWindConstraint,
 } from '@/lib/types/activity'
 import { IConstraintScorer } from '@/lib/types/interfaces'
 import {
@@ -24,7 +24,7 @@ export class DefaultConstraintScorer implements IConstraintScorer {
     this.slotDate = utcDateStringToUtc(slot.timestamp)
   }
 
-  getDayScore(constraint: DayConstraint): number {
+  getDayScore(constraint: TDayConstraint): number {
     const scores = []
 
     const isWeekday = !isWeekend(this.slotDate)
@@ -57,7 +57,7 @@ export class DefaultConstraintScorer implements IConstraintScorer {
     return calcMean(scores)
   }
 
-  getSunScore(constraint: SunConstraint): number {
+  getSunScore(constraint: TSunConstraint): number {
     const { sunRise, sunSet } = this.slot.sun
     const daylightInterval = {
       start: utcDateStringToUtc(sunRise),
@@ -108,7 +108,7 @@ export class DefaultConstraintScorer implements IConstraintScorer {
     return calcMean(scores)
   }
 
-  getTideScore(constraint: TideConstraint): number {
+  getTideScore(constraint: TTideConstraint): number {
     const matchingTides = this.slot.tide.filter(
       ({ type }) => type === constraint.eventType,
     )
@@ -155,7 +155,7 @@ export class DefaultConstraintScorer implements IConstraintScorer {
     return calcMean(scores)
   }
 
-  getTimeScore(constraint: TimeConstraint): number {
+  getTimeScore(constraint: TTimeConstraint): number {
     // for hour comparisons, we can have up to an hour past whatever the target was, and still get some score.
     const scores = []
     if (constraint.earliestHour !== undefined) {
@@ -185,7 +185,7 @@ export class DefaultConstraintScorer implements IConstraintScorer {
     return calcMean(scores)
   }
 
-  getWeatherScore(constraint: WeatherConstraint): number {
+  getWeatherScore(constraint: TWeatherConstraint): number {
     const scores = []
 
     const { cloudCover, temperature, precipitationProbability, uvIndex } =
@@ -233,7 +233,7 @@ export class DefaultConstraintScorer implements IConstraintScorer {
     return calcMean(scores)
   }
 
-  getWindScore(constraint: WindConstraint): number {
+  getWindScore(constraint: TWindConstraint): number {
     const scores = []
     const { speed, gustSpeed, direction } = this.slot.wind
 

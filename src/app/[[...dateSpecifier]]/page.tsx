@@ -60,11 +60,11 @@ export default async function Page({
 async function PageContent({ initialDate }: { initialDate: TZDate }) {
   const userId = await getUserId()
 
-  const activities = await getActivitiesByUserId(userId || 'global', true)
+  const activities = await getActivitiesByUserId(userId)
   const dataContextRange = await getDataContextRange(CONSTANTS.LOCATION_COORDS)
   const workingHours = await getOrPutSetting<WorkingHoursSetting>(
     'working_hours',
-    userId || 'global',
+    userId,
     defaultWorkingHours,
   )
   const {
@@ -77,14 +77,10 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
 
   async function getActivityScoresWithThreshhold(scoreThreshold: number) {
     return dataContextId !== undefined
-      ? await getBestActivitiesForDatacontext(
-          dataContextId,
-          [userId || 'global', 'global'],
-          {
-            futureOnly: !dateIsInThePast, // todo: add a setting for these
-            scoreThreshold,
-          },
-        )
+      ? await getBestActivitiesForDatacontext(dataContextId, userId, {
+          futureOnly: !dateIsInThePast, // todo: add a setting for these
+          scoreThreshold,
+        })
       : []
   }
 
@@ -94,7 +90,7 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
   const refreshData = async (currentPath: string) => {
     'use server'
     const options = {
-      scope: userId ? 'user' : ('global' as const),
+      scope: userId === null ? 'global' : 'user',
       userId,
       startDate: initialDate,
       endDate: initialDate,

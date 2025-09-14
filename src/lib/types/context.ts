@@ -1,4 +1,8 @@
-export type TideType = 'high' | 'low'
+import * as z from 'zod'
+
+export const TideType = z.enum(['high', 'low'])
+
+export type TTideType = z.infer<typeof TideType>
 
 export type Timestamp = {
   timestamp: string
@@ -7,7 +11,7 @@ export type Timestamp = {
 export type TideInfo = {
   height: number
   time: number
-  type: TideType
+  type: TTideType
 } & Timestamp
 
 export type TideData = TideInfo[]
@@ -51,5 +55,3 @@ export type DataContext = {
   weatherData: WeatherDataPoints
   windData: WindDataPoints
 }
-
-export type DataContextWithId = WithId<DataContext>

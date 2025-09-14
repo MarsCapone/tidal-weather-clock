@@ -2,7 +2,7 @@ import { doRefresh } from '@/app/api/refresh'
 import CONSTANTS from '@/lib/constants'
 import { getDataContextRange } from '@/lib/db/helpers/datacontext'
 
-export async function GET(request: Request): Promise<Response> {
+export async function GET(): Promise<Response> {
   // refresh everything ever
 
   const { earliest, latest } = await getDataContextRange(

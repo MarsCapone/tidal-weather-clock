@@ -2,7 +2,7 @@ import logger from '@/app/api/pinoLogger'
 import { putActivities } from '@/lib/db/helpers/activity'
 import { db } from '@/lib/db/index'
 import { activityTable } from '@/lib/db/schemas/activity'
-import { Activity, Constraint } from '@/lib/types/activity'
+import { Constraint, TActivity } from '@/lib/types/activity'
 import { kebabCase } from 'change-case'
 
 const defaultConstraints: Record<string, Constraint> = {
@@ -27,7 +27,7 @@ const defaultConstraints: Record<string, Constraint> = {
 }
 
 const addActivities = async () => {
-  const activities: Omit<Activity, 'id' | 'scope' | 'priority'>[] = [
+  const activities: Omit<TActivity, 'id' | 'scope' | 'priority'>[] = [
     {
       name: 'Paddle Boarding (inland)',
       description: 'Head into the creek, and back',
@@ -73,6 +73,18 @@ const addActivities = async () => {
         },
       ],
     },
+    {
+      name: 'Play Scrabble',
+      description:
+        "There's nothing else for it - it's time for a game of Scrabble!",
+      constraints: [
+        {
+          type: 'day',
+          isWeekday: true,
+          isWeekend: true,
+        },
+      ],
+    },
   ]
 
   await putActivities(
@@ -82,7 +94,7 @@ const addActivities = async () => {
       scope: 'global',
       priority: 1,
     })),
-    'global',
+    null,
   )
 }
 

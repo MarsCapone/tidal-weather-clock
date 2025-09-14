@@ -145,11 +145,12 @@ function Interval({ start, end }: { start: string; end: string }) {
   )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ExplainedScore({ score }: { score: ActivityScore }) {
   const readableScores = getHumanReadableScore(score.debug)
 
   const reasons = readableScores.constraintAnalysis.map(
-    (reason, i) => reason.details,
+    (reason) => reason.details,
   )
 
   return (

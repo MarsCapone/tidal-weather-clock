@@ -85,7 +85,9 @@ export default function DayTimeline({
 
   return (
     <ul
-      className={`timeline timeline-vertical md:timeline-horizontal my-2 justify-center`}
+      className={
+        'timeline timeline-vertical md:timeline-horizontal my-2 justify-center'
+      }
     >
       {timelineItems.map(({ additionalClasses, Icon, label, timestamp }, i) => (
         <li key={`timeline-item-${i}`}>

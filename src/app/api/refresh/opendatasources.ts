@@ -184,11 +184,7 @@ export class OpenMeteoAndEasyTideDataFetcher implements IDataContextFetcher {
     return content as OpenMeteoData
   }
 
-  async getDataContext(date: Date): Promise<DataContext | null> {
-    return null
-  }
-
-  async getDataContexts(date: Date): Promise<DataContext[]> {
+  async getDataContexts(): Promise<DataContext[]> {
     // easytide always returns data for the next 7 days
     // open-meteo we have configured to return data for the next 7 days
     // all dates are UTC, so we don't need to convert them

@@ -48,7 +48,7 @@ function PageContent() {
   )
 }
 
-// @ts-ignore
+// @ts-expect-error - withPathAuthRequired does not agree with the type of the PageContent
 export default auth0.withPageAuthRequired(PageContent, {
   returnTo: '/settings',
 }) as AppRouterPageRoute

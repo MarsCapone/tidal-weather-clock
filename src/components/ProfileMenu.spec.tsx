@@ -1,8 +1,8 @@
-import { ProfileMenuInternal } from '@/components/ProfileMenu'
+import { ProfileMenuInternal } from '@/components/ProfileMenuInternal'
+import { exampleSession } from '@/lib/utils/test-data'
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
-import { describe, test, beforeEach, expect } from 'vitest'
-import { exampleSession } from '@/lib/utils/test-data'
+import { beforeEach, describe, expect, test } from 'vitest'
 
 describe('ProfileMenu (empty)', () => {
   beforeEach(() => {

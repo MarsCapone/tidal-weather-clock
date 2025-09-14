@@ -5,7 +5,7 @@ import { dateOptions } from '@/lib/utils/dates'
 import { deleteDebugData } from '@/lib/utils/debug'
 import { addDays, formatISO, startOfToday } from 'date-fns'
 
-export async function GET(request: Request): Promise<Response> {
+export async function GET(): Promise<Response> {
   /* This handler will be called when the cron job runs.
    * So the logic here should be to perform the necessary tasks that run on a
    * schedule. Namely, two things:
@@ -22,7 +22,7 @@ export async function GET(request: Request): Promise<Response> {
 
   // refresh all data contexts
   const today = startOfToday(dateOptions)
-  const dataContextIds = await refreshDataContexts(today)
+  const dataContextIds = await refreshDataContexts()
 
   const { updatedScoreCount } = await doRefresh({
     scope: 'all',

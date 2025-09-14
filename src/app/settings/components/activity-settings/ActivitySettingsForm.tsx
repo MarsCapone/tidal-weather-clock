@@ -1,25 +1,33 @@
 'use client'
 
 import ActivityArray from '@/app/settings/components/activity-settings/ActivityArray'
-import { InputActivities } from '@/app/settings/components/activity-settings/types'
+import {
+  InputActivities,
+  TInputActivities,
+} from '@/app/settings/components/activity-settings/types'
 import { SettingCard, SettingTitle } from '@/app/settings/components/common'
-import { Activity } from '@/lib/types/activity'
+import { TActivity } from '@/lib/types/activity'
 import logger from '@/lib/utils/logger'
 import { mpsToKnots } from '@/lib/utils/units'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
+import { useState } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
+import * as z from 'zod'
 
 export type ActivitySettingsFormProps = {
   userId: string
-  activities: Activity[]
-  setActivitiesAction: (activities: Activity[]) => void
+  activities: TActivity[]
+  setActivitiesAction: (activities: TActivity[]) => void
 }
+
 export default function ActivitySettingsForm({
   activities,
   setActivitiesAction,
 }: ActivitySettingsFormProps) {
-  const defaultValues = {
+  const [zodErrors, setZodErrors] = useState<z.ZodError | null>(null)
+  const [defaultValues] = useState<TInputActivities>({
     // when items are saved, they are converted to the correct unit, but we need to represent them
     // in the display unit first
     activities: activities.map((activity) => ({
@@ -43,11 +51,17 @@ export default function ActivitySettingsForm({
         return constraint
       }),
     })),
-  }
-  const methods = useForm<InputActivities>({
+  })
+  const methods = useForm<
+    z.input<typeof InputActivities>,
+    unknown,
+    z.output<typeof InputActivities>
+  >({
     defaultValues,
+    resolver: zodResolver(InputActivities),
   })
   const {
+    reset,
     control,
     handleSubmit,
     formState: { errors, isDirty },
@@ -58,10 +72,19 @@ export default function ActivitySettingsForm({
     name: 'activities',
   })
 
-  const onSubmit = (data: InputActivities) => {
-    logger.info('setting activities', data)
+  const onSubmit = (data: TInputActivities) => {
+    const result = InputActivities.safeParse(data)
+    if (!result.success) {
+      setZodErrors(result.error)
+    }
+    logger.warn('saving zod activities', {
+      data: InputActivities.safeParse(data),
+    })
     setActivitiesAction(data.activities)
+    reset(data)
   }
+
+  const hasErrors = Object.keys(errors).length !== 0
 
   return (
     <div>
@@ -70,12 +93,23 @@ export default function ActivitySettingsForm({
           <div className="bg-base-100 mb-4 flex flex-row items-center justify-between">
             <div>
               <SettingTitle title={'Activity Settings'} />
-              <div className="text-md px-4 italic">
+              <div className="text-md px-4">
                 You cannot edit global activities
+                {hasErrors && (
+                  <div className="text-error text-xs italic">
+                    Please fix the errors below
+                    {zodErrors && (
+                      <pre>
+                        {JSON.stringify(z.treeifyError(zodErrors), null, 2)}
+                      </pre>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex gap-2">
               <button
+                type={'button'}
                 className="btn btn-primary rounded-field"
                 onClick={() =>
                   prepend({
@@ -98,12 +132,16 @@ export default function ActivitySettingsForm({
               </button>
             </div>
           </div>
+          {hasErrors && !zodErrors && (
+            <pre
+              className={
+                'text-error rounded-box bg-base-200 m-4 max-h-48 overflow-y-scroll p-2 font-mono text-xs'
+              }
+            >
+              {JSON.stringify(errors.activities, null, 2)}
+            </pre>
+          )}
           <SettingCard>
-            {errors.activities && (
-              <div className="alert alert-error">
-                <span>{JSON.stringify(errors)}</span>
-              </div>
-            )}
             <ActivityArray fields={fields} removeByIndex={remove} />
           </SettingCard>
         </form>

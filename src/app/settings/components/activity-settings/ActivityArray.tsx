@@ -6,8 +6,12 @@ import {
   WeatherConstraintControls,
   WindConstraintControls,
 } from '@/app/settings/components/activity-settings/constraint-controls'
-import { InputActivities } from '@/app/settings/components/activity-settings/types'
+import {
+  InputActivities,
+  TInputActivities,
+} from '@/app/settings/components/activity-settings/types'
 import { Input } from '@/app/settings/components/common/form'
+import { ErrorMessage } from '@hookform/error-message'
 import {
   Calendar1Icon,
   ClockIcon,
@@ -24,9 +28,10 @@ import {
   useFieldArray,
   useFormContext,
 } from 'react-hook-form'
+import * as z from 'zod'
 
 type ActivityArrayProps = {
-  fields: FieldArrayWithId<InputActivities>[]
+  fields: FieldArrayWithId<z.input<typeof InputActivities>>[]
   removeByIndex: (i: number) => void
 }
 
@@ -59,44 +64,60 @@ export default function ActivityArray({
 }
 
 function SingleActivity({ removeByIndex, index }: SingleActivityProps) {
-  const { register, getValues } = useFormContext<InputActivities>()
+  const {
+    register,
+    getValues,
+    formState: { errors },
+  } = useFormContext<TInputActivities>()
   const activity = getValues(`activities.${index}`)
   const disabled = activity.scope === 'global'
   return (
     <div className={''}>
       <div className={'mb-4 flex flex-row items-end gap-4'}>
-        <Input
-          title={'Activity Name'}
-          className={'input input-md w-full'}
-          outerClassName={'flex-none'}
-          inputProps={{
-            ...register(`activities.${index}.name`),
-            disabled,
-          }}
-        />
-        <Input
-          title={'Description'}
-          className={'input input-md w-full'}
-          outerClassName={'grow'}
-          inputProps={{
-            ...register(`activities.${index}.description`),
-            disabled,
-          }}
-        />
-        <Input
-          title={'Priority'}
-          className={'input input-md'}
-          outerClassName={''}
-          inputProps={{
-            ...register(`activities.${index}.priority`),
-            disabled,
-            type: 'number',
-            min: 1,
-            max: 10,
-          }}
-        />
+        <div className={'w-full'}>
+          <Input
+            title={'Activity Name'}
+            className={'input input-md'}
+            outerClassName={'flex-none'}
+            inputProps={{
+              ...register(`activities.${index}.name`),
+              disabled,
+            }}
+          />
+          <ErrorMessage name={`activities.${index}.name`} errors={errors} />
+        </div>
+        <div className="w-full">
+          <Input
+            title={'Description'}
+            className={'input input-md'}
+            outerClassName={'grow'}
+            inputProps={{
+              ...register(`activities.${index}.description`),
+              disabled,
+            }}
+          />
+          <ErrorMessage
+            name={`activities.${index}.description`}
+            errors={errors}
+          />
+        </div>
+        <div>
+          <Input
+            title={'Priority'}
+            className={'input input-md'}
+            outerClassName={''}
+            inputProps={{
+              ...register(`activities.${index}.priority`),
+              disabled,
+              type: 'number',
+              min: 1,
+              max: 10,
+            }}
+          />
+          <ErrorMessage name={`activities.${index}.priority`} errors={errors} />
+        </div>
         {!disabled && (
-          <button className={`my-2`} onClick={() => removeByIndex(index)}>
+          <button className={'my-2'} onClick={() => removeByIndex(index)}>
             <Trash2Icon className={'h-6 w-6'} />
           </button>
         )}
@@ -149,7 +170,11 @@ const constraintTypes = [
 ]
 
 function ConstraintArray({ index, disabled }: ConstraintFormProps) {
-  const { control, register } = useFormContext<InputActivities>()
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContext<TInputActivities>()
   const { fields, remove, prepend } = useFieldArray({
     control,
     name: `activities.${index}.constraints`,
@@ -158,7 +183,15 @@ function ConstraintArray({ index, disabled }: ConstraintFormProps) {
   return (
     <div>
       <div className={'mb-4 flex flex-row items-center justify-between gap-4'}>
-        <div className={'text-md'}>Constraints</div>
+        <div className={'text-md'}>
+          Constraints
+          <div className={'text-error text-xs'}>
+            <ErrorMessage
+              name={`activities.${index}.constraints`}
+              errors={errors}
+            />
+          </div>
+        </div>
         {!disabled && (
           <button
             className={'btn btn-sm rounded-field'}
@@ -194,7 +227,6 @@ function ConstraintArray({ index, disabled }: ConstraintFormProps) {
                       }
                     >
                       <Controls
-                        register={register}
                         activityIndex={index}
                         constraintIndex={k}
                         disabled={disabled}

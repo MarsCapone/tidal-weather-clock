@@ -26,7 +26,7 @@ export async function uploadDebugData(
     addRandomSuffix: true,
   })
 
-  logger.debug(`uploaded debug data`, {
+  logger.debug('uploaded debug data', {
     fileName,
     name,
     url,
@@ -55,7 +55,7 @@ export async function deleteDebugData(
     return
   }
 
-  logger.info(`deleting debug data blobs`, {
+  logger.info('deleting debug data blobs', {
     ageDays,
     blobs: blobsToDelete.map((blob) => blob.pathname),
     category,
