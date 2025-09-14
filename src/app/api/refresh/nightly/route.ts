@@ -22,7 +22,7 @@ export async function GET(): Promise<Response> {
 
   // refresh all data contexts
   const today = startOfToday(dateOptions)
-  const dataContextIds = await refreshDataContexts(today)
+  const dataContextIds = await refreshDataContexts()
 
   const { updatedScoreCount } = await doRefresh({
     scope: 'all',

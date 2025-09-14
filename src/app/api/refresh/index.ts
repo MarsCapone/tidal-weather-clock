@@ -13,9 +13,18 @@ import {
 import { activityScoresTable } from '@/lib/db/schemas/activity'
 import { getScores } from '@/lib/score'
 import { utcDateStringToUtc } from '@/lib/utils/dates'
-import { TZDate } from '@date-fns/tz'
 import { sql } from 'drizzle-orm'
-import fastCartesian from 'fast-cartesian'
+
+function cartesianProduct<A, B>(a: A[], b: B[]): [A, B][] {
+  const sets = [a, b]
+  return sets.reduce<(A | B)[][]>(
+    (results, ids) =>
+      results
+        .map((result) => ids.map((id) => [...result, id]))
+        .reduce((nested, result) => [...nested, ...result]),
+    [[]],
+  ) as [A, B][]
+}
 
 export type DoRefreshOptions = {
   scope: 'user' | 'global' | 'all'
@@ -44,7 +53,7 @@ export async function doRefresh({
   }
 
   const updatedDataContextCount = refreshDataContext
-    ? (await refreshDataContexts(startDate as TZDate)).length
+    ? (await refreshDataContexts()).length
     : 0
 
   const activities =
@@ -58,10 +67,10 @@ export async function doRefresh({
     CONSTANTS.LOCATION_COORDS,
   )
 
-  const dataContextActivityPairs = fastCartesian([
+  const dataContextActivityPairs = cartesianProduct(
     dataContextWrappers.map(({ dataContext, id }) => ({ ...dataContext, id })),
     activities,
-  ])
+  )
 
   logger.debug(
     'Calculating scores for all activities and data contexts for all users. This may take a while.',
@@ -120,9 +129,9 @@ export async function doRefresh({
   }
 }
 
-export async function refreshDataContexts(startDate: TZDate) {
+export async function refreshDataContexts() {
   const dataFetcher = new OpenMeteoAndEasyTideDataFetcher(logger)
-  const dataContexts = await dataFetcher.getDataContexts(startDate)
+  const dataContexts = await dataFetcher.getDataContexts()
 
   const ids = await Promise.all(
     dataContexts.map((dc) => addDataContext(dc, CONSTANTS.LOCATION_COORDS)),
