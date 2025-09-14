@@ -1,8 +1,12 @@
 // Human-readable output types
 import { ActivityScore } from '@/lib/db/helpers/activity'
-import { SunData, TideData, WeatherInfo, WindInfo } from '@/lib/types/context'
-import { Constraint } from '@/lib/types/activity'
 import { TimeSlot } from '@/lib/score'
+import { Constraint } from '@/lib/types/activity'
+import { SunData, TideData, WeatherInfo, WindInfo } from '@/lib/types/context'
+import { utcDateStringToUtc, utcDateToLocalTimeString } from '@/lib/utils/dates'
+import { describeCloudiness } from '@/lib/utils/weather-descriptions'
+import { TZDate } from '@date-fns/tz'
+import { format, formatISO, isWeekend } from 'date-fns'
 
 type ConstraintAnalysis = {
   requirement: string
@@ -99,16 +103,7 @@ function getScoreGrade(score: number): string {
 
 function formatWeather(weather: WeatherInfo): string {
   const temp = `${weather.temperature}°C`
-  const clouds =
-    weather.cloudCover === 100
-      ? 'overcast'
-      : weather.cloudCover >= 75
-        ? 'very cloudy'
-        : weather.cloudCover >= 50
-          ? 'cloudy'
-          : weather.cloudCover >= 25
-            ? 'partly cloudy'
-            : 'clear'
+  const clouds = describeCloudiness(weather.cloudCover)
 
   const precip =
     weather.precipitation! > 0 ? `, ${weather.precipitation}mm rain` : ''
@@ -200,16 +195,21 @@ function formatDaylight(sun: SunData, timeStart: Date): string {
   const sunset = new Date(sun.sunSet)
   const current = timeStart
 
+  const sunriseFormatted = utcDateToLocalTimeString(
+    new TZDate(sunrise.getTime()),
+  )
+  const sunsetFormatted = utcDateToLocalTimeString(new TZDate(sunset.getTime()))
+
   if (current < sunrise) {
     const hoursUntilSunrise =
       (sunrise.getTime() - current.getTime()) / (1000 * 60 * 60)
-    return `Dark (sunrise in ${hoursUntilSunrise.toFixed(1)}h at ${formatTime(sunrise)})`
+    return `Dark (sunrise in ${hoursUntilSunrise.toFixed(1)}h at ${sunriseFormatted})`
   } else if (current > sunset) {
-    return `Dark (sunset was at ${formatTime(sunset)})`
+    return `Dark (sunset was at ${sunsetFormatted})`
   } else {
     const hoursUntilSunset =
       (sunset.getTime() - current.getTime()) / (1000 * 60 * 60)
-    return `Daylight (sunset in ${hoursUntilSunset.toFixed(1)}h at ${formatTime(sunset)})`
+    return `Daylight (sunset in ${hoursUntilSunset.toFixed(1)}h at ${sunsetFormatted})`
   }
 }
 
@@ -267,10 +267,37 @@ function analyzeConstraint(
     }
   }
 
+  if (constraint.type === 'day') {
+    const requirement =
+      constraint.isWeekday && constraint.isWeekend
+        ? 'Day: any day'
+        : constraint.isWeekday && !constraint.isWeekend
+          ? 'Day: any day except weekend'
+          : !constraint.isWeekday && constraint.isWeekend
+            ? 'Day: any day except weekday'
+            : 'Day: never'
+    const actualDay = utcDateStringToUtc(timeSlot.timestamp)
+    return {
+      requirement,
+      status,
+      score,
+      details: `Current day is a ${isWeekend(actualDay) ? 'weekend' : 'weekday'}`,
+    }
+  }
+
+  if (constraint.type === 'weather') {
+    return {
+      requirement: 'something about the wind',
+      status,
+      score,
+      details: '...',
+    }
+  }
+
   return {
-    requirement: 'Unknown constraint',
+    requirement: `Unknown constraint: ${constraint.type}`,
     status,
     score,
-    details: 'Unable to analyze constraint details',
+    details: `Unable to analyze constraint details: ${constraint.type} constraint with score ${score.toFixed(1)}`,
   }
 }

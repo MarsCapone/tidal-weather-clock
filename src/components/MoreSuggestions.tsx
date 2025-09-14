@@ -112,7 +112,10 @@ function SingleActivityScore({ score }: { score: ActivityScoreWithInterval }) {
           <span>({scoreOutOfFive})</span>
         </span>
       </div>
-      {/*<ExplainedScore score={score} />*/}
+      <ExplainedScore score={score} />
+      <div className={'mt-4 flex flex-row justify-end text-xs font-thin'}>
+        {score.activityId}:v{score.activityVersion}
+      </div>
     </div>
   )
 }
@@ -145,19 +148,19 @@ function Interval({ start, end }: { start: string; end: string }) {
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ExplainedScore({ score }: { score: ActivityScore }) {
   const readableScores = getHumanReadableScore(score.debug)
 
-  const reasons = readableScores.constraintAnalysis.map(
-    (reason) => reason.details,
-  )
+  const conditions = Object.values(readableScores.conditions)
 
   return (
     <div>
-      <div>{reasons.join(' | ')}</div>
-      <JsonEditor data={readableScores} />
-      <JsonEditor data={score.debug} />
+      <div className={'divider'}></div>
+      <div className={'grid grid-cols-2 text-sm'}>
+        {conditions.map((c, i) => (
+          <p key={i}>{c}</p>
+        ))}
+      </div>
     </div>
   )
 }
