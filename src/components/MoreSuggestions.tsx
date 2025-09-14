@@ -1,13 +1,15 @@
 import { ActivityScore } from '@/lib/db/helpers/activity'
 import getHumanReadableScore from '@/lib/utils/activity-score-formatter'
 import { TimeZoneContext } from '@/lib/utils/contexts'
-import { utcDateStringToLocalTimeString } from '@/lib/utils/dates'
+import {
+  utcDateStringToLocalTimeString,
+  utcDateStringToUtc,
+} from '@/lib/utils/dates'
 import {
   ActivityScoreWithInterval,
   groupActivityScores,
 } from '@/lib/utils/group-activity-score'
-import { formatISO } from 'date-fns'
-import { JsonEditor } from 'json-edit-react'
+import { differenceInHours, endOfToday, formatISO } from 'date-fns'
 import { ArrowRight } from 'lucide-react'
 import React from 'react'
 
@@ -75,7 +77,6 @@ function MoreSuggestionsDialog({
   activityScores,
 }: MoreSuggestionsDialogProps) {
   const groupedScores = groupActivityScores(activityScores)
-
   return (
     <dialog className={'modal'} id={dialogId}>
       <div className="modal-box max-h-5xl max-w-5xl">
@@ -112,13 +113,29 @@ function SingleActivityScore({ score }: { score: ActivityScoreWithInterval }) {
           <span>({scoreOutOfFive})</span>
         </span>
       </div>
-      {/*<ExplainedScore score={score} />*/}
+      <ExplainedScore score={score} />
+      <div className={'mt-4 flex flex-row justify-end text-xs font-thin'}>
+        {score.activityId}:v{score.activityVersion}
+      </div>
     </div>
   )
 }
 
 function Interval({ start, end }: { start: string; end: string }) {
   const { timeZone } = React.useContext(TimeZoneContext)
+
+  const interval = {
+    start: utcDateStringToUtc(start),
+    end: utcDateStringToUtc(end),
+  }
+
+  const summaryInterval =
+    differenceInHours(interval.end, interval.start) >= 23
+      ? 'any time'
+      : differenceInHours(interval.end, endOfToday()) <= 1
+        ? 'for the rest of the day'
+        : ''
+
   function LocalTime({ timestamp }: { timestamp: string }) {
     return (
       <div>
@@ -135,29 +152,32 @@ function Interval({ start, end }: { start: string; end: string }) {
   }
 
   return (
-    <div className="flex flex-row items-center gap-1">
-      <LocalTime timestamp={start} />
-      <div className={'px-4 font-normal'}>
-        <ArrowRight className="h-6 w-6" />
+    <>
+      {summaryInterval && <span>({summaryInterval})</span>}
+      <div className="flex flex-row items-center gap-1">
+        <LocalTime timestamp={start} />
+        <div className={'px-4 font-normal'}>
+          <ArrowRight className="h-6 w-6" />
+        </div>
+        <LocalTime timestamp={end} />
       </div>
-      <LocalTime timestamp={end} />
-    </div>
+    </>
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ExplainedScore({ score }: { score: ActivityScore }) {
   const readableScores = getHumanReadableScore(score.debug)
 
-  const reasons = readableScores.constraintAnalysis.map(
-    (reason) => reason.details,
-  )
+  const conditions = Object.values(readableScores.conditions)
 
   return (
     <div>
-      <div>{reasons.join(' | ')}</div>
-      <JsonEditor data={readableScores} />
-      <JsonEditor data={score.debug} />
+      <div className={'divider'}></div>
+      <div className={'grid grid-cols-2 text-sm'}>
+        {conditions.map((c, i) => (
+          <p key={i}>{c}</p>
+        ))}
+      </div>
     </div>
   )
 }

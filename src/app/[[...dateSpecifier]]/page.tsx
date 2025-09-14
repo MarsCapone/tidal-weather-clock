@@ -79,6 +79,7 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
     return dataContextId !== undefined
       ? await getBestActivitiesForDatacontext(dataContextId, userId, {
           futureOnly: !dateIsInThePast, // todo: add a setting for these
+          lookbackHours: 1,
           scoreThreshold,
         })
       : []

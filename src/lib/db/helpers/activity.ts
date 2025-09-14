@@ -174,12 +174,15 @@ export async function getBestActivitiesForDatacontext(
   options?: {
     scoreThreshold?: number
     futureOnly?: boolean
+    // if future only, then include the previous lookbackHours in the range
+    lookbackHours?: number
   },
 ): Promise<ActivityScore[]> {
   const limitFuture = options?.futureOnly ?? false
+  const lookbackHours = `'${String(options?.lookbackHours ?? 0)}'`
 
   const results = await db
-    .select()
+    .selectDistinctOn([activityTable.id, activityScoresTable.timestamp])
     .from(activityScoresTable)
     .innerJoin(
       activityTable,
@@ -192,11 +195,17 @@ export async function getBestActivitiesForDatacontext(
       and(
         eq(activityScoresTable.datacontext_id, dataContextId),
         gte(activityScoresTable.score, options?.scoreThreshold ?? 0.5),
-        sql`CASE WHEN ${limitFuture} THEN ${activityScoresTable.timestamp}::timestamp > now() ELSE true END`,
+        sql`CASE WHEN ${limitFuture} THEN (${activityScoresTable.timestamp}::timestamp) > (now() - INTERVAL ${sql.raw(lookbackHours)} hour) ELSE true END`,
         userId === null
           ? isNull(activityTable.user_id)
           : eq(activityTable.user_id, userId),
       ),
+    )
+    .orderBy(
+      asc(activityTable.id),
+      desc(activityScoresTable.timestamp),
+      desc(activityTable.version),
+      desc(activityTable.created_at),
     )
 
   return results.map(

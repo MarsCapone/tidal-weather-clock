@@ -1,4 +1,4 @@
-import ColorschemeToggle from '@/components/Colorscheme'
+import ColorschemeToggle from '@/components/nav-bar/Colorscheme'
 import ProfileMenu from '@/components/profile/ProfileMenu'
 import CONSTANTS from '@/lib/constants'
 import { MenuIcon } from 'lucide-react'

@@ -2,6 +2,7 @@ import { ActivityScore } from '@/lib/db/helpers/activity'
 import { DataContext } from '@/lib/types/context'
 import { DateContext, TimeZoneContext } from '@/lib/utils/contexts'
 import { utcDateStringToUtc } from '@/lib/utils/dates'
+import { ActivityScoreWithInterval } from '@/lib/utils/group-activity-score'
 import { tz, TZDate } from '@date-fns/tz'
 import {
   Duration,
@@ -14,7 +15,7 @@ import { useFlags } from 'launchdarkly-react-client-sdk'
 import React, { useContext, useEffect } from 'react'
 
 export type ClockDisplayProps = {
-  suggestedActivity: ActivityScore | null
+  activityScores: ActivityScoreWithInterval[]
   dataContext: DataContext
 }
 
@@ -30,7 +31,7 @@ export default function ClockDisplay(props: ClockDisplayProps) {
 }
 
 export function TimeToNext({
-  suggestedActivity,
+  activityScores,
   displayTime = true,
 }: ClockDisplayProps & { displayTime?: boolean; type: 'descriptive' }) {
   const [diff, setDiff] = React.useState<string | null>(null)
@@ -41,14 +42,19 @@ export function TimeToNext({
 
   useEffect(() => {
     const updateTime = () => {
-      if (!suggestedActivity || !showSuggestedActivity) {
+      if (activityScores.length === 0 || !showSuggestedActivity) {
         return
       }
+      const suggestedActivity = activityScores[0]
       const current = new TZDate().withTimeZone(timeZone)
       const duration = intervalToDuration({
         start: current,
         end: utcDateStringToUtc(suggestedActivity.timestamp),
       })
+
+      const startedInThePast =
+        current.getTime() >
+        utcDateStringToUtc(suggestedActivity.timestamp).getTime()
 
       const additionalFormats: (keyof Duration)[] = showSecondsCountdown
         ? ['seconds']
@@ -56,12 +62,14 @@ export function TimeToNext({
       const formatted = formatDuration(duration, {
         format: ['weeks', 'days', 'hours', 'minutes', ...additionalFormats],
       })
-      setDiff(formatted)
+      setDiff(startedInThePast ? 'now' : formatted)
       setCurrentTime(current)
     }
     const interval = setInterval(updateTime, 1000)
     return () => clearInterval(interval)
-  }, [suggestedActivity, showSecondsCountdown, showSuggestedActivity, timeZone])
+  }, [activityScores, showSecondsCountdown, showSuggestedActivity, timeZone])
+
+  const suggestedActivity = activityScores.length > 0 ? activityScores[0] : null
 
   const timestamp =
     suggestedActivity &&
@@ -150,7 +158,9 @@ function getActivityView(
   return (
     <>
       {activity}
-      <div className="text-md font-bold md:text-xl xl:text-3xl">in</div>
+      {timings.diff !== 'now' && (
+        <div className="text-md font-bold md:text-xl xl:text-3xl">in</div>
+      )}
       <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
         {timings.diff}
       </div>

@@ -10,6 +10,7 @@ import { TActivity } from '@/lib/types/activity'
 import { DataContext } from '@/lib/types/context'
 import { WorkingHoursSetting } from '@/lib/types/settings'
 import { DateContext } from '@/lib/utils/contexts'
+import { groupActivityScores } from '@/lib/utils/group-activity-score'
 import { formatDistanceToNowStrict } from 'date-fns'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import { RefreshCwIcon } from 'lucide-react'
@@ -29,6 +30,7 @@ export default function MainContent({
   allActivityScores: ActivityScore[]
 }) {
   const { showSuggestedActivity } = useFlags()
+  const groupedActivityScores = groupActivityScores(activityScores)
 
   if (dataContext === undefined) {
     return (
@@ -56,7 +58,7 @@ export default function MainContent({
               workingHours={workingHours}
             />
             <ClockDisplay
-              suggestedActivity={activityScores[0]}
+              activityScores={groupedActivityScores}
               dataContext={dataContext}
             />
             {showSuggestedActivity && (
