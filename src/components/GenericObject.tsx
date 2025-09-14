@@ -82,6 +82,7 @@ export default function GenericObject({
   }
 
   if (typeof obj === 'object') {
+    // @ts-expect-error - hard to type a generic recursive object
     return <div>{renderObject(obj, className)}</div>
   }
 
