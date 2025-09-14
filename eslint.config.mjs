@@ -1,10 +1,10 @@
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
+import { FlatCompat } from '@eslint/eslintrc'
 import js from '@eslint/js'
+import { defineConfig } from 'eslint/config'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
-import { FlatCompat } from '@eslint/eslintrc'
-import { defineConfig } from 'eslint/config'
-import { fileURLToPath } from 'url'
-import { dirname } from 'path'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -14,7 +14,9 @@ const compat = new FlatCompat({
 })
 
 export default defineConfig([
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  js.configs.recommended,
+  tseslint.configs.recommended,
+  ...compat.extends('next/core-web-vitals'),
   {
     ignores: [
       '.next/**',
@@ -30,11 +32,6 @@ export default defineConfig([
   },
   {
     files: ['**/*.{js,mjs,cjs,ts}'],
-    plugins: { js },
-    extends: ['js/recommended'],
-  },
-  {
-    files: ['**/*.{js,mjs,cjs,ts}'],
     languageOptions: { globals: globals.browser },
   },
   {
@@ -46,7 +43,4 @@ export default defineConfig([
       'import/no-anonymous-default-export': 'off',
     },
   },
-
-  js.configs.recommended,
-  tseslint.configs.recommended,
 ])
