@@ -2,9 +2,27 @@ import { db } from '@/lib/db'
 import { createUserWithExtras, getUserIdByEmail } from '@/lib/db/helpers/users'
 import logger from '@/lib/utils/logger'
 import { Auth0Client } from '@auth0/nextjs-auth0/server'
+import { SessionData } from '@auth0/nextjs-auth0/types'
 import { secondsInDay } from 'date-fns/constants'
 import { eq } from 'drizzle-orm'
 import { usersTable } from './db/schemas/users'
+
+async function modifySession(session: SessionData): Promise<SessionData> {
+  const email = session.user.email
+  let userId = email === undefined ? null : await getUserIdByEmail(email)
+
+  // if we're here and there's email but not a user, then we need to create a user
+  if (email !== undefined && userId === null) {
+    userId = await createUserWithExtras(email)
+  }
+  return {
+    ...session,
+    user: {
+      ...session.user,
+      twcUserId: userId,
+    },
+  }
+}
 
 export const auth0 = new Auth0Client({
   session: {
@@ -14,13 +32,20 @@ export const auth0 = new Auth0Client({
     // if you don't access for more than 7 days, you get logged out
     inactivityDuration: secondsInDay * 7,
   },
+  async beforeSessionSaved(session) {
+    return await modifySession(session)
+  },
 })
 
-export const getUserId = async () => {
+export const getUserId = async (): Promise<string | null> => {
   const session = await auth0.getSession()
 
   if (session === null) {
     return null
+  }
+
+  if (session.user.twcUserId) {
+    return session.user.twcUserId
   }
 
   const email = session.user.email

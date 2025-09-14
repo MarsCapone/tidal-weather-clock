@@ -50,8 +50,9 @@ export async function getOrPutSetting<T>(
     name,
     userId,
     fallback,
+    userIdT: String(userId),
   })
-  if (userId === null) {
+  if (userId === null || userId === undefined) {
     return fallback
   }
   const value = await getSetting<T>(name, userId)

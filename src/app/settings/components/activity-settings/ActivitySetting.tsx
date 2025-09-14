@@ -1,7 +1,7 @@
 import logger from '@/app/api/pinoLogger'
 import { doRefresh } from '@/app/api/refresh'
 import ActivitySettingsForm from '@/app/settings/components/activity-settings/ActivitySettingsForm'
-import { getUserId } from '@/lib/auth0'
+import { auth0, getUserId } from '@/lib/auth0'
 import {
   getActivitiesByUserId,
   putActivities,
@@ -11,6 +11,7 @@ import { TActivity } from '@/lib/types/activity'
 import { addDays, startOfToday } from 'date-fns'
 
 export default async function ActivitySetting() {
+  const session = await auth0.getSession()
   const userId = await getUserId()
   const activities = await getActivitiesByUserId(userId)
 
@@ -30,7 +31,12 @@ export default async function ActivitySetting() {
   }
 
   if (!userId) {
-    return <div>You must be logged in to edit your activities.</div>
+    return (
+      <div>
+        You must be logged in to edit your activities. '{userId}'{' '}
+        {JSON.stringify(session)}
+      </div>
+    )
   }
 
   return (

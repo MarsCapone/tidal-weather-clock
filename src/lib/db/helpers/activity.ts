@@ -19,6 +19,11 @@ export async function getActivitiesByUserId(userId: string | null) {
   const userIds = userId ? [userId] : []
   logger.debug('getActivitiesByUserId', { userId, userIds })
 
+  const where =
+    userId === null
+      ? isNull(activityTable.user_id)
+      : eq(activityTable.user_id, userId)
+
   const activityResponses: TActivity[] = (
     await db
       .selectDistinctOn([activityTable.id], {
@@ -33,7 +38,7 @@ export async function getActivitiesByUserId(userId: string | null) {
         >`CASE WHEN ${activityTable.user_id} IS NULL THEN 'global' ELSE 'user' END`,
       })
       .from(activityTable)
-      .where(and(inArray(activityTable.user_id, userIds)))
+      .where(where)
       .groupBy(
         activityTable.id,
         activityTable.name,

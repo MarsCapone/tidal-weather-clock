@@ -29,7 +29,7 @@ export async function getUserIdByEmail(email: string): Promise<string | null> {
 export async function createUserWithExtras(email: string): Promise<string> {
   /** Create a user and return the id */
 
-  logger.info('creating user', {
+  logger.info('creating new user', {
     emailHash: bytesToHex(blake3(new TextEncoder().encode(email))),
   })
   const userIdResults = await db
@@ -45,6 +45,11 @@ export async function createUserWithExtras(email: string): Promise<string> {
   // then do other setup
   // 1. copy all global activities to the user
   const globalActivities = await getActivitiesByUserId(null)
+  if (globalActivities.length === 0) {
+    logger.warn('no global activities found, not copying to user')
+    return userId
+  }
+
   logger.debug('copying global activities to user', {
     userId,
     activityCount: globalActivities.length,
