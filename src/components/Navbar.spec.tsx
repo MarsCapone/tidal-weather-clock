@@ -4,7 +4,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-vi.mock('drizzle-orm')
+vi.mock('drizzle-orm/neon-http')
 
 describe('Navbar', () => {
   beforeEach(() => {
