@@ -2,7 +2,9 @@ import Navbar from '@/components/Navbar'
 import CONSTANTS from '@/lib/constants'
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
-import { beforeEach, describe, expect, test } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
+
+vi.mock('drizzle-orm')
 
 describe('Navbar', () => {
   beforeEach(() => {
