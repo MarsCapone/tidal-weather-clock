@@ -29,6 +29,11 @@ export default function Page() {
             </p>
             <p className="pt-8">Much love,</p>
             <p className="">Samson</p>
+            <p className="pt-10 text-sm">
+              P.S. This website has gone through many iterations. You previously
+              mentioned a clock... how do you represent more than 12 hours
+              clearly?
+            </p>
           </div>
         </div>
       </div>
