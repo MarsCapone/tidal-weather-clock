@@ -1,6 +1,6 @@
 import CONSTANTS from '@/lib/constants'
 import './globals.css'
-import Navbar from '@/components/Navbar'
+import Navbar from '@/components/nav-bar/Navbar'
 import Providers from '@/components/Providers'
 import React from 'react'
 
