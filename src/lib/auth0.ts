@@ -1,11 +1,14 @@
 import { db } from '@/lib/db'
-import { createUserWithExtras, getUserIdByEmail } from '@/lib/db/helpers/users'
+import {
+  createUserWithExtras,
+  getUserIdByEmail,
+  updateLastLogin,
+} from '@/lib/db/helpers/users'
 import logger from '@/lib/utils/logger'
 import { Auth0Client } from '@auth0/nextjs-auth0/server'
 import { SessionData } from '@auth0/nextjs-auth0/types'
+import { formatISO } from 'date-fns'
 import { secondsInDay } from 'date-fns/constants'
-import { eq } from 'drizzle-orm'
-import { usersTable } from './db/schemas/users'
 
 async function modifySession(session: SessionData): Promise<SessionData> {
   const email = session.user.email
@@ -15,11 +18,18 @@ async function modifySession(session: SessionData): Promise<SessionData> {
   if (email !== undefined && userId === null) {
     userId = await createUserWithExtras(email)
   }
+
+  let lastLogin = null
+  if (userId !== null) {
+    lastLogin = await updateLastLogin(userId)
+  }
+
   return {
     ...session,
     user: {
       ...session.user,
       twcUserId: userId,
+      twcLastLogin: lastLogin ? formatISO(lastLogin) : null,
     },
   }
 }

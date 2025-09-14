@@ -10,8 +10,6 @@ export function ProfileMenuInternal({
 }: {
   session: SessionData | null
 }) {
-  const router = useRouter()
-
   if (!session) {
     return (
       <ProfileMenuWrapper buttonContent={<LogInIcon />}>

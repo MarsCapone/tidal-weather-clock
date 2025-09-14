@@ -11,7 +11,7 @@ import { usersTable } from '@/lib/db/schemas/users'
 import { blake3 } from '@noble/hashes/blake3'
 import { bytesToHex } from '@noble/hashes/utils'
 import { addDays, startOfToday, subDays } from 'date-fns'
-import { eq, inArray } from 'drizzle-orm'
+import { eq, inArray, sql } from 'drizzle-orm'
 import { v4 as uuidv4 } from 'uuid'
 
 export async function getUserIdByEmail(email: string): Promise<string | null> {
@@ -71,8 +71,20 @@ export async function createUserWithExtras(email: string): Promise<string> {
     startDate: subDays(startOfToday(), 1),
     endDate: addDays(startOfToday(), 6),
   })
+  await db.update(usersTable).set({
+    copied_global_activities: true,
+  })
 
   return userId
+}
+
+export async function updateLastLogin(userId: string): Promise<Date | null> {
+  const result = await db
+    .update(usersTable)
+    .set({ last_login: new Date() })
+    .where(eq(usersTable.id, userId))
+    .returning({ last_login: usersTable.last_login })
+  return result[0].last_login
 }
 
 export async function deleteUser(userId: string): Promise<void> {
