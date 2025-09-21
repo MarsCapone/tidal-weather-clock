@@ -8,7 +8,9 @@ export const settingsTable = pgTable(
     value: json(),
     // we will set user:{userid}
     scope: text().default('global').notNull(),
-    user_id: text().references(() => usersTable.id, { onDelete: 'cascade' }),
+    user_id: text()
+      .notNull()
+      .references(() => usersTable.id, { onDelete: 'cascade' }),
   },
   (table) => [
     primaryKey({ columns: [table.name, table.scope, table.user_id] }),

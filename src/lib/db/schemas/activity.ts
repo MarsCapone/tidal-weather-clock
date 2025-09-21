@@ -2,6 +2,7 @@ import { datacontextTable } from '@/lib/db/schemas/datacontext'
 import { usersTable } from '@/lib/db/schemas/users'
 import { Constraint } from '@/lib/types/activity'
 import {
+  boolean,
   foreignKey,
   integer,
   json,
@@ -31,6 +32,7 @@ export const activityTable = pgTable(
     user_id: text().references(() => usersTable.id, { onDelete: 'cascade' }),
     content: json().$type<ActivityContent>().notNull(),
     created_at: timestamp().defaultNow().notNull(),
+    ignore_ooh: boolean().notNull().default(false),
   },
   (table) => [primaryKey({ columns: [table.id, table.version] })],
 )
