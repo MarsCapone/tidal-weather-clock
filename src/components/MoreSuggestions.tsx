@@ -9,18 +9,16 @@ import {
   ActivityScoreWithInterval,
   groupActivityScores,
 } from '@/lib/utils/group-activity-score'
-import { differenceInHours, endOfToday, formatISO } from 'date-fns'
+import { differenceInHours, endOfToday, formatISO, isBefore } from 'date-fns'
 import { ArrowRight } from 'lucide-react'
 import React from 'react'
 
 export type MoreSuggestionsProps = {
   activityScores: ActivityScore[]
-  allActivityScores: ActivityScore[]
 }
 
 export default function MoreSuggestions({
   activityScores,
-  allActivityScores,
 }: MoreSuggestionsProps) {
   const dialogId = `more-suggestions-${Math.random().toString(36)}`
   const openDialog = () => {
@@ -30,40 +28,61 @@ export default function MoreSuggestions({
     }
   }
 
-  let text = ''
-  let description = ''
-  let passedActivities = activityScores
-
-  if (activityScores.length === 0 && allActivityScores.length > 0) {
-    text = 'See all activities'
-    description = 'no rated suggestions'
-    passedActivities = allActivityScores
-  } else if (activityScores.length > 0) {
-    text = 'See more suggestions'
-  } else {
-    description = 'try adding more activities or loosening constraints'
+  if (activityScores.length === 0) {
+    return (
+      <MoreSuggestionsButton disabled={true} text={'No activity suggestions'} />
+    )
   }
 
   return (
     <>
-      <div className="mx-4 mb-4 lg:m-4">
-        <button
-          className={`btn btn-primary btn-md md:btn-lg w-fit rounded-md ${text === '' ? 'btn-disabled' : ''}`}
-          onClick={openDialog}
-        >
-          <div className="flex flex-col">
-            <div>{text || 'No suggestions available'}</div>
-            {activityScores.length === 0 && (
-              <div className="text-xs font-thin">({description})</div>
-            )}
-          </div>
-        </button>
-      </div>
+      <MoreSuggestionsButton
+        onClick={openDialog}
+        disabled={false}
+        text={'See more suggestions'}
+      />
       <MoreSuggestionsDialog
         dialogId={dialogId}
-        activityScores={passedActivities}
+        activityScores={activityScores}
       />
     </>
+  )
+}
+
+type MoreSuggestionsButtonProps =
+  | {
+      onClick: () => void
+      disabled: false
+      text: string
+      description?: string
+    }
+  | {
+      onClick?: () => void
+      disabled: true
+      text: string
+      description?: string
+    }
+
+function MoreSuggestionsButton({
+  onClick,
+  disabled,
+  text,
+  description,
+}: MoreSuggestionsButtonProps) {
+  return (
+    <div className="mx-4 mb-4 lg:m-4">
+      <button
+        className={`btn btn-primary btn-md md:btn-lg w-fit rounded-md ${disabled ? 'btn-disabled' : ''}`}
+        onClick={onClick}
+      >
+        <div className="flex flex-col">
+          <div>{text}</div>
+          {description && (
+            <div className="text-xs font-thin">({description})</div>
+          )}
+        </div>
+      </button>
+    </div>
   )
 }
 
@@ -77,6 +96,7 @@ function MoreSuggestionsDialog({
   activityScores,
 }: MoreSuggestionsDialogProps) {
   const groupedScores = groupActivityScores(activityScores)
+  console.log(groupedScores)
   return (
     <dialog className={'modal'} id={dialogId}>
       <div className="modal-box max-h-5xl max-w-5xl">
@@ -132,7 +152,8 @@ function Interval({ start, end }: { start: string; end: string }) {
   const summaryInterval =
     differenceInHours(interval.end, interval.start) >= 23
       ? 'any time'
-      : differenceInHours(interval.end, endOfToday()) <= 1
+      : isBefore(interval.start, new Date()) &&
+          differenceInHours(endOfToday(), interval.end) <= 1
         ? 'for the rest of the day'
         : ''
 
@@ -167,13 +188,28 @@ function Interval({ start, end }: { start: string; end: string }) {
 
 function ExplainedScore({ score }: { score: ActivityScore }) {
   const readableScores = getHumanReadableScore(score.debug)
+  const constraintTypes = score.debug.constraintsWithScores.map(
+    (c) => c.constraint.type,
+  )
 
-  const conditions = Object.values(readableScores.conditions)
+  const conditions = Object.entries(readableScores.conditions)
+    .filter(([k]) => constraintTypes.includes(k as never))
+    .map(([, v]) => v)
+
+  if (conditions.length === 0) {
+    return null
+  }
 
   return (
     <div>
-      <div className={'divider'}></div>
-      <div className={'grid grid-cols-2 text-sm'}>
+      <div className={'grid grid-cols-3'}>
+        <div></div>
+        <div className={'divider'}>constraint details</div>
+        <div></div>
+      </div>
+      <div
+        className={`grid ${conditions.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} text-sm`}
+      >
         {conditions.map((c, i) => (
           <p key={i}>{c}</p>
         ))}

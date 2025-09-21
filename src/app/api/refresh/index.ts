@@ -13,6 +13,7 @@ import {
 import { activityScoresTable } from '@/lib/db/schemas/activity'
 import { getScores } from '@/lib/score'
 import { utcDateStringToUtc } from '@/lib/utils/dates'
+import { addDays } from 'date-fns'
 import { sql } from 'drizzle-orm'
 
 function cartesianProduct<A, B>(a: A[], b: B[]): [A, B][] {
@@ -28,9 +29,9 @@ function cartesianProduct<A, B>(a: A[], b: B[]): [A, B][] {
 
 export type DoRefreshOptions = {
   scope: 'user' | 'global' | 'all'
-  userId: string | null
+  userId?: string | null
   startDate: Date | string
-  endDate: Date | string
+  endDate: Date | string | number
   refreshDataContext?: boolean
 }
 
@@ -41,6 +42,7 @@ export async function doRefresh({
   endDate,
   refreshDataContext = false,
 }: DoRefreshOptions) {
+  userId ??= null
   if (scope === 'user' && userId === null) {
     throw new Error('userId is required when scope is user')
   }
@@ -50,6 +52,8 @@ export async function doRefresh({
   }
   if (typeof endDate === 'string') {
     endDate = utcDateStringToUtc(endDate)
+  } else if (typeof endDate === 'number') {
+    endDate = addDays(startDate, endDate)
   }
 
   const updatedDataContextCount = refreshDataContext
@@ -57,9 +61,9 @@ export async function doRefresh({
     : 0
 
   const activities =
-    scope === 'all'
-      ? await getAllActivities()
-      : await getActivitiesByUserId(userId)
+    scope === 'user'
+      ? await getActivitiesByUserId(userId)
+      : await getAllActivities()
 
   const dataContextWrappers = await getDataContextsByDateRange(
     startDate,

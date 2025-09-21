@@ -38,23 +38,24 @@ export class DefaultConstraintScorer implements IConstraintScorer {
       scores.push(constraint.isWeekend === !isWeekday ? 1 : 0)
     }
 
-    if (constraint.dateRanges) {
-      const isInRange = constraint.dateRanges.some(({ start, end }) => {
-        const interval = {
-          start: utcDateStringToUtc(start),
-          end: utcDateStringToUtc(end),
-        }
-        return isWithinInterval(this.slotDate, interval)
-      })
-
-      scores.push(isInRange ? 1 : 0)
-    }
+    // if (constraint.dateRanges) {
+    //   const isInRange = constraint.dateRanges.some(({ start, end }) => {
+    //     const interval = {
+    //       start: utcDateStringToUtc(start),
+    //       end: utcDateStringToUtc(end),
+    //     }
+    //     return isWithinInterval(this.slotDate, interval)
+    //   })
+    //
+    //   scores.push(isInRange ? 1 : 0)
+    // }
 
     if (scores.length === 0) {
       return 1
     }
 
-    return calcMean(scores)
+    // unlike other conditions, the day is distinct - as long as one part matches, it doesn't matter if the other parts don't
+    return Math.max(...scores)
   }
 
   getSunScore(constraint: TSunConstraint): number {

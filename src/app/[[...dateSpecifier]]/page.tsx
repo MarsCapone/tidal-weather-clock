@@ -14,7 +14,11 @@ import {
 } from '@/lib/db/helpers/datacontext'
 import { getOrPutSetting } from '@/lib/db/helpers/settings'
 import { defaultWorkingHours, WorkingHoursSetting } from '@/lib/types/settings'
-import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
+import {
+  dateOptions,
+  utcDateStringToFractionalUtc,
+  utcDateStringToUtc,
+} from '@/lib/utils/dates'
 import { TZDate } from '@date-fns/tz'
 import { addDays, isBefore, startOfToday } from 'date-fns'
 import { revalidatePath } from 'next/cache'
@@ -85,8 +89,19 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
       : []
   }
 
-  const activityScores = await getActivityScoresWithThreshhold(0.5)
-  const allActivityScores = await getActivityScoresWithThreshhold(0)
+  // ordered by increasing priority - the lowest priority is the most important!
+  const activityScores = (await getActivityScoresWithThreshhold(0.3)).sort(
+    (a, b) => a.priority - b.priority,
+  )
+
+  const filteredActivityScores = workingHours.enabled
+    ? activityScores.filter(
+        (score) =>
+          utcDateStringToFractionalUtc(score.timestamp) >=
+            workingHours.startHour &&
+          utcDateStringToFractionalUtc(score.timestamp) <= workingHours.endHour,
+      )
+    : activityScores
 
   const refreshData = async (currentPath: string) => {
     'use server'
@@ -112,8 +127,7 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
         activities={activities}
         workingHours={workingHours || defaultWorkingHours}
         dataContext={dataContext}
-        activityScores={activityScores}
-        allActivityScores={allActivityScores}
+        activityScores={filteredActivityScores}
       />
     </DateProvider>
   )

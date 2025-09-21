@@ -21,13 +21,11 @@ export default function MainContent({
   workingHours,
   dataContext,
   activityScores,
-  allActivityScores,
 }: {
   activities: TActivity[]
   workingHours: WorkingHoursSetting
   dataContext: DataContext | undefined
   activityScores: ActivityScore[]
-  allActivityScores: ActivityScore[]
 }) {
   const { showSuggestedActivity } = useFlags()
   const groupedActivityScores = groupActivityScores(activityScores)
@@ -62,10 +60,7 @@ export default function MainContent({
               dataContext={dataContext}
             />
             {showSuggestedActivity && (
-              <MoreSuggestions
-                activityScores={activityScores}
-                allActivityScores={allActivityScores}
-              />
+              <MoreSuggestions activityScores={activityScores} />
             )}
             <WeatherDetails
               dataContext={dataContext}
