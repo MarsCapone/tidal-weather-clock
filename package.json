@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build",
+    "build": "drizzle-kit push && next build",
     "dev": "next dev --turbopack",
     "drizzle:push": "drizzle-kit push --verbose",
     "drizzle:seed": "bun run ./src/lib/db/seed.ts",
@@ -90,6 +90,7 @@
     "eslint-config-next": "15.3.2",
     "eslint-config-prettier": "^10.1.8",
     "happy-dom": "^18.0.1",
+    "npm-run-all": "^4.1.5",
     "prettier": "^3.6.2",
     "prettier-plugin-packagejson": "^2.5.18",
     "prettier-plugin-tailwindcss": "^0.6.13",
