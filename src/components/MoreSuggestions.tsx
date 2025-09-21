@@ -9,18 +9,16 @@ import {
   ActivityScoreWithInterval,
   groupActivityScores,
 } from '@/lib/utils/group-activity-score'
-import { differenceInHours, endOfToday, formatISO } from 'date-fns'
+import { differenceInHours, endOfToday, formatISO, isBefore } from 'date-fns'
 import { ArrowRight } from 'lucide-react'
 import React from 'react'
 
 export type MoreSuggestionsProps = {
   activityScores: ActivityScore[]
-  allActivityScores: ActivityScore[]
 }
 
 export default function MoreSuggestions({
   activityScores,
-  allActivityScores,
 }: MoreSuggestionsProps) {
   const dialogId = `more-suggestions-${Math.random().toString(36)}`
   const openDialog = () => {
@@ -30,40 +28,68 @@ export default function MoreSuggestions({
     }
   }
 
-  let text = ''
-  let description = ''
-  let passedActivities = activityScores
-
-  if (activityScores.length === 0 && allActivityScores.length > 0) {
-    text = 'See all activities'
-    description = 'no rated suggestions'
-    passedActivities = allActivityScores
-  } else if (activityScores.length > 0) {
-    text = 'See more suggestions'
-  } else {
-    description = 'try adding more activities or loosening constraints'
+  if (activityScores.length === 0) {
+    return (
+      <MoreSuggestionsButton disabled={true} text={'No activity suggestions'} />
+    )
+  } else if (activityScores.length === 1) {
+    return (
+      <MoreSuggestionsButton
+        disabled={true}
+        text={'No more suggestions'}
+        description={'Try a different day, or loosen activity constraints.'}
+      />
+    )
   }
 
   return (
     <>
-      <div className="mx-4 mb-4 lg:m-4">
-        <button
-          className={`btn btn-primary btn-md md:btn-lg w-fit rounded-md ${text === '' ? 'btn-disabled' : ''}`}
-          onClick={openDialog}
-        >
-          <div className="flex flex-col">
-            <div>{text || 'No suggestions available'}</div>
-            {activityScores.length === 0 && (
-              <div className="text-xs font-thin">({description})</div>
-            )}
-          </div>
-        </button>
-      </div>
+      <MoreSuggestionsButton
+        onClick={openDialog}
+        disabled={false}
+        text={'See more suggestions'}
+      />
       <MoreSuggestionsDialog
         dialogId={dialogId}
-        activityScores={passedActivities}
+        activityScores={activityScores}
       />
     </>
+  )
+}
+
+type MoreSuggestionsButtonProps =
+  | {
+      onClick: () => void
+      disabled: false
+      text: string
+      description?: string
+    }
+  | {
+      disabled: true
+      text: string
+      description?: string
+    }
+
+function MoreSuggestionsButton({
+  onClick,
+  disabled,
+  text,
+  description,
+}: MoreSuggestionsButtonProps) {
+  return (
+    <div className="mx-4 mb-4 lg:m-4">
+      <button
+        className={`btn btn-primary btn-md md:btn-lg w-fit rounded-md ${disabled ? 'btn-disabled' : ''}`}
+        onClick={onClick}
+      >
+        <div className="flex flex-col">
+          <div>{text}</div>
+          {description && (
+            <div className="text-xs font-thin">({description})</div>
+          )}
+        </div>
+      </button>
+    </div>
   )
 }
 
@@ -132,7 +158,8 @@ function Interval({ start, end }: { start: string; end: string }) {
   const summaryInterval =
     differenceInHours(interval.end, interval.start) >= 23
       ? 'any time'
-      : differenceInHours(interval.end, endOfToday()) <= 1
+      : isBefore(interval.start, new Date()) &&
+          differenceInHours(endOfToday(), interval.end) <= 1
         ? 'for the rest of the day'
         : ''
 

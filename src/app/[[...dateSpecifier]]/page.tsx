@@ -85,8 +85,7 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
       : []
   }
 
-  const activityScores = await getActivityScoresWithThreshhold(0.5)
-  const allActivityScores = await getActivityScoresWithThreshhold(0)
+  const activityScores = await getActivityScoresWithThreshhold(0.3)
 
   const refreshData = async (currentPath: string) => {
     'use server'
@@ -113,7 +112,6 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
         workingHours={workingHours || defaultWorkingHours}
         dataContext={dataContext}
         activityScores={activityScores}
-        allActivityScores={allActivityScores}
       />
     </DateProvider>
   )

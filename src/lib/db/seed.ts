@@ -1,9 +1,12 @@
 import logger from '@/app/api/pinoLogger'
+import { doRefresh } from '@/app/api/refresh'
 import { putActivities } from '@/lib/db/helpers/activity'
 import { db } from '@/lib/db/index'
 import { activityTable } from '@/lib/db/schemas/activity'
+import { usersTable } from '@/lib/db/schemas/users'
 import { Constraint, TActivity } from '@/lib/types/activity'
 import { kebabCase } from 'change-case'
+import { addDays, startOfToday } from 'date-fns'
 
 const defaultConstraints: Record<string, Constraint> = {
   highTide: {
@@ -103,8 +106,14 @@ const main = async () => {
     .delete(activityTable)
     .returning({ id: activityTable.id, version: activityTable.version })
   logger.warn('deleted existing activities', { deleted })
+  await db.delete(usersTable)
 
   await addActivities()
+  await doRefresh({
+    scope: 'all',
+    startDate: startOfToday(),
+    endDate: 7,
+  })
 }
 
 main()
