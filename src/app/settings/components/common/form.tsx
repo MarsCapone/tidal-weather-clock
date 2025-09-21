@@ -16,7 +16,7 @@ export function NamedFormComponent({
     <fieldset className={`fieldset ${className || ''}`}>
       <legend className="fieldset-legend">{title}</legend>
       {children}
-      {suffix && <p className="label">{suffix}</p>}
+      {suffix && <p className="label w-fit text-wrap">{suffix}</p>}
     </fieldset>
   )
 }
@@ -38,6 +38,27 @@ export function Input({
       className={outerClassName}
     >
       <input className={className} {...inputProps} />
+    </NamedFormComponent>
+  )
+}
+
+export function TextArea({
+  title,
+  suffix,
+  className,
+  outerClassName,
+  inputProps,
+}: NamedFormComponentProps & {
+  outerClassName?: string
+  inputProps: HTMLProps<HTMLTextAreaElement>
+}): React.ReactElement {
+  return (
+    <NamedFormComponent
+      title={title}
+      suffix={suffix}
+      className={outerClassName}
+    >
+      <textarea className={className} {...inputProps} />
     </NamedFormComponent>
   )
 }

@@ -91,7 +91,7 @@ const addActivities = async () => {
           isWeekend: true,
         },
       ],
-      priority: 10,
+      priority: 1,
     },
   ]
 

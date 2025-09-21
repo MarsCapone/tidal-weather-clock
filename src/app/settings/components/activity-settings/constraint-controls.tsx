@@ -56,13 +56,13 @@ export function WindConstraintControls({
           disabled={disabled}
         />
       </div>
-      <div className={'grid grid-cols-2 gap-x-4'}>
+      <div className={'grid grid-cols-1 gap-x-4 sm:grid-cols-2'}>
         <Input
           title={'Direction tolerance (º)'}
           suffix={
             'Acceptable angle off the wind the match the preferred direction'
           }
-          className={'input input-sm'}
+          className={'input input-sm w-full'}
           inputProps={{
             ...register(getTarget('maxGustSpeed')),
             type: 'float',
@@ -194,7 +194,10 @@ export function TideConstraintControls({
         title={'Time from tidal event'}
         className={'grid grid-cols-3 gap-x-4'}
       >
-        <NamedFormComponent title={'Tide Type'}>
+        <NamedFormComponent
+          title={'Tide Type'}
+          className={'flex flex-col sm:flex-row'}
+        >
           <label className={'label'}>
             Low
             <input
@@ -204,6 +207,8 @@ export function TideConstraintControls({
               disabled={disabled}
               {...register(getTarget('eventType'))}
             />
+          </label>
+          <label className={'label'}>
             <input
               type="radio"
               value={'high'}
