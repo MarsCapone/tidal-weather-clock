@@ -13,7 +13,6 @@ import {
 } from '@/app/settings/components/activity-settings/types'
 import { Input, TextArea } from '@/app/settings/components/common/form'
 import SettingButton from '@/app/settings/components/common/SettingButton'
-import { DarkModeContext } from '@/lib/utils/contexts'
 import { capitalize } from '@/lib/utils/string'
 import { ErrorMessage } from '@hookform/error-message'
 import {
@@ -26,7 +25,7 @@ import {
   Trash2Icon,
   WindIcon,
 } from 'lucide-react'
-import React, { useContext } from 'react'
+import React from 'react'
 import {
   FieldArrayWithId,
   useFieldArray,

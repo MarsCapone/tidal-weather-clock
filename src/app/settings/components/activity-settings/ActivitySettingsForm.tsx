@@ -5,7 +5,7 @@ import {
   InputActivities,
   TInputActivities,
 } from '@/app/settings/components/activity-settings/types'
-import { SettingCard, SettingTitle } from '@/app/settings/components/common'
+import { SettingTitle } from '@/app/settings/components/common'
 import SettingButton from '@/app/settings/components/common/SettingButton'
 import { TActivity } from '@/lib/types/activity'
 import logger from '@/lib/utils/logger'
