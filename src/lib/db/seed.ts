@@ -6,7 +6,7 @@ import { activityTable } from '@/lib/db/schemas/activity'
 import { usersTable } from '@/lib/db/schemas/users'
 import { Constraint, TActivity } from '@/lib/types/activity'
 import { kebabCase } from 'change-case'
-import { addDays, startOfToday } from 'date-fns'
+import { startOfToday } from 'date-fns'
 
 const defaultConstraints: Record<string, Constraint> = {
   highTide: {

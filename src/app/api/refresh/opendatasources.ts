@@ -7,7 +7,6 @@ import {
   utcDateStringToFractionalUtc,
   utcDateStringToUtc,
 } from '@/lib/utils/dates'
-import { uploadDebugData } from '@/lib/utils/debug'
 import { calcMean } from '@/lib/utils/math'
 import { TZDate } from '@date-fns/tz'
 import {
@@ -238,15 +237,16 @@ export class OpenMeteoAndEasyTideDataFetcher implements IDataContextFetcher {
       },
     )
 
-    await uploadDebugData(
-      'dataContextSource',
-      `openmeteo+easytide-${formatISO(new Date(), dateOptions)}`,
-      {
-        dailyPoints,
-        hourlyPoints,
-        rawData: { easyTideData, openMeteoData },
-      },
-    )
+    // We can't do this in the NextJS Edge Runtime
+    // await uploadDebugData(
+    //   'dataContextSource',
+    //   `openmeteo+easytide-${formatISO(new Date(), dateOptions)}`,
+    //   {
+    //     dailyPoints,
+    //     hourlyPoints,
+    //     rawData: { easyTideData, openMeteoData },
+    //   },
+    // )
 
     return dates
       .map((d) => {
