@@ -30,7 +30,7 @@ const defaultConstraints: Record<string, Constraint> = {
 }
 
 const addActivities = async () => {
-  const activities: Omit<TActivity, 'id' | 'scope' | 'priority'>[] = [
+  const activities: Omit<TActivity, 'id' | 'scope'>[] = [
     {
       name: 'Paddle Boarding (inland)',
       description: 'Head into the creek, and back',
@@ -42,6 +42,7 @@ const addActivities = async () => {
           maxSpeed: 5.2,
         },
       ],
+      priority: 5,
     },
     {
       name: 'Ferry to Island',
@@ -55,12 +56,14 @@ const addActivities = async () => {
           isWeekend: false,
         },
       ],
+      priority: 5,
     },
     {
       name: 'Swim in Bank Hole',
       description:
         'Walk down from the hard, across the water, and towards the first groyne for a swim',
       constraints: [defaultConstraints.daylight, defaultConstraints.lowTide],
+      priority: 5,
     },
     {
       name: 'Stargazing',
@@ -75,6 +78,7 @@ const addActivities = async () => {
           maxCloudCover: 0,
         },
       ],
+      priority: 5,
     },
     {
       name: 'Play Scrabble',
@@ -87,6 +91,7 @@ const addActivities = async () => {
           isWeekend: true,
         },
       ],
+      priority: 10,
     },
   ]
 
@@ -95,7 +100,6 @@ const addActivities = async () => {
       ...a,
       id: kebabCase(a.name.toLowerCase()),
       scope: 'global',
-      priority: 1,
     })),
     null,
   )

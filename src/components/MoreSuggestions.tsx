@@ -32,14 +32,6 @@ export default function MoreSuggestions({
     return (
       <MoreSuggestionsButton disabled={true} text={'No activity suggestions'} />
     )
-  } else if (activityScores.length === 1) {
-    return (
-      <MoreSuggestionsButton
-        disabled={true}
-        text={'No more suggestions'}
-        description={'Try a different day, or loosen activity constraints.'}
-      />
-    )
   }
 
   return (
