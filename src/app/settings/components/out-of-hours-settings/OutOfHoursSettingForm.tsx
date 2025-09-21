@@ -63,10 +63,10 @@ export default function OutOfHoursSettingForm({
         </div>
         <div>Do not suggest activities outside of these hours.</div>
         <SettingCard>
-          <div className="flex flex-row gap-4">
+          <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
             <Input
               title={'Start time'}
-              className="input w-36"
+              className="input w-full sm:w-36"
               inputProps={{
                 type: 'time',
                 ...register('startHour', {}),
@@ -84,7 +84,7 @@ export default function OutOfHoursSettingForm({
             />
             <Input
               title={'End time'}
-              className="input w-36"
+              className="input w-full sm:w-36"
               inputProps={{
                 type: 'time',
                 ...register('endHour', {}),
