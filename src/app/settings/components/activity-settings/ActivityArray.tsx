@@ -14,6 +14,7 @@ import {
 import { Input, TextArea } from '@/app/settings/components/common/form'
 import SettingButton from '@/app/settings/components/common/SettingButton'
 import { DarkModeContext } from '@/lib/utils/contexts'
+import { capitalize } from '@/lib/utils/string'
 import { ErrorMessage } from '@hookform/error-message'
 import {
   Calendar1Icon,
@@ -213,7 +214,7 @@ function ConstraintArray({ index, disabled }: ConstraintFormProps) {
                           `activities.${index}.constraints.${k}.type`,
                         )}
                       />
-                      <Icon className={'mr-1'} />
+                      <Icon className={'mx-1'} />
                       <span className={'hidden md:block'}>{label}</span>
                     </label>
                     <div
@@ -222,12 +223,17 @@ function ConstraintArray({ index, disabled }: ConstraintFormProps) {
                       }
                     >
                       <div
-                        className={'flex flex-row justify-end gap-2 sm:hidden'}
+                        className={
+                          'flex flex-row justify-between gap-2 sm:hidden'
+                        }
                       >
+                        <div className={'underline sm:hidden'}>
+                          {capitalize(type)}
+                        </div>
                         {!disabled && (
                           <button
                             className={
-                              'btn btn-accent btn-soft btn-xs rounded-field w-full text-xs'
+                              'btn btn-accent btn-soft btn-xs rounded-field text-xs'
                             }
                             onClick={() => remove(k)}
                           >
