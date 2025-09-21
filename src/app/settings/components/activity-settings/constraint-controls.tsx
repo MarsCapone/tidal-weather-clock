@@ -56,13 +56,13 @@ export function WindConstraintControls({
           disabled={disabled}
         />
       </div>
-      <div className={'grid grid-cols-2 gap-x-4'}>
+      <div className={'grid grid-cols-1 gap-x-4 sm:grid-cols-2'}>
         <Input
           title={'Direction tolerance (º)'}
           suffix={
             'Acceptable angle off the wind the match the preferred direction'
           }
-          className={'input input-sm'}
+          className={'input input-sm w-full'}
           inputProps={{
             ...register(getTarget('maxGustSpeed')),
             type: 'float',

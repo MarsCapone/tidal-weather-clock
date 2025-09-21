@@ -16,7 +16,7 @@ export function NamedFormComponent({
     <fieldset className={`fieldset ${className || ''}`}>
       <legend className="fieldset-legend">{title}</legend>
       {children}
-      {suffix && <p className="label">{suffix}</p>}
+      {suffix && <p className="label w-fit text-wrap">{suffix}</p>}
     </fieldset>
   )
 }
