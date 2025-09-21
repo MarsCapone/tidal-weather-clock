@@ -88,6 +88,7 @@ export const Activity = z.object({
   priority: z.coerce.number().min(1).max(10).default(1),
   scope: z.literal('global').or(z.literal('user')),
   version: z.coerce.number().optional(),
+  ignoreOoh: z.boolean(),
 })
 
 export type TActivity = z.output<typeof Activity>

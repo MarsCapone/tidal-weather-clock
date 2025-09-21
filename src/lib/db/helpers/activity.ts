@@ -26,6 +26,7 @@ export async function getActivitiesByUserId(userId: string | null) {
         scope: sql<
           'global' | 'user'
         >`CASE WHEN ${activityTable.user_id} IS NULL THEN 'global' ELSE 'user' END`,
+        ignore_ooh: activityTable.ignore_ooh,
       })
       .from(activityTable)
       .where(where)
@@ -41,15 +42,27 @@ export async function getActivitiesByUserId(userId: string | null) {
         desc(activityTable.version),
         desc(activityTable.created_at),
       )
-  ).map(({ id, name, description, priority, scope, content, version }) => ({
-    id,
-    name,
-    description,
-    priority,
-    scope,
-    version,
-    constraints: content['constraints'] || [],
-  }))
+  ).map(
+    ({
+      id,
+      name,
+      description,
+      priority,
+      scope,
+      content,
+      version,
+      ignore_ooh,
+    }) => ({
+      id,
+      name,
+      description,
+      priority,
+      scope,
+      version,
+      constraints: content['constraints'] || [],
+      ignoreOoh: ignore_ooh,
+    }),
+  )
 
   return activityResponses
 }
@@ -61,7 +74,16 @@ export async function getAllActivities(): Promise<TActivity[]> {
     .orderBy(activityTable.id, desc(activityTable.version))
 
   return dbResult.map(
-    ({ id, name, description, priority, content, version, user_id }) => ({
+    ({
+      id,
+      name,
+      description,
+      priority,
+      content,
+      version,
+      user_id,
+      ignore_ooh,
+    }) => ({
       id,
       name,
       description,
@@ -70,6 +92,7 @@ export async function getAllActivities(): Promise<TActivity[]> {
       version,
       user_id,
       constraints: content['constraints'] || [],
+      ignoreOoh: ignore_ooh,
     }),
   )
 }
@@ -153,6 +176,7 @@ export type ActivityScore = {
   name: string
   description: string
   priority: number
+  ignoreOoh: boolean
   user_id: string
   score: number
   timestamp: string
@@ -210,13 +234,22 @@ export async function getBestActivitiesForDatacontext(
 
   return results.map(
     ({
-      activity: { name, description, user_id, version, id, priority },
+      activity: {
+        name,
+        description,
+        user_id,
+        version,
+        id,
+        priority,
+        ignore_ooh,
+      },
       activity_score: { score, timestamp, debug, datacontext_id },
     }) => {
       return {
         name,
         description,
         priority,
+        ignoreOoh: ignore_ooh,
         user_id,
         score,
         timestamp,

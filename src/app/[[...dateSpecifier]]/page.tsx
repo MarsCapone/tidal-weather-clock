@@ -98,9 +98,11 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
   const filteredActivityScores = workingHours.enabled
     ? activityScores.filter(
         (score) =>
-          utcDateStringToFractionalUtc(score.timestamp) >=
+          score.ignoreOoh ||
+          (utcDateStringToFractionalUtc(score.timestamp) >=
             workingHours.startHour &&
-          utcDateStringToFractionalUtc(score.timestamp) <= workingHours.endHour,
+            utcDateStringToFractionalUtc(score.timestamp) <=
+              workingHours.endHour),
       )
     : activityScores
 
