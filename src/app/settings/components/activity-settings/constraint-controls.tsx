@@ -194,7 +194,10 @@ export function TideConstraintControls({
         title={'Time from tidal event'}
         className={'grid grid-cols-3 gap-x-4'}
       >
-        <NamedFormComponent title={'Tide Type'}>
+        <NamedFormComponent
+          title={'Tide Type'}
+          className={'flex flex-col sm:flex-row'}
+        >
           <label className={'label'}>
             Low
             <input
@@ -204,6 +207,8 @@ export function TideConstraintControls({
               disabled={disabled}
               {...register(getTarget('eventType'))}
             />
+          </label>
+          <label className={'label'}>
             <input
               type="radio"
               value={'high'}
