@@ -13,6 +13,7 @@ import {
 } from '@/app/settings/components/activity-settings/types'
 import { Input } from '@/app/settings/components/common/form'
 import SettingButton from '@/app/settings/components/common/SettingButton'
+import { DarkModeContext } from '@/lib/utils/contexts'
 import { ErrorMessage } from '@hookform/error-message'
 import {
   Calendar1Icon,
@@ -24,7 +25,7 @@ import {
   Trash2Icon,
   WindIcon,
 } from 'lucide-react'
-import React from 'react'
+import React, { useContext } from 'react'
 import {
   FieldArrayWithId,
   useFieldArray,
@@ -55,9 +56,8 @@ export default function ActivityArray({
     <ul>
       {fields.map((item, index) => {
         return (
-          <li key={`activity-${item.id}`}>
+          <li key={`activity-${item.id}`} className={'mb-4'}>
             <SingleActivity index={index} removeByIndex={removeByIndex} />
-            <div className={'divider'}></div>
           </li>
         )
       })}
@@ -74,13 +74,12 @@ function SingleActivity({ removeByIndex, index }: SingleActivityProps) {
   const activity = getValues(`activities.${index}`)
   const disabled = activity.scope === 'global'
   return (
-    <div className={''}>
-      <div className={'mb-4 flex flex-col items-end gap-4 sm:flex-row'}>
+    <div className={'card card-lg shadow-base-300 rounded-box p-4 shadow-lg'}>
+      <div className={'mb-4 flex flex-row items-end gap-4'}>
         <div className={'w-full'}>
           <Input
             title={'Activity Name'}
-            className={'input input-md'}
-            outerClassName={'flex-none'}
+            className={'input input-md w-full'}
             inputProps={{
               ...register(`activities.${index}.name`),
               disabled,
@@ -88,14 +87,22 @@ function SingleActivity({ removeByIndex, index }: SingleActivityProps) {
           />
           <ErrorMessage name={`activities.${index}.name`} errors={errors} />
         </div>
+        <button
+          className={'btn btn-md btn-soft rounded-field btn-error mb-1'}
+          onClick={() => removeByIndex(index)}
+        >
+          <Trash2Icon className={'h-6 w-6'} />
+        </button>
+      </div>
+      <div className={'mb-4 flex flex-col items-center gap-2 sm:flex-row'}>
         <div className="w-full">
           <Input
             title={'Description'}
-            className={'input input-md'}
-            outerClassName={'grow'}
+            className={'textarea textarea-md'}
             inputProps={{
               ...register(`activities.${index}.description`),
               disabled,
+              type: 'textarea',
             }}
           />
           <ErrorMessage
@@ -103,8 +110,6 @@ function SingleActivity({ removeByIndex, index }: SingleActivityProps) {
             errors={errors}
           />
         </div>
-      </div>
-      <div className={'mb-4 flex flex-row items-center gap-2'}>
         <PrioritySelector
           disabled={disabled}
           {...register(`activities.${index}.priority`)}

@@ -144,9 +144,7 @@ export default function ActivitySettingsForm({
               {JSON.stringify(errors.activities, null, 2)}
             </pre>
           )}
-          <SettingCard>
-            <ActivityArray fields={fields} removeByIndex={remove} />
-          </SettingCard>
+          <ActivityArray fields={fields} removeByIndex={remove} />
         </form>
       </FormProvider>
     </div>
