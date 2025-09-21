@@ -89,9 +89,10 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
       : []
   }
 
-  // ordered by increasing priority - the lowest priority is the most important!
+  // ordered by decreasing priority - the highest priority is the most important!
+  // this makes it easier to display the controls for it
   const activityScores = (await getActivityScoresWithThreshhold(0.3)).sort(
-    (a, b) => a.priority - b.priority,
+    (a, b) => b.priority - a.priority,
   )
 
   const filteredActivityScores = workingHours.enabled

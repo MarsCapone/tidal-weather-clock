@@ -6,11 +6,13 @@ import {
   WeatherConstraintControls,
   WindConstraintControls,
 } from '@/app/settings/components/activity-settings/constraint-controls'
+import PrioritySelector from '@/app/settings/components/activity-settings/PrioritySelector'
 import {
   InputActivities,
   TInputActivities,
 } from '@/app/settings/components/activity-settings/types'
 import { Input } from '@/app/settings/components/common/form'
+import SettingButton from '@/app/settings/components/common/SettingButton'
 import { ErrorMessage } from '@hookform/error-message'
 import {
   Calendar1Icon,
@@ -73,7 +75,7 @@ function SingleActivity({ removeByIndex, index }: SingleActivityProps) {
   const disabled = activity.scope === 'global'
   return (
     <div className={''}>
-      <div className={'mb-4 flex flex-row items-end gap-4'}>
+      <div className={'mb-4 flex flex-col items-end gap-4 sm:flex-row'}>
         <div className={'w-full'}>
           <Input
             title={'Activity Name'}
@@ -101,35 +103,28 @@ function SingleActivity({ removeByIndex, index }: SingleActivityProps) {
             errors={errors}
           />
         </div>
-        <div>
-          <Input
-            title={'Priority'}
-            className={'input input-md'}
-            outerClassName={''}
-            inputProps={{
-              ...register(`activities.${index}.priority`),
-              disabled,
-              type: 'number',
-              min: 1,
-              max: 10,
-            }}
-          />
+      </div>
+      <div className={'mb-4 flex flex-row items-center gap-2'}>
+        <PrioritySelector
+          disabled={disabled}
+          {...register(`activities.${index}.priority`)}
+        >
           <ErrorMessage name={`activities.${index}.priority`} errors={errors} />
-        </div>
-        {!disabled && (
-          <button className={'my-2'} onClick={() => removeByIndex(index)}>
-            <Trash2Icon className={'h-6 w-6'} />
-          </button>
-        )}
+        </PrioritySelector>
       </div>
       <ConstraintArray index={index} disabled={disabled} />
       <div
         className={
-          'flex flex-row justify-end gap-2 font-mono text-xs font-thin'
+          'flex flex-row items-center justify-between gap-2 text-xs font-thin'
         }
       >
         <span>id:{activity.id}</span>
-        <span>scope:{activity.scope}</span>
+        <button
+          className={'btn btn-xs btn-soft rounded-field'}
+          onClick={() => removeByIndex(index)}
+        >
+          Delete Activity <Trash2Icon className={'h-4 w-4'} />
+        </button>
       </div>
     </div>
   )
@@ -193,12 +188,12 @@ function ConstraintArray({ index, disabled }: ConstraintFormProps) {
           </div>
         </div>
         {!disabled && (
-          <button
-            className={'btn btn-sm rounded-field'}
+          <SettingButton
+            className={'md:btn-sm btn-primary'}
             onClick={() => prepend({ type: 'wind' })}
           >
             Add Constraint <PlusIcon className="h-4 w-4" />
-          </button>
+          </SettingButton>
         )}
       </div>
       <div>
