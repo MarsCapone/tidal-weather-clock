@@ -210,7 +210,11 @@ function ExplainedScore({ score }: { score: ActivityScore }) {
 
   return (
     <div>
-      <div className={'divider'}></div>
+      <div className={'grid grid-cols-3'}>
+        <div></div>
+        <div className={'divider'}>constraint details</div>
+        <div></div>
+      </div>
       <div
         className={`grid ${conditions.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} text-sm`}
       >
