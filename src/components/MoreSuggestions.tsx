@@ -196,13 +196,24 @@ function Interval({ start, end }: { start: string; end: string }) {
 
 function ExplainedScore({ score }: { score: ActivityScore }) {
   const readableScores = getHumanReadableScore(score.debug)
+  const constraintTypes = score.debug.constraintsWithScores.map(
+    (c) => c.constraint.type,
+  )
 
-  const conditions = Object.values(readableScores.conditions)
+  const conditions = Object.entries(readableScores.conditions)
+    .filter(([k]) => constraintTypes.includes(k as never))
+    .map(([, v]) => v)
+
+  if (conditions.length === 0) {
+    return null
+  }
 
   return (
     <div>
       <div className={'divider'}></div>
-      <div className={'grid grid-cols-2 text-sm'}>
+      <div
+        className={`grid ${conditions.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} text-sm`}
+      >
         {conditions.map((c, i) => (
           <p key={i}>{c}</p>
         ))}
