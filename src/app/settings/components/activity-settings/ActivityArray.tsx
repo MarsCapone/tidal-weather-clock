@@ -121,16 +121,10 @@ function SingleActivity({ removeByIndex, index }: SingleActivityProps) {
       <ConstraintArray index={index} disabled={disabled} />
       <div
         className={
-          'flex flex-row items-center justify-between gap-2 text-xs font-thin'
+          'flex flex-row items-center justify-end gap-2 text-xs font-thin'
         }
       >
         <span>id:{activity.id}</span>
-        <button
-          className={'btn btn-xs btn-soft rounded-field'}
-          onClick={() => removeByIndex(index)}
-        >
-          Delete Activity <Trash2Icon className={'h-4 w-4'} />
-        </button>
       </div>
     </div>
   )
@@ -205,7 +199,7 @@ function ConstraintArray({ index, disabled }: ConstraintFormProps) {
       <div>
         {fields.map((item, k) => (
           <div key={item.id} className={'mb-4'}>
-            <div className={'tabs tabs-sm tabs-box w-full'}>
+            <div className={'tabs tabs-sm sm:tabs-md tabs-box w-full'}>
               {constraintTypes.map(({ type, label, Icon, Controls }, ci) => {
                 return (
                   <React.Fragment key={ci}>
@@ -227,6 +221,21 @@ function ConstraintArray({ index, disabled }: ConstraintFormProps) {
                         'tab-content rounded-field bg-base-100 border-base-300 p-4'
                       }
                     >
+                      <div
+                        className={'flex flex-row justify-end gap-2 sm:hidden'}
+                      >
+                        {!disabled && (
+                          <button
+                            className={
+                              'btn btn-accent btn-soft btn-xs rounded-field w-full text-xs'
+                            }
+                            onClick={() => remove(k)}
+                          >
+                            Delete Constraint{' '}
+                            <Trash2Icon className={'h-4 w-4'} />
+                          </button>
+                        )}
+                      </div>
                       <Controls
                         activityIndex={index}
                         constraintIndex={k}
@@ -237,10 +246,19 @@ function ConstraintArray({ index, disabled }: ConstraintFormProps) {
                 )
               })}
               <div className={'grow'}></div>
-              <div className={'flex flex-row justify-end gap-2'}>
+              <div
+                className={
+                  'hidden flex-row items-center justify-end gap-2 sm:flex'
+                }
+              >
                 {!disabled && (
-                  <button className={'px-2'} onClick={() => remove(k)}>
-                    <Trash2Icon className={'h-4 w-4'} />
+                  <button
+                    className={
+                      'btn btn-sm btn-accent btn-soft rounded-field px-2'
+                    }
+                    onClick={() => remove(k)}
+                  >
+                    Delete Constraint <Trash2Icon className={'h-4 w-4'} />
                   </button>
                 )}
               </div>
