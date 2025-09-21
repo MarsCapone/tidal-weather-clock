@@ -11,7 +11,7 @@ import {
   InputActivities,
   TInputActivities,
 } from '@/app/settings/components/activity-settings/types'
-import { Input } from '@/app/settings/components/common/form'
+import { Input, TextArea } from '@/app/settings/components/common/form'
 import SettingButton from '@/app/settings/components/common/SettingButton'
 import { DarkModeContext } from '@/lib/utils/contexts'
 import { ErrorMessage } from '@hookform/error-message'
@@ -96,13 +96,14 @@ function SingleActivity({ removeByIndex, index }: SingleActivityProps) {
       </div>
       <div className={'mb-4 flex flex-col items-center gap-2 sm:flex-row'}>
         <div className="w-full">
-          <Input
+          <TextArea
             title={'Description'}
-            className={'textarea textarea-md'}
+            className={'textarea textarea-md resize-y'}
             inputProps={{
               ...register(`activities.${index}.description`),
               disabled,
               type: 'textarea',
+              wrap: 'soft',
             }}
           />
           <ErrorMessage

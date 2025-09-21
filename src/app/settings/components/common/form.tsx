@@ -41,3 +41,24 @@ export function Input({
     </NamedFormComponent>
   )
 }
+
+export function TextArea({
+  title,
+  suffix,
+  className,
+  outerClassName,
+  inputProps,
+}: NamedFormComponentProps & {
+  outerClassName?: string
+  inputProps: HTMLProps<HTMLTextAreaElement>
+}): React.ReactElement {
+  return (
+    <NamedFormComponent
+      title={title}
+      suffix={suffix}
+      className={outerClassName}
+    >
+      <textarea className={className} {...inputProps} />
+    </NamedFormComponent>
+  )
+}
