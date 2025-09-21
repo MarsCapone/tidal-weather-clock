@@ -66,11 +66,19 @@ export function groupActivityScores(
         currentGroup = [next]
       }
     }
+    subGroups.push(currentGroup)
 
     return subGroups
   })
 
   // then we can just transform each group into a score with interval
+
+  console.log('grouped scores', {
+    sortedGroupedScores,
+    groupedScores,
+    result: groupedScores.map(scoresToIntervalScore),
+  })
+
   return groupedScores.map(scoresToIntervalScore)
 }
 

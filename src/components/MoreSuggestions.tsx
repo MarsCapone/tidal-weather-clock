@@ -65,6 +65,7 @@ type MoreSuggestionsButtonProps =
       description?: string
     }
   | {
+      onClick?: () => void
       disabled: true
       text: string
       description?: string
@@ -103,6 +104,7 @@ function MoreSuggestionsDialog({
   activityScores,
 }: MoreSuggestionsDialogProps) {
   const groupedScores = groupActivityScores(activityScores)
+  console.log(groupedScores)
   return (
     <dialog className={'modal'} id={dialogId}>
       <div className="modal-box max-h-5xl max-w-5xl">
