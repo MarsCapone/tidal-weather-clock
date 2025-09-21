@@ -1,9 +1,5 @@
 export function SettingTitle({ title }: { title: string }) {
-  return (
-    <h1 className="bg-base-100 sticky top-10 p-2 px-4 text-2xl font-bold">
-      {title}
-    </h1>
-  )
+  return <h1 className="bg-base-100 p-2 px-4 text-2xl font-bold">{title}</h1>
 }
 
 type SettingCardProps = {
@@ -13,7 +9,7 @@ type SettingCardProps = {
 }
 export function SettingCard({ title, buttons, children }: SettingCardProps) {
   return (
-    <div className="card card-lg my-2 shadow-sm">
+    <div className="card card-sm md:card-lg my-2 shadow-sm">
       <div className="card-body">
         {(title || buttons) && (
           <div className="card-title flex flex-row justify-between">

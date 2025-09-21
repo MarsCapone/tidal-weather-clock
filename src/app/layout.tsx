@@ -16,7 +16,7 @@ export default function Layout({ children }: React.PropsWithChildren) {
         <div id="root">
           <Providers>
             <Navbar />
-            <div className="mx-auto flex min-w-full flex-col justify-center gap-2 p-10 text-center md:min-w-0">
+            <div className="mx-auto flex min-w-full flex-col justify-center gap-2 p-4 text-center md:min-w-0 md:p-10">
               {children}
             </div>
           </Providers>

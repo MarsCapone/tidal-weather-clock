@@ -2,6 +2,7 @@
 
 import { SettingCard, SettingTitle } from '@/app/settings/components/common'
 import { Input } from '@/app/settings/components/common/form'
+import SettingButton from '@/app/settings/components/common/SettingButton'
 import { WorkingHoursSetting } from '@/lib/types/settings'
 import {
   fractionalUtcToLocalTimeString,
@@ -52,12 +53,13 @@ export default function OutOfHoursSettingForm({
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-4 flex flex-row items-center justify-between">
           <SettingTitle title={'Out of Hours'} />
-          <button
-            type="submit"
-            className={`btn rounded-field ${isDirty ? 'btn-primary' : 'btn-disabled'}`}
+          <SettingButton
+            type={'submit'}
+            disabled={!isDirty}
+            className={'btn-primary'}
           >
             Save Changes
-          </button>
+          </SettingButton>
         </div>
         <div>Do not suggest activities outside of these hours.</div>
         <SettingCard>

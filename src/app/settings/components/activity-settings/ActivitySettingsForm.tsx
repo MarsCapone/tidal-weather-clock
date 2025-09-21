@@ -6,6 +6,7 @@ import {
   TInputActivities,
 } from '@/app/settings/components/activity-settings/types'
 import { SettingCard, SettingTitle } from '@/app/settings/components/common'
+import SettingButton from '@/app/settings/components/common/SettingButton'
 import { TActivity } from '@/lib/types/activity'
 import logger from '@/lib/utils/logger'
 import { mpsToKnots } from '@/lib/utils/units'
@@ -107,10 +108,11 @@ export default function ActivitySettingsForm({
                 )}
               </div>
             </div>
-            <div className="flex gap-2">
-              <button
+            <div className="flex flex-col gap-2 md:flex-row">
+              <SettingButton
                 type={'button'}
-                className="btn btn-primary rounded-field"
+                className={'btn-primary'}
+                disabled={false}
                 onClick={() =>
                   prepend({
                     id: uuidv4(),
@@ -123,13 +125,14 @@ export default function ActivitySettingsForm({
                 }
               >
                 Add Activity <PlusIcon className="h-4 w-4" />
-              </button>
-              <button
+              </SettingButton>
+              <SettingButton
                 type={'submit'}
-                className={`btn btn-secondary rounded-field ${isDirty ? '' : 'btn-disabled'}`}
+                disabled={!isDirty}
+                className={'btn-secondary'}
               >
                 Save Changes
-              </button>
+              </SettingButton>
             </div>
           </div>
           {hasErrors && !zodErrors && (

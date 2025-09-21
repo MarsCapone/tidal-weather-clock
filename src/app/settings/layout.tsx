@@ -6,7 +6,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div>
       <Breadcrumbs />
-      <div className="p-10">
+      <div className="md:p-10">
         <PageTitle />
         {children}
       </div>
