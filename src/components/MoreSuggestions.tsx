@@ -5,10 +5,7 @@ import {
   utcDateStringToLocalTimeString,
   utcDateStringToUtc,
 } from '@/lib/utils/dates'
-import {
-  ActivityScoreWithInterval,
-  groupActivityScores,
-} from '@/lib/utils/group-activity-score'
+import { ActivityScoreWithInterval } from '@/lib/utils/group-activity-score'
 import { differenceInHours, endOfToday, formatISO, isBefore } from 'date-fns'
 import { ArrowRight } from 'lucide-react'
 import React from 'react'
