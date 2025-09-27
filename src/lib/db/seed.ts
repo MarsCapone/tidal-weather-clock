@@ -43,6 +43,7 @@ const addActivities = async () => {
         },
       ],
       priority: 5,
+      ignoreOoh: false,
     },
     {
       name: 'Ferry to Island',
@@ -57,6 +58,7 @@ const addActivities = async () => {
         },
       ],
       priority: 5,
+      ignoreOoh: false,
     },
     {
       name: 'Swim in Bank Hole',
@@ -64,6 +66,7 @@ const addActivities = async () => {
         'Walk down from the hard, across the water, and towards the first groyne for a swim',
       constraints: [defaultConstraints.daylight, defaultConstraints.lowTide],
       priority: 5,
+      ignoreOoh: false,
     },
     {
       name: 'Stargazing',
@@ -79,6 +82,7 @@ const addActivities = async () => {
         },
       ],
       priority: 5,
+      ignoreOoh: true,
     },
     {
       name: 'Play Scrabble',
@@ -92,6 +96,7 @@ const addActivities = async () => {
         },
       ],
       priority: 1,
+      ignoreOoh: false,
     },
   ]
 
