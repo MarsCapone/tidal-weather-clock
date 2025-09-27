@@ -59,7 +59,7 @@ export const getUserId = async (): Promise<string | null> => {
 
   const email = session.user.email
   if (email === undefined) {
-    logger.error('Unable to get user', { session, user: session.user })
+    logger.error('Unable to get user', { user: session.user })
     return null
   }
 
