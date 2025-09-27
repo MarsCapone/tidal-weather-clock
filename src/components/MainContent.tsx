@@ -60,7 +60,7 @@ export default function MainContent({
               dataContext={dataContext}
             />
             {showSuggestedActivity && (
-              <MoreSuggestions activityScores={activityScores} />
+              <MoreSuggestions activityScores={groupedActivityScores} />
             )}
             <WeatherDetails
               dataContext={dataContext}

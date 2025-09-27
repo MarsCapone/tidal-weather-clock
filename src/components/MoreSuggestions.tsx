@@ -5,16 +5,13 @@ import {
   utcDateStringToLocalTimeString,
   utcDateStringToUtc,
 } from '@/lib/utils/dates'
-import {
-  ActivityScoreWithInterval,
-  groupActivityScores,
-} from '@/lib/utils/group-activity-score'
+import { ActivityScoreWithInterval } from '@/lib/utils/group-activity-score'
 import { differenceInHours, endOfToday, formatISO, isBefore } from 'date-fns'
 import { ArrowRight } from 'lucide-react'
 import React from 'react'
 
 export type MoreSuggestionsProps = {
-  activityScores: ActivityScore[]
+  activityScores: ActivityScoreWithInterval[]
 }
 
 export default function MoreSuggestions({
@@ -88,20 +85,19 @@ function MoreSuggestionsButton({
 
 type MoreSuggestionsDialogProps = {
   dialogId: string
-  activityScores: ActivityScore[]
+  activityScores: ActivityScoreWithInterval[]
 }
 
 function MoreSuggestionsDialog({
   dialogId,
   activityScores,
 }: MoreSuggestionsDialogProps) {
-  const groupedScores = groupActivityScores(activityScores)
-  console.log(groupedScores)
+  console.log(activityScores)
   return (
     <dialog className={'modal'} id={dialogId}>
       <div className="modal-box max-h-5xl max-w-5xl">
         <div className="flex flex-col justify-start">
-          {groupedScores.flatMap((score, index) => (
+          {activityScores.flatMap((score, index) => (
             <React.Fragment key={`score-${index}`}>
               {!!index && <div className={'divider'} />}
               <SingleActivityScore score={score} />

@@ -1,3 +1,4 @@
+import logger from '@/app/api/pinoLogger'
 import {
   createUserWithExtras,
   getUserIdByEmail,
@@ -58,7 +59,8 @@ export const getUserId = async (): Promise<string | null> => {
 
   const email = session.user.email
   if (email === undefined) {
-    throw new Error('Unable to get user')
+    logger.error('Unable to get user', { user: session.user })
+    return null
   }
 
   const userId = await getUserIdByEmail(email)

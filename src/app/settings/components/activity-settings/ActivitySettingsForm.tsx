@@ -121,6 +121,7 @@ export default function ActivitySettingsForm({
                     priority: 5,
                     scope: 'user',
                     constraints: [],
+                    ignoreOoh: false,
                   })
                 }
               >

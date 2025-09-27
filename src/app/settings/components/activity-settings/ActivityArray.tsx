@@ -75,7 +75,7 @@ function SingleActivity({ removeByIndex, index }: SingleActivityProps) {
   const disabled = activity.scope === 'global'
   return (
     <div className={'card card-lg shadow-base-300 rounded-box p-4 shadow-lg'}>
-      <div className={'mb-4 flex flex-row items-end gap-4'}>
+      <div className={'mb-4 flex flex-col items-end gap-4 sm:flex-row'}>
         <div className={'w-full'}>
           <Input
             title={'Activity Name'}
@@ -87,12 +87,33 @@ function SingleActivity({ removeByIndex, index }: SingleActivityProps) {
           />
           <ErrorMessage name={`activities.${index}.name`} errors={errors} />
         </div>
-        <button
-          className={'btn btn-md btn-soft rounded-field btn-error mb-1'}
-          onClick={() => removeByIndex(index)}
+        <div
+          className={
+            'flex w-full flex-row items-end justify-between gap-2 sm:w-fit'
+          }
         >
-          <Trash2Icon className={'h-6 w-6'} />
-        </button>
+          <div>
+            <Input
+              title={'Ignore Out of Hours?'}
+              className="toggle"
+              outerClassName={'w-fit'}
+              inputProps={{
+                type: 'checkbox',
+                ...register(`activities.${index}.ignoreOoh`),
+              }}
+            />
+            <ErrorMessage
+              name={`activities.${index}.ignoreOoh`}
+              errors={errors}
+            />
+          </div>
+          <button
+            className={'btn btn-md btn-soft rounded-field btn-error mb-1'}
+            onClick={() => removeByIndex(index)}
+          >
+            <Trash2Icon className={'h-6 w-6'} />
+          </button>
+        </div>
       </div>
       <div className={'mb-4 flex flex-col items-center gap-2 sm:flex-row'}>
         <div className="w-full">
