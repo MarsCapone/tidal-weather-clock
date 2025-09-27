@@ -60,7 +60,7 @@ export const getUserId = async (): Promise<string | null> => {
   const email = session.user.email
   if (email === undefined) {
     logger.error('Unable to get user', { session, user: session.user })
-    throw new Error('Unable to get user')
+    return null
   }
 
   const userId = await getUserIdByEmail(email)
