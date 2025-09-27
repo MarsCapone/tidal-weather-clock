@@ -14,7 +14,7 @@ import { ArrowRight } from 'lucide-react'
 import React from 'react'
 
 export type MoreSuggestionsProps = {
-  activityScores: ActivityScore[]
+  activityScores: ActivityScoreWithInterval[]
 }
 
 export default function MoreSuggestions({
@@ -88,20 +88,19 @@ function MoreSuggestionsButton({
 
 type MoreSuggestionsDialogProps = {
   dialogId: string
-  activityScores: ActivityScore[]
+  activityScores: ActivityScoreWithInterval[]
 }
 
 function MoreSuggestionsDialog({
   dialogId,
   activityScores,
 }: MoreSuggestionsDialogProps) {
-  const groupedScores = groupActivityScores(activityScores)
-  console.log(groupedScores)
+  console.log(activityScores)
   return (
     <dialog className={'modal'} id={dialogId}>
       <div className="modal-box max-h-5xl max-w-5xl">
         <div className="flex flex-col justify-start">
-          {groupedScores.flatMap((score, index) => (
+          {activityScores.flatMap((score, index) => (
             <React.Fragment key={`score-${index}`}>
               {!!index && <div className={'divider'} />}
               <SingleActivityScore score={score} />

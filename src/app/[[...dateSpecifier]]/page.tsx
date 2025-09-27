@@ -5,6 +5,7 @@ import MainContent, { RefreshData } from '@/components/MainContent'
 import { getUserId } from '@/lib/auth0'
 import CONSTANTS from '@/lib/constants'
 import {
+  ActivityScore,
   getActivitiesByUserId,
   getBestActivitiesForDatacontext,
 } from '@/lib/db/helpers/activity'
@@ -89,22 +90,38 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
       : []
   }
 
+  const defaultThreshold = 0.3
+  const strictThreshold = 0.7
+
   // ordered by decreasing priority - the highest priority is the most important!
   // this makes it easier to display the controls for it
-  const activityScores = (await getActivityScoresWithThreshhold(0.3)).sort(
-    (a, b) => b.priority - a.priority,
-  )
+  const activityScores = (
+    await getActivityScoresWithThreshhold(defaultThreshold)
+  ).sort((a, b) => b.priority - a.priority)
 
-  const filteredActivityScores = workingHours.enabled
-    ? activityScores.filter(
-        (score) =>
-          score.ignoreOoh ||
-          (utcDateStringToFractionalUtc(score.timestamp) >=
-            workingHours.startHour &&
-            utcDateStringToFractionalUtc(score.timestamp) <=
-              workingHours.endHour),
-      )
-    : activityScores
+  const scoreFilter = (score: ActivityScore): boolean => {
+    const scoreHour = utcDateStringToFractionalUtc(score.timestamp)
+    if (!workingHours.enabled) {
+      return true
+    }
+
+    if (
+      scoreHour >= workingHours.startHour &&
+      scoreHour <= workingHours.endHour
+    ) {
+      // we're filtering in the normal way, so we can use the default threshold
+      return true
+    }
+
+    if (score.ignoreOoh) {
+      // if we're ignoring out of hours, we can use the strict threshold
+      return score.score >= strictThreshold
+    }
+
+    return false
+  }
+
+  const filteredActivityScores = activityScores.filter(scoreFilter)
 
   const refreshData = async (currentPath: string) => {
     'use server'

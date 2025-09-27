@@ -121,6 +121,7 @@ export async function putActivities(
         content: { constraints: a.constraints || [] },
         user_id: userId,
         version: nextVersion[0]?.v || 1,
+        ignore_ooh: a.ignoreOoh ?? false,
       }
 
       const query = await db

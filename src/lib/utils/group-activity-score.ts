@@ -2,6 +2,11 @@ import { ActivityScore } from '@/lib/db/helpers/activity'
 import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
 import { addHours, formatISO } from 'date-fns'
 
+const GROUPING_BRACKETS = {
+  maxTimeMs: 60 * 60 * 1000, // 1h
+  maxScoreDiff: 0.1,
+}
+
 export type ActivityScoreWithInterval = ActivityScore & {
   interval: {
     startTimestamp: string
@@ -52,33 +57,49 @@ export function groupActivityScores(
     for (let i = 1; i < group.length; i++) {
       const next = group[i]
       // check if next is not within 1 hour of current
-      const diff =
+      const timeDiff = Math.abs(
         utcDateStringToUtc(next.timestamp).getTime() -
-        utcDateStringToUtc(
-          currentGroup[currentGroup.length - 1].timestamp,
-        ).getTime()
-      if (diff <= 1000 * 60 * 60) {
-        // if the diff is less than 1 hour, then we can add it to the current group
+          utcDateStringToUtc(
+            currentGroup[currentGroup.length - 1].timestamp,
+          ).getTime(),
+      )
+
+      // we want to compare the next score to either the current group's min or max score
+      const minGroupScore = Math.min(...currentGroup.map((s) => s.score))
+      const maxGroupScore = Math.max(...currentGroup.map((s) => s.score))
+
+      if (
+        timeDiff <= GROUPING_BRACKETS.maxTimeMs &&
+        // if we extend the range of the current group by the appropriate diff, and the next score is within that
+        // range, we can consider it still part of the current group
+        next.score <= maxGroupScore + GROUPING_BRACKETS.maxScoreDiff &&
+        next.score >= minGroupScore - GROUPING_BRACKETS.maxScoreDiff
+      ) {
+        console.log('extend group', {
+          currentGroup: currentGroup.map((s) => s.score),
+          nextScore: next.score,
+        })
+        // then it's part of the current group
         currentGroup.push(next)
       } else {
-        // it's more than 1 hour, so we need to start a new group
+        // otherwise, the current group is done and we can start a new one
+        console.log('new group', {
+          nextScore: next.score,
+          currentGroup: currentGroup.map((s) => s.score),
+        })
         subGroups.push(currentGroup)
         currentGroup = [next]
       }
     }
-    subGroups.push(currentGroup)
+    if (currentGroup.length > 0) {
+      // finally, push a last group if there's anything in it
+      subGroups.push(currentGroup)
+    }
 
     return subGroups
   })
 
   // then we can just transform each group into a score with interval
-
-  console.log('grouped scores', {
-    sortedGroupedScores,
-    groupedScores,
-    result: groupedScores.map(scoresToIntervalScore),
-  })
-
   return groupedScores.map(scoresToIntervalScore)
 }
 
