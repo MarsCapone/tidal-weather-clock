@@ -1,5 +1,6 @@
 import { ActivityScore } from '@/lib/db/helpers/activity'
 import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
+import { calcMean } from '@/lib/utils/math'
 import { addHours, formatISO } from 'date-fns'
 
 const GROUPING_BRACKETS = {
@@ -110,6 +111,7 @@ function scoresToIntervalScore(
   const end = scores[scores.length - 1].timestamp
   return {
     ...scores[0],
+    score: calcMean(scores.map((s) => s.score)),
     interval: {
       startTimestamp: scores[0].timestamp,
       endTimestamp: formatISO(
