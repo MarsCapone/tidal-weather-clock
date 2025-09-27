@@ -12,7 +12,6 @@ import {
   utcDateStringToFractionalUtc,
   utcDateStringToLocalTimeString,
 } from '@/lib/utils/dates'
-import logger from '@/lib/utils/logger'
 import { mpsToKnots } from '@/lib/utils/units'
 import {
   describeCloudiness,
@@ -260,9 +259,6 @@ function byTimestamp<T extends Timestamp>(points: T[]): Record<string, T> {
 function getAggregatedDatapoints(
   dataContext: DataContext,
 ): AggregatedDataPoint[] {
-  logger.debug('getAggregatedDatapoints', {
-    referenceDate: dataContext.referenceDate,
-  })
   const timestamps = dataContext.weatherData.points.map(
     (point) => point.timestamp,
   )
@@ -272,11 +268,10 @@ function getAggregatedDatapoints(
   )
   const windByTimestamp = byTimestamp<WindInfo>(dataContext.windData.points)
 
-  const result = timestamps.map((t) => ({
+  return timestamps.map((t) => ({
     ...(weatherByTimestamp[t] || {}),
     ...(windByTimestamp[t] || {}),
   }))
-  return result
 }
 
 function renderUvIndex(uvIndex: number): React.ReactNode {

@@ -76,18 +76,10 @@ export function groupActivityScores(
         next.score <= maxGroupScore + GROUPING_BRACKETS.maxScoreDiff &&
         next.score >= minGroupScore - GROUPING_BRACKETS.maxScoreDiff
       ) {
-        console.debug('extend group', {
-          currentGroup: currentGroup.map((s) => s.score),
-          nextScore: next.score,
-        })
         // then it's part of the current group
         currentGroup.push(next)
       } else {
         // otherwise, the current group is done and we can start a new one
-        console.debug('new group', {
-          nextScore: next.score,
-          currentGroup: currentGroup.map((s) => s.score),
-        })
         subGroups.push(currentGroup)
         currentGroup = [next]
       }

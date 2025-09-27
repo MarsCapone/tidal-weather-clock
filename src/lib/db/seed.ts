@@ -39,7 +39,7 @@ const addActivities = async () => {
         defaultConstraints.daylight,
         {
           type: 'wind',
-          maxSpeed: 5.2,
+          maxSpeed: 2.5,
         },
       ],
       priority: 5,
@@ -78,7 +78,7 @@ const addActivities = async () => {
         },
         {
           type: 'weather',
-          maxCloudCover: 0,
+          maxCloudCover: 1,
         },
       ],
       priority: 5,
@@ -116,6 +116,7 @@ const main = async () => {
     .returning({ id: activityTable.id, version: activityTable.version })
   logger.warn('deleted existing activities', { deleted })
   await db.delete(usersTable)
+  logger.warn('deleted existing users')
 
   await addActivities()
   await doRefresh({

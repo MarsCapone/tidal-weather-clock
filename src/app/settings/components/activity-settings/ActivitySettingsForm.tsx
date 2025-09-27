@@ -28,7 +28,7 @@ export default function ActivitySettingsForm({
   setActivitiesAction,
 }: ActivitySettingsFormProps) {
   const [zodErrors, setZodErrors] = useState<z.ZodError | null>(null)
-  const [defaultValues] = useState<TInputActivities>({
+  const defaultValues = {
     // when items are saved, they are converted to the correct unit, but we need to represent them
     // in the display unit first
     activities: activities.map((activity) => ({
@@ -52,7 +52,7 @@ export default function ActivitySettingsForm({
         return constraint
       }),
     })),
-  })
+  }
   const methods = useForm<
     z.input<typeof InputActivities>,
     unknown,
@@ -65,7 +65,7 @@ export default function ActivitySettingsForm({
     reset,
     control,
     handleSubmit,
-    formState: { errors, isDirty },
+    formState: { errors },
   } = methods
 
   const { fields, remove, prepend } = useFieldArray({
@@ -77,12 +77,14 @@ export default function ActivitySettingsForm({
     const result = InputActivities.safeParse(data)
     if (!result.success) {
       setZodErrors(result.error)
+      logger.error('zod validation failed', { zodErrors })
+    } else {
+      logger.warn('saving zod activities', {
+        data: InputActivities.safeParse(data),
+      })
+      setActivitiesAction(data.activities)
+      reset(data)
     }
-    logger.warn('saving zod activities', {
-      data: InputActivities.safeParse(data),
-    })
-    setActivitiesAction(data.activities)
-    reset(data)
   }
 
   const hasErrors = Object.keys(errors).length !== 0
@@ -129,7 +131,7 @@ export default function ActivitySettingsForm({
               </SettingButton>
               <SettingButton
                 type={'submit'}
-                disabled={!isDirty}
+                // disabled={!isDirty}
                 className={'btn-secondary'}
               >
                 Save Changes
