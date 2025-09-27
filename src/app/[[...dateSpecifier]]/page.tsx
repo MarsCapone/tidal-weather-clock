@@ -90,8 +90,7 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
       : []
   }
 
-  const defaultThreshold = 0.3
-  const strictThreshold = 0.7
+  const defaultThreshold = 0.5
 
   // ordered by decreasing priority - the highest priority is the most important!
   // this makes it easier to display the controls for it
@@ -100,25 +99,14 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
   ).sort((a, b) => b.priority - a.priority)
 
   const scoreFilter = (score: ActivityScore): boolean => {
+    if (!workingHours.enabled || score.ignoreOoh) {
+      return true
+    }
     const scoreHour = utcDateStringToFractionalUtc(score.timestamp)
-    if (!workingHours.enabled) {
-      return true
-    }
 
-    if (
-      scoreHour >= workingHours.startHour &&
-      scoreHour <= workingHours.endHour
-    ) {
-      // we're filtering in the normal way, so we can use the default threshold
-      return true
-    }
-
-    if (score.ignoreOoh) {
-      // if we're ignoring out of hours, we can use the strict threshold
-      return score.score >= strictThreshold
-    }
-
-    return false
+    return (
+      scoreHour >= workingHours.startHour && scoreHour <= workingHours.endHour
+    )
   }
 
   const filteredActivityScores = activityScores.filter(scoreFilter)

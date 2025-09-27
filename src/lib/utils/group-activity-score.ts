@@ -4,7 +4,7 @@ import { addHours, formatISO } from 'date-fns'
 
 const GROUPING_BRACKETS = {
   maxTimeMs: 60 * 60 * 1000, // 1h
-  maxScoreDiff: 0.1,
+  maxScoreDiff: 0.15,
 }
 
 export type ActivityScoreWithInterval = ActivityScore & {
