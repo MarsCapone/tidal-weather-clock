@@ -20,11 +20,8 @@ export default function NavBarLinks({
 }: NavBarLinksProps) {
   const { showBirthdayBanner } = useFlags()
 
-  logger.debug('showBirthdayBanner', { showBirthdayBanner })
   let isBirthday = false
-  if (showBirthdayBanner === undefined) {
-    logger.debug('showBirthdayBanner is undefined')
-  } else if (showBirthdayBanner === 'always') {
+  if (showBirthdayBanner === 'always') {
     isBirthday = true
   } else if (showBirthdayBanner.startsWith('range')) {
     const [start, end] = showBirthdayBanner.split(':').slice(1)
