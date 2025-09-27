@@ -21,7 +21,9 @@ export default function NavBarLinks({
   const { showBirthdayBanner } = useFlags()
 
   let isBirthday = false
-  if (showBirthdayBanner === 'always') {
+  if (!showBirthdayBanner || showBirthdayBanner === 'off') {
+    isBirthday = false
+  } else if (showBirthdayBanner === 'always') {
     isBirthday = true
   } else if (showBirthdayBanner.startsWith('range')) {
     const [start, end] = showBirthdayBanner.split(':').slice(1)
