@@ -11,6 +11,7 @@ import {
   formatRelative,
   intervalToDuration,
 } from 'date-fns'
+import { enGB } from 'date-fns/locale'
 import { useFlags } from 'launchdarkly-react-client-sdk'
 import React, { useContext, useEffect } from 'react'
 
@@ -149,7 +150,9 @@ function getActivityView(
         </div>
         <div className="text-xl font-extrabold md:text-3xl xl:text-5xl">
           {timings.timestamp &&
-            formatRelative(timings.timestamp, timings.currentTime)}
+            formatRelative(timings.timestamp, timings.currentTime, {
+              locale: enGB,
+            })}
         </div>
       </>
     )
