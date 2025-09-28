@@ -6,7 +6,6 @@ import { getUserId } from '@/lib/auth0'
 import CONSTANTS from '@/lib/constants'
 import {
   ActivityScore,
-  getActivitiesByUserId,
   getBestActivitiesForDatacontext,
 } from '@/lib/db/helpers/activity'
 import {

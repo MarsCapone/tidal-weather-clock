@@ -190,6 +190,7 @@ export async function getBestActivitiesForDatacontext(
               eq(activityScoresTable.activity_version, version),
               sql`CASE WHEN ${limitFuture} THEN (${activityScoresTable.timestamp}::timestamp) > (now() - INTERVAL ${sql.raw(lookbackHours)} hour) ELSE true END`,
               eq(activityScoresTable.datacontext_id, dataContextId),
+              gte(activityScoresTable.score, options?.scoreThreshold || 0),
             ),
           )
       }),
