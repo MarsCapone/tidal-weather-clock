@@ -121,14 +121,14 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
     preFiltered: activityScores,
   })
 
-  const refreshData = async (currentPath: string) => {
+  const refreshData = async (currentPath: string, isPast: boolean) => {
     'use server'
     const options = {
       scope: userId === null ? 'global' : 'user',
       userId,
       startDate: initialDate,
       endDate: initialDate,
-      refreshDataContext: true,
+      refreshDataContext: !isPast,
     }
     logger.info('Refreshing data', { options, currentPath })
     await doRefresh(options as DoRefreshOptions)

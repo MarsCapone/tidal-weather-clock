@@ -95,6 +95,12 @@ export async function getScores({
     })
     .filter((t) => t !== null)
 
+  console.log('getting scores for timeslots', {
+    timeSlots: timeSlots.length,
+    activity: activity.id,
+    dataContext: dataContext.id,
+  })
+
   const scores = timeSlots.map((timeSlot) => {
     const scorer = new DefaultConstraintScorer(timeSlot)
     const constraintScores = activity.constraints.map((c) => {

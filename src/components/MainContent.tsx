@@ -73,7 +73,10 @@ export default function MainContent({
 
 export type RefreshDataProps = {
   lastUpdatedTime: Date | undefined
-  onClickedRefreshAction: (currentPath: string) => Promise<void>
+  onClickedRefreshAction: (
+    currentPath: string,
+    isPast: boolean,
+  ) => Promise<void>
 }
 export function RefreshData({
   lastUpdatedTime,
@@ -87,24 +90,28 @@ export function RefreshData({
 
   const onClick = () => {
     setRefreshing(true)
-    onClickedRefreshAction(window.location.pathname).then(() => {
+    onClickedRefreshAction(window.location.pathname, isPast).then(() => {
       setRefreshing(false)
     })
   }
+
+  const lastUpdatedText = isPast ? 'Data fetched' : 'Last updated'
+
+  const buttonText = isPast ? 'Recalculate activity' : 'Refresh'
 
   return (
     <div className="md:bg-base-100 p-4 md:absolute md:top-24 md:right-2 md:z-10">
       <div className="flex flex-row items-center justify-center text-xs md:justify-end">
         <div className="flex items-center gap-2 md:flex-col md:items-end">
-          <span>Last updated: {formattedTime} </span>
-          {!isPast && (
-            <button
-              className={`btn btn-xs btn-accent rounded-field w-fit ${refreshing ? 'btn-disabled' : ''}`}
-              onClick={onClick}
-            >
-              Refresh <RefreshCwIcon className="h-4 w-4" />
-            </button>
-          )}
+          <span>
+            {lastUpdatedText}: {formattedTime}{' '}
+          </span>
+          <button
+            className={`btn btn-xs btn-accent rounded-field w-fit ${refreshing ? 'btn-disabled' : ''}`}
+            onClick={onClick}
+          >
+            {buttonText} <RefreshCwIcon className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </div>
