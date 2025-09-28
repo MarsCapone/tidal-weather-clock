@@ -64,7 +64,7 @@ export function WindConstraintControls({
           }
           className={'input input-sm w-full'}
           inputProps={{
-            ...register(getTarget('maxGustSpeed')),
+            ...register(getTarget('maxGustSpeed'), { valueAsNumber: true }),
             type: 'float',
             disabled,
           }}
@@ -102,7 +102,7 @@ export function WeatherConstraintControls({
         title={'Min temperature (ºC)'}
         className={'input input-sm'}
         inputProps={{
-          ...register(getTarget('minTemperature')),
+          ...register(getTarget('minTemperature'), { valueAsNumber: true }),
           type: 'float',
           disabled,
         }}
@@ -112,7 +112,7 @@ export function WeatherConstraintControls({
         title={'Max temperature (ºC)'}
         className={'input input-sm'}
         inputProps={{
-          ...register(getTarget('maxTemperature')),
+          ...register(getTarget('maxTemperature'), { valueAsNumber: true }),
           type: 'float',
           disabled,
         }}
@@ -122,7 +122,7 @@ export function WeatherConstraintControls({
         title={'Max UV Index'}
         className={'input input-sm'}
         inputProps={{
-          ...register(getTarget('maxUvIndex')),
+          ...register(getTarget('maxUvIndex'), { valueAsNumber: true }),
           type: 'float',
           disabled,
         }}
@@ -132,7 +132,7 @@ export function WeatherConstraintControls({
         title={'Max cloud cover (%)'}
         className={'input input-sm'}
         inputProps={{
-          ...register(getTarget('maxCloudCover')),
+          ...register(getTarget('maxCloudCover'), { valueAsNumber: true }),
           type: 'float',
           disabled,
         }}
@@ -142,7 +142,9 @@ export function WeatherConstraintControls({
         title={'Max likelihood of rain'}
         className={'input input-sm'}
         inputProps={{
-          ...register(getTarget('maxPrecipitationProbability')),
+          ...register(getTarget('maxPrecipitationProbability'), {
+            valueAsNumber: true,
+          }),
           type: 'float',
           disabled,
         }}
@@ -173,22 +175,26 @@ export function TideConstraintControls({
           title={'Min height (m)'}
           className={'input input-sm'}
           inputProps={{
-            ...register(getTarget('minHeight')),
+            ...register(getTarget('minHeight'), { valueAsNumber: true }),
             type: 'float',
             disabled,
           }}
+          suffix={
+            <ErrorMessage name={getTarget('minHeight')} errors={errors} />
+          }
         />
-        <ErrorMessage name={getTarget('minHeight')} errors={errors} />
         <Input
           title={'Max height (m)'}
           className={'input input-sm'}
           inputProps={{
-            ...register(getTarget('maxHeight')),
+            ...register(getTarget('maxHeight'), { valueAsNumber: true }),
             type: 'float',
             disabled,
           }}
+          suffix={
+            <ErrorMessage name={getTarget('maxHeight')} errors={errors} />
+          }
         />
-        <ErrorMessage name={getTarget('maxHeight')} errors={errors} />
       </div>
       <NamedFormComponent
         title={'Time from tidal event'}
@@ -197,6 +203,9 @@ export function TideConstraintControls({
         <NamedFormComponent
           title={'Tide Type'}
           className={'flex flex-col sm:flex-row'}
+          suffix={
+            <ErrorMessage name={getTarget('eventType')} errors={errors} />
+          }
         >
           <label className={'label'}>
             Low
@@ -219,7 +228,6 @@ export function TideConstraintControls({
             High
           </label>
         </NamedFormComponent>
-        <ErrorMessage name={getTarget('eventType')} errors={errors} />
         <Input
           title={'Max hours before'}
           className={'input input-sm'}
@@ -227,11 +235,13 @@ export function TideConstraintControls({
             type: 'float',
             min: 0,
             max: 12,
-            ...register(getTarget('maxHoursBefore')),
+            ...register(getTarget('maxHoursBefore'), { valueAsNumber: true }),
             disabled,
           }}
+          suffix={
+            <ErrorMessage name={getTarget('maxHoursBefore')} errors={errors} />
+          }
         />
-        <ErrorMessage name={getTarget('maxHoursBefore')} errors={errors} />
         <Input
           title={'Max hours after'}
           className={'input input-sm'}
@@ -239,11 +249,13 @@ export function TideConstraintControls({
             type: 'float',
             min: 0,
             max: 12,
-            ...register(getTarget('maxHoursAfter')),
+            ...register(getTarget('maxHoursAfter'), { valueAsNumber: true }),
             disabled,
           }}
+          suffix={
+            <ErrorMessage name={getTarget('maxHoursAfter')} errors={errors} />
+          }
         />
-        <ErrorMessage name={getTarget('maxHoursAfter')} errors={errors} />
       </NamedFormComponent>
     </div>
   )
@@ -272,8 +284,10 @@ export function SunConstraintControls({
           type: 'checkbox',
           disabled,
         }}
+        suffix={
+          <ErrorMessage name={getTarget('requiresDaylight')} errors={errors} />
+        }
       />
-      <ErrorMessage name={getTarget('requiresDaylight')} errors={errors} />
       <Input
         title={'Requires Darkness'}
         className={'checkbox checkbox-sm rounded-sm'}
@@ -282,33 +296,48 @@ export function SunConstraintControls({
           type: 'checkbox',
           disabled,
         }}
+        suffix={
+          <ErrorMessage name={getTarget('requiresDarkness')} errors={errors} />
+        }
       />
-      <ErrorMessage name={getTarget('requiresDarkness')} errors={errors} />
-
       <Input
         title={'Max hours before sunset'}
         className={'input input-sm'}
         inputProps={{
-          ...register(getTarget('maxHoursBeforeSunset')),
+          ...register(getTarget('maxHoursBeforeSunset'), {
+            valueAsNumber: true,
+          }),
           type: 'float',
           min: 0,
           max: 12,
           disabled,
         }}
+        suffix={
+          <ErrorMessage
+            name={getTarget('maxHoursBeforeSunset')}
+            errors={errors}
+          />
+        }
       />
-      <ErrorMessage name={getTarget('maxHoursBeforeSunset')} errors={errors} />
       <Input
         title={'Min hours after sunrise'}
         className={'input input-sm'}
         inputProps={{
-          ...register(getTarget('minHoursAfterSunrise')),
+          ...register(getTarget('minHoursAfterSunrise'), {
+            valueAsNumber: true,
+          }),
           type: 'float',
           min: 0,
           max: 12,
           disabled,
         }}
+        suffix={
+          <ErrorMessage
+            name={getTarget('minHoursAfterSunrise')}
+            errors={errors}
+          />
+        }
       />
-      <ErrorMessage name={getTarget('minHoursAfterSunrise')} errors={errors} />
     </div>
   )
 }
@@ -331,26 +360,28 @@ export function TimeConstraintControls({
         title={'Earliest Hour'}
         className={'input input-sm'}
         inputProps={{
-          ...register(getTarget('earliestHour')),
+          ...register(getTarget('earliestHour'), { valueAsNumber: true }),
           type: 'float',
           min: 0,
           max: 24,
           disabled,
         }}
+        suffix={
+          <ErrorMessage name={getTarget('earliestHour')} errors={errors} />
+        }
       />
-      <ErrorMessage name={getTarget('earliestHour')} errors={errors} />
       <Input
         title={'Latest Hour'}
         className={'input input-sm'}
         inputProps={{
-          ...register(getTarget('latestHour')),
+          ...register(getTarget('latestHour'), { valueAsNumber: true }),
           type: 'float',
           min: 0,
           max: 24,
           disabled,
         }}
+        suffix={<ErrorMessage name={getTarget('latestHour')} errors={errors} />}
       />
-      <ErrorMessage name={getTarget('latestHour')} errors={errors} />
       <Input
         title={'Preferred hours'}
         suffix={'List of preferred hours for doing this activity'}
@@ -389,8 +420,8 @@ export function DayConstraintControls({
           type: 'checkbox',
           disabled,
         }}
+        suffix={<ErrorMessage name={getTarget('isWeekday')} errors={errors} />}
       />
-      <ErrorMessage name={getTarget('isWeekday')} errors={errors} />
       <Input
         title={'Weekend?'}
         className={'checkbox checkbox-sm rounded-sm'}
@@ -399,8 +430,8 @@ export function DayConstraintControls({
           type: 'checkbox',
           disabled,
         }}
+        suffix={<ErrorMessage name={getTarget('isWeekend')} errors={errors} />}
       />
-      <ErrorMessage name={getTarget('isWeekend')} errors={errors} />
 
       {/*<Input*/}
       {/*  title={'Dates'}*/}
@@ -437,12 +468,13 @@ function WindSpeedInput({
         inputProps={{
           ...register(target, {
             setValueAs: (value) => knotsToMps(value),
+            valueAsNumber: true,
           }),
           type: 'float',
           disabled,
         }}
+        suffix={<ErrorMessage name={target} errors={errors} />}
       />
-      <ErrorMessage name={target} errors={errors} />
     </>
   )
 }

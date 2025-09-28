@@ -6,7 +6,6 @@ import { getUserId } from '@/lib/auth0'
 import CONSTANTS from '@/lib/constants'
 import {
   ActivityScore,
-  getActivitiesByUserId,
   getBestActivitiesForDatacontext,
 } from '@/lib/db/helpers/activity'
 import {
@@ -65,7 +64,6 @@ export default async function Page({
 async function PageContent({ initialDate }: { initialDate: TZDate }) {
   const userId = await getUserId()
 
-  const activities = await getActivitiesByUserId(userId)
   const dataContextRange = await getDataContextRange(CONSTANTS.LOCATION_COORDS)
   const workingHours = await getOrPutSetting<WorkingHoursSetting>(
     'working_hours',
@@ -132,7 +130,6 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
         onClickedRefreshAction={refreshData}
       />
       <MainContent
-        activities={activities}
         workingHours={workingHours || defaultWorkingHours}
         dataContext={dataContext}
         activityScores={filteredActivityScores}

@@ -92,10 +92,9 @@ function MoreSuggestionsDialog({
   dialogId,
   activityScores,
 }: MoreSuggestionsDialogProps) {
-  console.log(activityScores)
   return (
     <dialog className={'modal'} id={dialogId}>
-      <div className="modal-box max-h-5xl max-w-5xl">
+      <div className="modal-box max-h-4xl max-w-3/4">
         <div className="flex flex-col justify-start">
           {activityScores.flatMap((score, index) => (
             <React.Fragment key={`score-${index}`}>

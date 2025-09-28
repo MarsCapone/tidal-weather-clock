@@ -1,5 +1,6 @@
 import { ActivityScore } from '@/lib/db/helpers/activity'
 import { dateOptions, utcDateStringToUtc } from '@/lib/utils/dates'
+import { calcMean } from '@/lib/utils/math'
 import { addHours, formatISO } from 'date-fns'
 
 const GROUPING_BRACKETS = {
@@ -75,18 +76,10 @@ export function groupActivityScores(
         next.score <= maxGroupScore + GROUPING_BRACKETS.maxScoreDiff &&
         next.score >= minGroupScore - GROUPING_BRACKETS.maxScoreDiff
       ) {
-        console.debug('extend group', {
-          currentGroup: currentGroup.map((s) => s.score),
-          nextScore: next.score,
-        })
         // then it's part of the current group
         currentGroup.push(next)
       } else {
         // otherwise, the current group is done and we can start a new one
-        console.debug('new group', {
-          nextScore: next.score,
-          currentGroup: currentGroup.map((s) => s.score),
-        })
         subGroups.push(currentGroup)
         currentGroup = [next]
       }
@@ -110,6 +103,7 @@ function scoresToIntervalScore(
   const end = scores[scores.length - 1].timestamp
   return {
     ...scores[0],
+    score: calcMean(scores.map((s) => s.score)),
     interval: {
       startTimestamp: scores[0].timestamp,
       endTimestamp: formatISO(

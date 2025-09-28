@@ -1,12 +1,20 @@
 import { TideType } from '@/lib/types/context'
 import * as z from 'zod'
 
+const optionalNumber = z.preprocess((val) => {
+  // @ts-expect-error something wrong with isNaN here
+  if (val === null || val === undefined || val === '' || isNaN(val)) {
+    return undefined
+  }
+  return val
+}, z.number().optional())
+
 export const WindConstraint = z.object({
   // tolerance in degrees for preferred directions
-  directionTolerance: z.coerce.number().optional(),
-  maxGustSpeed: z.coerce.number().optional(), // m/s
-  maxSpeed: z.coerce.number().optional(), // m/s
-  minSpeed: z.coerce.number().optional(), // m/s
+  directionTolerance: optionalNumber,
+  maxGustSpeed: optionalNumber, // m/s
+  maxSpeed: optionalNumber, // m/s
+  minSpeed: optionalNumber, // m/s
   preferredDirections: z.array(z.coerce.number()).optional(),
   type: z.literal('wind'),
 })
@@ -14,11 +22,11 @@ export const WindConstraint = z.object({
 export type TWindConstraint = z.output<typeof WindConstraint>
 
 export const WeatherConstraint = z.object({
-  maxCloudCover: z.coerce.number().optional(),
-  maxTemperature: z.coerce.number().optional(),
-  minTemperature: z.coerce.number().optional(),
-  maxUvIndex: z.coerce.number().optional(),
-  maxPrecipitationProbability: z.coerce.number().optional(),
+  maxCloudCover: optionalNumber,
+  maxTemperature: optionalNumber,
+  minTemperature: optionalNumber,
+  maxUvIndex: optionalNumber,
+  maxPrecipitationProbability: optionalNumber,
   type: z.literal('weather'),
 })
 
@@ -26,18 +34,18 @@ export type TWeatherConstraint = z.output<typeof WeatherConstraint>
 
 export const TideConstraint = z.object({
   eventType: TideType.optional(),
-  maxHeight: z.coerce.number().optional(),
-  minHeight: z.coerce.number().optional(),
-  maxHoursAfter: z.coerce.number().optional(),
-  maxHoursBefore: z.coerce.number().optional(),
+  maxHeight: optionalNumber,
+  minHeight: optionalNumber,
+  maxHoursAfter: optionalNumber,
+  maxHoursBefore: optionalNumber,
   type: z.literal('tide'),
 })
 
 export type TTideConstraint = z.output<typeof TideConstraint>
 
 export const SunConstraint = z.object({
-  maxHoursBeforeSunset: z.coerce.number().optional(),
-  minHoursAfterSunrise: z.coerce.number().optional(),
+  maxHoursBeforeSunset: optionalNumber,
+  minHoursAfterSunrise: optionalNumber,
   requiresDarkness: z.boolean().optional(),
   requiresDaylight: z.boolean().optional(),
   type: z.literal('sun'),
@@ -46,17 +54,17 @@ export const SunConstraint = z.object({
 export type TSunConstraint = z.output<typeof SunConstraint>
 
 export const TimeConstraint = z.object({
-  earliestHour: z.coerce.number().optional(),
-  latestHour: z.coerce.number().optional(),
-  preferredHours: z.array(z.coerce.number()).optional(),
+  earliestHour: optionalNumber,
+  latestHour: optionalNumber,
+  preferredHours: z.array(z.coerce.number()).nullish(),
   type: z.literal('time'),
 })
 
 export type TTimeConstraint = z.output<typeof TimeConstraint>
 
 export const DayConstraint = z.object({
-  isWeekday: z.boolean().optional(),
-  isWeekend: z.boolean().optional(),
+  isWeekday: z.boolean().nullish(),
+  isWeekend: z.boolean().nullish(),
   dateRanges: z
     .array(
       z.object({
@@ -64,7 +72,7 @@ export const DayConstraint = z.object({
         end: z.string(),
       }),
     )
-    .optional(),
+    .nullish(),
   type: z.literal('day'),
 })
 export type TDayConstraint = z.output<typeof DayConstraint>
@@ -87,7 +95,7 @@ export const Activity = z.object({
   name: z.string(),
   priority: z.coerce.number().min(1).max(10).default(1),
   scope: z.literal('global').or(z.literal('user')),
-  version: z.coerce.number().optional(),
+  version: z.number(),
   ignoreOoh: z.boolean(),
 })
 

@@ -12,7 +12,6 @@ import logger from '@/lib/utils/logger'
 import { mpsToKnots } from '@/lib/utils/units'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
-import { useState } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
 import * as z from 'zod'
@@ -27,8 +26,7 @@ export default function ActivitySettingsForm({
   activities,
   setActivitiesAction,
 }: ActivitySettingsFormProps) {
-  const [zodErrors, setZodErrors] = useState<z.ZodError | null>(null)
-  const [defaultValues] = useState<TInputActivities>({
+  const defaultValues = {
     // when items are saved, they are converted to the correct unit, but we need to represent them
     // in the display unit first
     activities: activities.map((activity) => ({
@@ -52,7 +50,7 @@ export default function ActivitySettingsForm({
         return constraint
       }),
     })),
-  })
+  }
   const methods = useForm<
     z.input<typeof InputActivities>,
     unknown,
@@ -61,12 +59,7 @@ export default function ActivitySettingsForm({
     defaultValues,
     resolver: zodResolver(InputActivities),
   })
-  const {
-    reset,
-    control,
-    handleSubmit,
-    formState: { errors, isDirty },
-  } = methods
+  const { reset, control, handleSubmit } = methods
 
   const { fields, remove, prepend } = useFieldArray({
     control,
@@ -76,16 +69,15 @@ export default function ActivitySettingsForm({
   const onSubmit = (data: TInputActivities) => {
     const result = InputActivities.safeParse(data)
     if (!result.success) {
-      setZodErrors(result.error)
+      logger.error('zod validation failed', { zodErrors: result.error })
+    } else {
+      logger.warn('saving zod activities', {
+        data: InputActivities.safeParse(data),
+      })
+      setActivitiesAction(data.activities)
+      reset(data)
     }
-    logger.warn('saving zod activities', {
-      data: InputActivities.safeParse(data),
-    })
-    setActivitiesAction(data.activities)
-    reset(data)
   }
-
-  const hasErrors = Object.keys(errors).length !== 0
 
   return (
     <div>
@@ -94,19 +86,6 @@ export default function ActivitySettingsForm({
           <div className="bg-base-100 mb-4 flex flex-row items-center justify-between">
             <div>
               <SettingTitle title={'Activity Settings'} />
-              <div className="text-md px-4">
-                You cannot edit global activities
-                {hasErrors && (
-                  <div className="text-error text-xs italic">
-                    Please fix the errors below
-                    {zodErrors && (
-                      <pre>
-                        {JSON.stringify(z.treeifyError(zodErrors), null, 2)}
-                      </pre>
-                    )}
-                  </div>
-                )}
-              </div>
             </div>
             <div className="flex flex-col gap-2 md:flex-row">
               <SettingButton
@@ -122,6 +101,7 @@ export default function ActivitySettingsForm({
                     scope: 'user',
                     constraints: [],
                     ignoreOoh: false,
+                    version: 0,
                   })
                 }
               >
@@ -129,22 +109,13 @@ export default function ActivitySettingsForm({
               </SettingButton>
               <SettingButton
                 type={'submit'}
-                disabled={!isDirty}
+                // disabled={!isDirty}
                 className={'btn-secondary'}
               >
                 Save Changes
               </SettingButton>
             </div>
           </div>
-          {hasErrors && !zodErrors && (
-            <pre
-              className={
-                'text-error rounded-box bg-base-200 m-4 max-h-48 overflow-y-scroll p-2 font-mono text-xs'
-              }
-            >
-              {JSON.stringify(errors.activities, null, 2)}
-            </pre>
-          )}
           <ActivityArray fields={fields} removeByIndex={remove} />
         </form>
       </FormProvider>

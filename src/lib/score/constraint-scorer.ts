@@ -135,7 +135,12 @@ export class DefaultConstraintScorer implements IConstraintScorer {
             : naiveDateAddFractional(dayStart, time + constraint.maxHoursAfter),
       }
 
-      const internalScores = [isWithinInterval(this.slotDate, interval) ? 1 : 0]
+      if (!isWithinInterval(this.slotDate, interval)) {
+        // it's at the wrong time, so this should score 0
+        return 0
+      }
+
+      const internalScores = [1]
 
       if (constraint.minHeight !== undefined) {
         const diff = constraint.minHeight - height
@@ -153,7 +158,11 @@ export class DefaultConstraintScorer implements IConstraintScorer {
       return calcMean(internalScores)
     })
 
-    return calcMean(scores)
+    // we don't want the mean here, we want to know if any of the tides were
+    // good. we won't have both being good with the same time slot, because
+    // the timings will be too far apart. so we can just check the max here.
+
+    return Math.max(...scores)
   }
 
   getTimeScore(constraint: TTimeConstraint): number {
@@ -173,7 +182,7 @@ export class DefaultConstraintScorer implements IConstraintScorer {
 
     if (constraint.preferredHours !== undefined) {
       // each preferred hour is a block of 1h. we just need to check if the slot is in one of those blocks
-      const isPreferred = constraint.preferredHours.some(
+      const isPreferred = (constraint.preferredHours ?? []).some(
         (p) =>
           p <= this.slot.fractionalHour && this.slot.fractionalHour <= p + 1,
       )

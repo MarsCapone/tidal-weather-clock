@@ -6,7 +6,6 @@ import MoreSuggestions from '@/components/MoreSuggestions'
 import { WeatherDetails } from '@/components/weather/WeatherDetails'
 import WeatherOverview from '@/components/weather/WeatherOverview'
 import { ActivityScore } from '@/lib/db/helpers/activity'
-import { TActivity } from '@/lib/types/activity'
 import { DataContext } from '@/lib/types/context'
 import { WorkingHoursSetting } from '@/lib/types/settings'
 import { DateContext } from '@/lib/utils/contexts'
@@ -22,7 +21,6 @@ export default function MainContent({
   dataContext,
   activityScores,
 }: {
-  activities: TActivity[]
   workingHours: WorkingHoursSetting
   dataContext: DataContext | undefined
   activityScores: ActivityScore[]
