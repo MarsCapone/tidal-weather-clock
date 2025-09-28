@@ -171,10 +171,7 @@ export async function getBestActivitiesForDatacontext(
   const limitFuture = options?.futureOnly ?? false
   const lookbackHours = `'${String(options?.lookbackHours ?? 0)}'`
 
-  const currentActivities =
-    userId === null
-      ? await getAllActivities()
-      : await getActivitiesByUserId(userId)
+  const currentActivities = await getActivitiesByUserId(userId)
 
   const activityScores = (
     await Promise.all(
