@@ -22,6 +22,7 @@ type TimelineItem = {
   Icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>
   label: string
   timestamp: Date | null
+  suffix?: string
 }
 
 export type DayTimelineProps = {} & Omit<
@@ -55,6 +56,7 @@ export default function DayTimeline({
     timestamp: utcDateStringToUtc(
       utcDateStringAddFractional(referenceDate, t.time),
     ),
+    suffix: `${t.height.toFixed(1)}m`,
   }))
 
   const timelineItems: TimelineItem[] = [
@@ -89,34 +91,38 @@ export default function DayTimeline({
         'timeline timeline-vertical md:timeline-horizontal my-2 justify-center'
       }
     >
-      {timelineItems.map(({ additionalClasses, Icon, label, timestamp }, i) => (
-        <li key={`timeline-item-${i}`}>
-          <hr className={`${additionalClasses.line || 'bg-primary'}`} />
-          <div
-            className={`timeline-start w-24 text-xl md:w-16 lg:w-24 xl:w-32 xl:text-2xl ${additionalClasses.label || ''} ${additionalClasses.all || ''}`}
-          >
-            {label}
-          </div>
-          <div
-            className={`timeline-middle rounded-full border-1 p-1.5 ${additionalClasses.icon || ''} ${additionalClasses.all || ''}`}
-          >
-            {Icon && (
-              <Icon
-                className={'h-6 w-6 xl:h-10 xl:w-10'}
-                height={20}
-                strokeWidth={2}
-                width={20}
-              />
-            )}
-          </div>
-          <div
-            className={`timeline-end timeline-box font-mono ${additionalClasses.time || ''} ${additionalClasses.all || ''}`}
-          >
-            {formatTime(timestamp!, dateFnOptions)}
-          </div>
-          <hr className={additionalClasses.line || 'bg-primary'} />
-        </li>
-      ))}
+      {timelineItems.map(
+        ({ additionalClasses, Icon, label, timestamp, suffix }, i) => (
+          <li key={`timeline-item-${i}`}>
+            <hr className={`${additionalClasses.line || 'bg-primary'}`} />
+            <div
+              className={`timeline-start w-24 text-xl md:w-16 lg:w-24 xl:w-32 xl:text-2xl ${additionalClasses.label || ''} ${additionalClasses.all || ''}`}
+            >
+              {label}
+            </div>
+            <div
+              className={`timeline-middle rounded-full border-1 p-1.5 ${additionalClasses.icon || ''} ${additionalClasses.all || ''}`}
+            >
+              {Icon && (
+                <Icon
+                  className={'h-6 w-6 xl:h-10 xl:w-10'}
+                  height={20}
+                  strokeWidth={2}
+                  width={20}
+                />
+              )}
+            </div>
+            <div
+              className={`timeline-end timeline-box font-mono ${additionalClasses.time || ''} ${additionalClasses.all || ''}`}
+            >
+              {formatTime(timestamp!, dateFnOptions)}
+              <br />
+              {suffix}
+            </div>
+            <hr className={additionalClasses.line || 'bg-primary'} />
+          </li>
+        ),
+      )}
     </ul>
   )
 }
