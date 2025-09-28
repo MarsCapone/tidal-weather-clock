@@ -92,7 +92,6 @@ function MoreSuggestionsDialog({
   dialogId,
   activityScores,
 }: MoreSuggestionsDialogProps) {
-  console.log(activityScores)
   return (
     <dialog className={'modal'} id={dialogId}>
       <div className="modal-box max-h-4xl max-w-3/4">
