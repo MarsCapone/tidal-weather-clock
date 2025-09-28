@@ -176,8 +176,6 @@ export async function getBestActivitiesForDatacontext(
       ? await getAllActivities()
       : await getActivitiesByUserId(userId)
 
-  console.log('currentActivities', { currentActivities })
-
   const activityScores = (
     await Promise.all(
       currentActivities.map(({ id, version }) => {

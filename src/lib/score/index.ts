@@ -18,7 +18,7 @@ import { calcMean } from '@/lib/utils/math'
 import { eachHourOfInterval, endOfDay, formatISO, startOfDay } from 'date-fns'
 
 type GetScoreParams = {
-  dataContext: DataContext
+  dataContext: DataContext & { id: number }
   activity: TActivity
 }
 
@@ -72,10 +72,14 @@ export async function getScores({
       if (wind === undefined || weather === undefined) {
         logger.warn('Not enough data to build timeslot', {
           hour: h,
-          wind: dataContext.windData.points.map(({ timestamp }) => timestamp),
-          weather: dataContext.weatherData.points.map(
-            ({ timestamp }) => timestamp,
-          ),
+          windProblem: wind === undefined,
+          weatherProblem: weather === undefined,
+          activity: {
+            name: activity.name,
+            id: activity.id,
+            version: activity.version,
+          },
+          dataContextId: dataContext.id,
         })
         return null
       }
@@ -139,7 +143,7 @@ export async function getScores({
 
   await uploadDebugData(
     'activityScore',
-    `activity_score_calculation-${activity.id}@v${activity.version}.json`,
+    `activity_score_calculation-dc${dataContext.id}-${activity.id}@v${activity.version}.json`,
     {
       dataContext,
       activity,

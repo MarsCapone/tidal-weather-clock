@@ -13,7 +13,7 @@ import {
 import { activityScoresTable } from '@/lib/db/schemas/activity'
 import { getScores } from '@/lib/score'
 import { utcDateStringToUtc } from '@/lib/utils/dates'
-import { addDays } from 'date-fns'
+import { addDays, formatISO } from 'date-fns'
 import { sql } from 'drizzle-orm'
 
 function cartesianProduct<A, B>(a: A[], b: B[]): [A, B][] {
@@ -122,8 +122,14 @@ export async function doRefresh({
     'Inserted all scores for all activities, data contexts and users',
     {
       count: allActivityScoreValues.length,
+      dataContextCount: dataContextWrappers.length,
+      dataContextActivityPairs: dataContextActivityPairs.length,
       averageScoresPerActivity:
         allActivityScoreValues.length / dataContextActivityPairs.length,
+      interval: {
+        start: formatISO(startDate),
+        end: formatISO(endDate),
+      },
     },
   )
 

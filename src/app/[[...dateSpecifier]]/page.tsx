@@ -77,6 +77,9 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
   } = (await getDataContextByDate(initialDate, CONSTANTS.LOCATION_COORDS)) || {}
 
   const dateIsInThePast = isBefore(initialDate, startOfToday(dateOptions))
+  if (dateIsInThePast) {
+    console.log('date is in the past')
+  }
 
   async function getActivityScoresWithThreshhold(scoreThreshold: number) {
     return dataContextId !== undefined
@@ -90,6 +93,10 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
 
   const defaultThreshold = 0.5
 
+  console.log('looking for scores', {
+    dataContextId,
+    userId,
+  })
   // ordered by decreasing priority - the highest priority is the most important!
   // this makes it easier to display the controls for it
   const activityScores = (
@@ -108,6 +115,11 @@ async function PageContent({ initialDate }: { initialDate: TZDate }) {
   }
 
   const filteredActivityScores = activityScores.filter(scoreFilter)
+
+  console.log('found activity scores', {
+    activities: filteredActivityScores,
+    preFiltered: activityScores,
+  })
 
   const refreshData = async (currentPath: string) => {
     'use server'
