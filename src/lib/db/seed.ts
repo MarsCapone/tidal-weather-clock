@@ -27,23 +27,48 @@ const defaultConstraints: Record<string, Constraint> = {
     maxHoursAfter: 1.5,
     maxHoursBefore: 1.5,
   },
+  clearSkies: {
+    type: 'weather',
+    maxPrecipitationProbability: 10,
+    maxCloudCover: 10,
+  },
 }
 
 const addActivities = async () => {
-  const activities: Omit<TActivity, 'id' | 'scope'>[] = [
+  const activities: Omit<TActivity, 'id' | 'scope' | 'version'>[] = [
     {
       name: 'Paddle Boarding (inland)',
       description: 'Head into the creek, and back',
       constraints: [
-        defaultConstraints.highTide,
+        {
+          ...defaultConstraints.highTide,
+          maxHoursAfter: 0,
+          type: 'tide',
+        },
         defaultConstraints.daylight,
+        defaultConstraints.clearSkies,
         {
           type: 'wind',
           maxSpeed: 2.5,
         },
       ],
-      priority: 5,
+      priority: 8,
       ignoreOoh: false,
+    },
+    {
+      name: 'Blue Boat to the Island',
+      description: 'Find a friend and take the blue boat to the island.',
+      priority: 7,
+      ignoreOoh: false,
+      constraints: [
+        defaultConstraints.highTide,
+        defaultConstraints.daylight,
+        defaultConstraints.clearSkies,
+        {
+          type: 'wind',
+          maxSpeed: 7.7,
+        },
+      ],
     },
     {
       name: 'Ferry to Island',
@@ -51,13 +76,14 @@ const addActivities = async () => {
       constraints: [
         defaultConstraints.daylight,
         defaultConstraints.highTide,
+        defaultConstraints.clearSkies,
         {
           type: 'day',
           isWeekday: true,
           isWeekend: false,
         },
       ],
-      priority: 5,
+      priority: 3,
       ignoreOoh: false,
     },
     {
@@ -105,6 +131,7 @@ const addActivities = async () => {
       ...a,
       id: kebabCase(a.name.toLowerCase()),
       scope: 'global',
+      version: 0,
     })),
     null,
   )
