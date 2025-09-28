@@ -27,7 +27,6 @@ export default function ActivitySettingsForm({
   activities,
   setActivitiesAction,
 }: ActivitySettingsFormProps) {
-  const [zodErrors, setZodErrors] = useState<z.ZodError | null>(null)
   const defaultValues = {
     // when items are saved, they are converted to the correct unit, but we need to represent them
     // in the display unit first
@@ -61,12 +60,7 @@ export default function ActivitySettingsForm({
     defaultValues,
     resolver: zodResolver(InputActivities),
   })
-  const {
-    reset,
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = methods
+  const { reset, control, handleSubmit } = methods
 
   const { fields, remove, prepend } = useFieldArray({
     control,
@@ -76,8 +70,7 @@ export default function ActivitySettingsForm({
   const onSubmit = (data: TInputActivities) => {
     const result = InputActivities.safeParse(data)
     if (!result.success) {
-      setZodErrors(result.error)
-      logger.error('zod validation failed', { zodErrors })
+      logger.error('zod validation failed', { zodErrors: result.error })
     } else {
       logger.warn('saving zod activities', {
         data: InputActivities.safeParse(data),
@@ -87,8 +80,6 @@ export default function ActivitySettingsForm({
     }
   }
 
-  const hasErrors = Object.keys(errors).length !== 0
-
   return (
     <div>
       <FormProvider {...methods}>
@@ -96,19 +87,6 @@ export default function ActivitySettingsForm({
           <div className="bg-base-100 mb-4 flex flex-row items-center justify-between">
             <div>
               <SettingTitle title={'Activity Settings'} />
-              <div className="text-md px-4">
-                You cannot edit global activities
-                {hasErrors && (
-                  <div className="text-error text-xs italic">
-                    Please fix the errors below
-                    {zodErrors && (
-                      <pre>
-                        {JSON.stringify(z.treeifyError(zodErrors), null, 2)}
-                      </pre>
-                    )}
-                  </div>
-                )}
-              </div>
             </div>
             <div className="flex flex-col gap-2 md:flex-row">
               <SettingButton
@@ -124,6 +102,7 @@ export default function ActivitySettingsForm({
                     scope: 'user',
                     constraints: [],
                     ignoreOoh: false,
+                    version: 0,
                   })
                 }
               >
@@ -138,15 +117,6 @@ export default function ActivitySettingsForm({
               </SettingButton>
             </div>
           </div>
-          {hasErrors && !zodErrors && (
-            <pre
-              className={
-                'text-error rounded-box bg-base-200 m-4 max-h-48 overflow-y-scroll p-2 font-mono text-xs'
-              }
-            >
-              {JSON.stringify(errors.activities, null, 2)}
-            </pre>
-          )}
           <ActivityArray fields={fields} removeByIndex={remove} />
         </form>
       </FormProvider>

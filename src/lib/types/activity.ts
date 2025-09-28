@@ -2,7 +2,8 @@ import { TideType } from '@/lib/types/context'
 import * as z from 'zod'
 
 const optionalNumber = z.preprocess((val) => {
-  if (val === null || val === undefined || val === '') {
+  // @ts-expect-error something wrong with isNaN here
+  if (val === null || val === undefined || val === '' || isNaN(val)) {
     return undefined
   }
   return val
@@ -14,7 +15,7 @@ export const WindConstraint = z.object({
   maxGustSpeed: optionalNumber, // m/s
   maxSpeed: optionalNumber, // m/s
   minSpeed: optionalNumber, // m/s
-  preferredDirections: z.array(z.coerce.number()).nullish(),
+  preferredDirections: z.array(z.coerce.number()).optional(),
   type: z.literal('wind'),
 })
 
@@ -32,7 +33,7 @@ export const WeatherConstraint = z.object({
 export type TWeatherConstraint = z.output<typeof WeatherConstraint>
 
 export const TideConstraint = z.object({
-  eventType: TideType.nullish(),
+  eventType: TideType.optional(),
   maxHeight: optionalNumber,
   minHeight: optionalNumber,
   maxHoursAfter: optionalNumber,
@@ -45,8 +46,8 @@ export type TTideConstraint = z.output<typeof TideConstraint>
 export const SunConstraint = z.object({
   maxHoursBeforeSunset: optionalNumber,
   minHoursAfterSunrise: optionalNumber,
-  requiresDarkness: z.boolean().nullish(),
-  requiresDaylight: z.boolean().nullish(),
+  requiresDarkness: z.boolean().optional(),
+  requiresDaylight: z.boolean().optional(),
   type: z.literal('sun'),
 })
 
@@ -94,7 +95,7 @@ export const Activity = z.object({
   name: z.string(),
   priority: z.coerce.number().min(1).max(10).default(1),
   scope: z.literal('global').or(z.literal('user')),
-  version: z.coerce.number().nullish(),
+  version: z.number(),
   ignoreOoh: z.boolean(),
 })
 

@@ -16,49 +16,27 @@ export async function getActivitiesByUserId(userId: string | null) {
 
   const activityResponses: TActivity[] = (
     await db
-      .selectDistinctOn([activityTable.id], {
-        id: activityTable.id,
-        version: activityTable.version,
-        name: activityTable.name,
-        description: activityTable.description,
-        priority: activityTable.priority,
-        content: activityTable.content,
-        scope: sql<
-          'global' | 'user'
-        >`CASE WHEN ${activityTable.user_id} IS NULL THEN 'global' ELSE 'user' END`,
-        ignore_ooh: activityTable.ignore_ooh,
-      })
+      .selectDistinctOn([activityTable.id])
       .from(activityTable)
       .where(where)
-      .groupBy(
-        activityTable.id,
-        activityTable.name,
-        activityTable.description,
-        activityTable.priority,
-        activityTable.version,
-      )
-      .orderBy(
-        asc(activityTable.id),
-        desc(activityTable.version),
-        desc(activityTable.created_at),
-      )
+      .orderBy(asc(activityTable.id), desc(activityTable.version))
   ).map(
     ({
       id,
       name,
       description,
       priority,
-      scope,
       content,
       version,
+      user_id,
       ignore_ooh,
     }) => ({
       id,
       name,
       description,
       priority,
-      scope,
       version,
+      scope: user_id === null ? 'global' : 'user',
       constraints: content['constraints'] || [],
       ignoreOoh: ignore_ooh,
     }),
@@ -157,19 +135,6 @@ export async function setActivities(activities: TActivity[], userId: string) {
       version: activityTable.version,
     })
   logger.debug('deleted activities', { userId, deletedActivities })
-  await Promise.all(
-    deletedActivities.map(({ id, version }) =>
-      db
-        .delete(activityScoresTable)
-        .where(
-          and(
-            eq(activityScoresTable.activity_id, id),
-            eq(activityScoresTable.activity_version, version),
-          ),
-        ),
-    ),
-  )
-  logger.debug('deleted activity scores', { userId, deletedActivities })
   await putActivities(activities, userId)
 }
 
@@ -178,7 +143,7 @@ export type ActivityScore = {
   description: string
   priority: number
   ignoreOoh: boolean
-  user_id: string
+  userId: string
   score: number
   timestamp: string
   debug: {
@@ -206,59 +171,46 @@ export async function getBestActivitiesForDatacontext(
   const limitFuture = options?.futureOnly ?? false
   const lookbackHours = `'${String(options?.lookbackHours ?? 0)}'`
 
-  const results = await db
-    .selectDistinctOn([activityTable.id, activityScoresTable.timestamp])
-    .from(activityScoresTable)
-    .innerJoin(
-      activityTable,
-      and(
-        eq(activityScoresTable.activity_id, activityTable.id),
-        eq(activityScoresTable.activity_version, activityTable.version),
-      ),
-    )
-    .where(
-      and(
-        eq(activityScoresTable.datacontext_id, dataContextId),
-        gte(activityScoresTable.score, options?.scoreThreshold ?? 0.5),
-        sql`CASE WHEN ${limitFuture} THEN (${activityScoresTable.timestamp}::timestamp) > (now() - INTERVAL ${sql.raw(lookbackHours)} hour) ELSE true END`,
-        userId === null
-          ? isNull(activityTable.user_id)
-          : eq(activityTable.user_id, userId),
-      ),
-    )
-    .orderBy(
-      asc(activityTable.id),
-      desc(activityScoresTable.timestamp),
-      desc(activityTable.version),
-      desc(activityTable.created_at),
-    )
+  const currentActivities =
+    userId === null
+      ? await getAllActivities()
+      : await getActivitiesByUserId(userId)
 
-  return results.map(
-    ({
-      activity: {
-        name,
-        description,
-        user_id,
-        version,
-        id,
-        priority,
-        ignore_ooh,
-      },
-      activity_score: { score, timestamp, debug, datacontext_id },
-    }) => {
-      return {
-        name,
-        description,
-        priority,
-        ignoreOoh: ignore_ooh,
-        user_id,
-        score,
-        timestamp,
-        debug,
-        activityId: id,
-        activityVersion: version,
-        dataContextId: datacontext_id,
-      } as ActivityScore
-    },
-  )
+  console.log('currentActivities', { currentActivities })
+
+  const activityScores = (
+    await Promise.all(
+      currentActivities.map(({ id, version }) => {
+        return db
+          .select()
+          .from(activityScoresTable)
+          .where(
+            and(
+              eq(activityScoresTable.activity_id, id),
+              eq(activityScoresTable.activity_version, version),
+              sql`CASE WHEN ${limitFuture} THEN (${activityScoresTable.timestamp}::timestamp) > (now() - INTERVAL ${sql.raw(lookbackHours)} hour) ELSE true END`,
+              eq(activityScoresTable.datacontext_id, dataContextId),
+            ),
+          )
+      }),
+    )
+  ).flatMap((scores, index) => {
+    const { name, description, version, id, priority, ignoreOoh } =
+      currentActivities[index]
+    return scores.map(({ score, timestamp, debug }) => ({
+      name,
+      description,
+      priority,
+      ignoreOoh,
+      userId,
+      score,
+      timestamp,
+      debug,
+      activityId: id,
+      activityVersion: version,
+      dataContextId,
+    }))
+  })
+
+  return activityScores as ActivityScore[]
 }
